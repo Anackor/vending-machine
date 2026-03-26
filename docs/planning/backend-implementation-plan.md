@@ -7,7 +7,16 @@ The plan has been split into atomic phase documents so each implementation step 
 ## Planning structure
 
 - `docs/planning/ai-phase-index.md`: AI-oriented index with the recommended loading strategy
-- `docs/planning/phases/phase-0-platform-bootstrap.md`
+- `docs/planning/phases/phase-0/README.md`
+- `docs/planning/phases/phase-0/block-a-runtime-and-tooling.md`
+- `docs/planning/phases/phase-0/block-b-docker-workspace.md`
+- `docs/planning/phases/phase-0/block-c-symfony-bootstrap.md`
+- `docs/planning/phases/phase-0/block-d-architecture-and-namespace.md`
+- `docs/planning/phases/phase-0/block-e-ddd-naming.md`
+- `docs/planning/phases/phase-0/block-f-mongodb-foundation.md`
+- `docs/planning/phases/phase-0/block-g-quality-toolchain.md`
+- `docs/planning/phases/phase-0/block-h-developer-workflow.md`
+- `docs/planning/phases/phase-0/block-i-final-phase-gate.md`
 - `docs/planning/phases/phase-1-domain-design-and-core-model.md`
 - `docs/planning/phases/phase-2-application-layer-and-ports.md`
 - `docs/planning/phases/phase-3-infrastructure-and-persistence.md`
@@ -36,6 +45,12 @@ Before executing any phase, the minimum common context should be:
 - the root `README.md`
 - `docs/challenges/backend/README.md`
 - the target phase document
+
+For Phase 0 specifically:
+
+- always load `docs/planning/phases/phase-0/README.md`
+- load only the block file you are actively executing
+- load previous Phase 0 block files only when their decisions or outputs are required
 
 Additional documents should only be loaded when the phase explicitly depends on them.
 

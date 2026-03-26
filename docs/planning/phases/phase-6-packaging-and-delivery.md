@@ -14,7 +14,7 @@ Finalize the repository so it is easy for reviewers to run, validate, and assess
 
 - `README.md`
 - `docs/challenges/backend/README.md`
-- `docs/planning/phases/phase-0-platform-bootstrap.md`
+- `docs/planning/phases/phase-0/README.md`
 - `docs/planning/phases/phase-4-initial-interface.md`
 - `docs/planning/phases/phase-5-test-hardening-and-quality-gates.md`
 
