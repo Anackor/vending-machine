@@ -102,7 +102,7 @@ Load previous block files only if:
 
 - file: `docs/planning/phases/phase-0/block-e-ddd-naming.md`
 - task ids: `P0-045` to `P0-052`
-- status: pending
+- status: complete
 - outputs: bounded-context naming, module naming, class naming conventions
 
 ### F. MongoDB foundation
