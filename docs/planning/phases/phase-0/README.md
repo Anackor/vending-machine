@@ -95,7 +95,7 @@ Load previous block files only if:
 
 - file: `docs/planning/phases/phase-0/block-d-architecture-and-namespace.md`
 - task ids: `P0-035` to `P0-044`
-- status: pending
+- status: complete
 - outputs: namespace layout, source tree boundaries, initial dependency rules
 
 ### E. DDD naming baseline
