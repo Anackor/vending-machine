@@ -116,7 +116,7 @@ Load previous block files only if:
 
 - file: `docs/planning/phases/phase-0/block-g-quality-toolchain.md`
 - task ids: `P0-063` to `P0-078`
-- status: pending
+- status: complete
 - outputs: PHPStan, deptrac, Rector, and ECS executable from the local environment
 
 ### H. Developer workflow and documentation
