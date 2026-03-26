@@ -23,8 +23,8 @@ Define the controlled entry points, scripts, and contributor-facing instructions
 - [ ] P0-087: document the standard environment shutdown flow
 - [ ] P0-088: document the first-run bootstrap flow for a clean machine
 - [ ] P0-089: document the minimum local prerequisites for contributors, including GNU Make
-- [ ] P0-090: document where architecture rules and quality commands live
-- [ ] P0-091: validate the documented workflow from the perspective of a new developer with no hidden steps
+- [ ] P0-090: document where architecture rules, naming conventions, AI/developer guidance, and quality commands live
+- [ ] P0-091: validate the documented workflow and guidance from the perspective of a new developer with no hidden steps
 
 ## Output contract
 
@@ -32,7 +32,7 @@ The block is expected to leave behind:
 
 - a preferred local entry point based on `Makefile`
 - documented startup, shutdown, and first-run flows
-- clear contributor prerequisites and command mapping
+- clear contributor prerequisites, command mapping, and location of non-automated conventions
 
 ## Exit condition
 
