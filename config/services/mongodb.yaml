@@ -1,0 +1,9 @@
+services:
+    MongoDB\Client:
+        arguments:
+            - '%env(resolve:MONGODB_URI)%'
+
+    MongoDB\Database:
+        factory: ['@MongoDB\Client', 'selectDatabase']
+        arguments:
+            - '%env(resolve:MONGODB_DATABASE)%'
