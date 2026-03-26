@@ -124,7 +124,7 @@ Load previous block files only if:
 - file: `docs/planning/phases/phase-0/block-h-developer-workflow.md`
 - task ids: `P0-079` to `P0-091`
 - status: pending
-- outputs: Composer scripts, Makefile strategy, contributor-facing runbook
+- outputs: Composer scripts, Makefile strategy, contributor-facing runbook, conventions guidance
 
 ### I. Final phase gate
 
