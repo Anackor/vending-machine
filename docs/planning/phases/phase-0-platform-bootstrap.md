@@ -13,6 +13,7 @@ Create the engineering foundation that allows backend development to start immed
 - DDD-oriented project structure
 - SOLID-driven design constraints
 - PHPStan, deptrac, Rector, and ECS
+- Makefile-based command entry point for recurring local operations
 - repeatable local developer workflow
 
 ## Inputs
@@ -36,16 +37,27 @@ Each block below is intended to be executed and reviewed independently. Do not s
 
 ### A. Runtime and tooling decisions
 
-- [ ] P0-001: identify the latest stable Symfony release that will be the project target
-- [ ] P0-002: identify the minimum PHP version supported by that Symfony release
-- [ ] P0-003: select the exact PHP image tag for local development
-- [ ] P0-004: select the exact MongoDB image tag for local development
-- [ ] P0-005: list the PHP extensions required by the Symfony baseline
-- [ ] P0-006: list the PHP extensions required by the chosen MongoDB integration
-- [ ] P0-007: decide whether Composer is executed only inside Docker or also from the host
-- [ ] P0-008: decide whether Symfony CLI is required locally or if `bin/console` inside Docker is enough
-- [ ] P0-009: decide whether production-oriented Docker files are intentionally postponed to a later phase
-- [ ] P0-010: record the selected versions and bootstrap decisions in committed documentation
+- [x] P0-001: target Symfony `8.0.x`; as of 2026-03-26 the latest stable release is `8.0.7`
+- [x] P0-002: use PHP `8.4` because Symfony `8.0` requires PHP `8.4.0` or higher
+- [x] P0-003: use `php:8.4-cli-bookworm` as the local application base image for Phase 0
+- [x] P0-004: use `mongo:8.0.19-noble` as the local MongoDB image for Phase 0
+- [x] P0-005: require the Symfony baseline extensions `ctype`, `iconv`, `json`, `pcre`, `session`, `simplexml`, and `tokenizer`; include `intl`, `mbstring`, `opcache`, and `zip` as project-level development essentials
+- [x] P0-006: require the `mongodb` PHP extension for the selected MongoDB integration direction
+- [x] P0-007: run Composer inside Docker only; do not require host-level Composer
+- [x] P0-008: do not require Symfony CLI locally; standardize on `bin/console` inside the application container
+- [x] P0-009: postpone production-oriented Docker files and image hardening to Phase 6 unless a later phase creates an earlier delivery need
+- [x] P0-010: record the selected versions and bootstrap decisions in committed documentation
+
+Frozen decisions for Block A on 2026-03-26:
+
+- Symfony target: `8.0.*`
+- PHP runtime target: `8.4`
+- PHP application image: `php:8.4-cli-bookworm`
+- MongoDB image: `mongo:8.0.19-noble`
+- Composer strategy: install and run Composer inside the application container only
+- Symfony CLI strategy: not required locally for Phase 0
+- Docker delivery strategy: one development-oriented Docker path now; production-oriented Docker work later
+- Workflow direction: adopt a `Makefile` in Block H as the preferred entry point for recurring local commands
 
 Block exit condition: runtime versions, extension list, and local-tooling strategy are frozen.
 
@@ -55,7 +67,7 @@ Block exit condition: runtime versions, extension list, and local-tooling strate
 - [ ] P0-012: create the PHP application Dockerfile with the selected PHP version
 - [ ] P0-013: install the required system packages in the application image
 - [ ] P0-014: install and enable the required PHP extensions in the application image
-- [ ] P0-015: install Composer in the application image or define the official Composer image strategy
+- [ ] P0-015: install Composer in the application image
 - [ ] P0-016: define the container working directory used by the application service
 - [ ] P0-017: create `docker-compose.yml` with an application service
 - [ ] P0-018: add a MongoDB service to `docker-compose.yml`
@@ -153,24 +165,25 @@ Block exit condition: every agreed quality tool is executable and already protec
 - [ ] P0-080: define the Composer script for linting and style checks
 - [ ] P0-081: define the Composer script for static analysis
 - [ ] P0-082: define the Composer script for tests or reserve the placeholder that later phases will fill
-- [ ] P0-083: decide whether a `Makefile` adds value on top of Composer scripts and Docker commands
-- [ ] P0-084: if a `Makefile` is used, add the first developer-facing commands
-- [ ] P0-085: document the standard environment startup flow
-- [ ] P0-086: document the standard environment shutdown flow
-- [ ] P0-087: document the first-run bootstrap flow for a clean machine
-- [ ] P0-088: document the minimum local prerequisites for contributors
-- [ ] P0-089: document where architecture rules and quality commands live
-- [ ] P0-090: validate the documented workflow from the perspective of a new developer with no hidden steps
+- [ ] P0-083: adopt a `Makefile` as the preferred controlled entry point for recurring local commands
+- [ ] P0-084: implement the first `Makefile` targets for bootstrap, environment control, console access, lint, analysis, and tests
+- [ ] P0-085: document the `Makefile` usage and the command mapping it abstracts
+- [ ] P0-086: document the standard environment startup flow
+- [ ] P0-087: document the standard environment shutdown flow
+- [ ] P0-088: document the first-run bootstrap flow for a clean machine
+- [ ] P0-089: document the minimum local prerequisites for contributors, including GNU Make
+- [ ] P0-090: document where architecture rules and quality commands live
+- [ ] P0-091: validate the documented workflow from the perspective of a new developer with no hidden steps
 
 Block exit condition: a reviewer can reach a working local platform by following the committed documentation only.
 
 ### I. Final phase gate
 
-- [ ] P0-091: run the full documented bootstrap flow from scratch
-- [ ] P0-092: run the full documented quality flow from scratch
-- [ ] P0-093: re-run the MongoDB smoke check after the quality setup is in place
-- [ ] P0-094: verify the source tree still respects the intended dependency direction
-- [ ] P0-095: confirm that Phase 1 can start without reopening platform, tooling, or directory-layout decisions
+- [ ] P0-092: run the full documented bootstrap flow from scratch
+- [ ] P0-093: run the full documented quality flow from scratch
+- [ ] P0-094: re-run the MongoDB smoke check after the quality setup is in place
+- [ ] P0-095: verify the source tree still respects the intended dependency direction
+- [ ] P0-096: confirm that Phase 1 can start without reopening platform, tooling, or directory-layout decisions
 
 ## Validations
 
@@ -214,6 +227,7 @@ Block exit condition: a reviewer can reach a working local platform by following
 ### Workflow validation
 
 - the project can be started with documented commands only
+- the preferred `Makefile` commands are documented and runnable
 - the lint and analysis workflow is documented and runnable
 - a new developer can reach a working local environment without hidden steps
 
@@ -223,6 +237,7 @@ Block exit condition: a reviewer can reach a working local platform by following
 - Docker environment for the application and MongoDB
 - initial Hexagonal and DDD-oriented project structure
 - configured PHPStan, deptrac, Rector, and ECS
+- Makefile-based local command entry point
 - documented local developer workflow
 
 ## Exit criteria
