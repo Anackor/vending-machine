@@ -63,20 +63,31 @@ Block exit condition: runtime versions, extension list, and local-tooling strate
 
 ### B. Docker workspace bootstrap
 
-- [ ] P0-011: create the Docker asset directory structure for the application image
-- [ ] P0-012: create the PHP application Dockerfile with the selected PHP version
-- [ ] P0-013: install the required system packages in the application image
-- [ ] P0-014: install and enable the required PHP extensions in the application image
-- [ ] P0-015: install Composer in the application image
-- [ ] P0-016: define the container working directory used by the application service
-- [ ] P0-017: create `docker-compose.yml` with an application service
-- [ ] P0-018: add a MongoDB service to `docker-compose.yml`
-- [ ] P0-019: define the shared network used by the application and database services
-- [ ] P0-020: define the source-code bind mount for local development
-- [ ] P0-021: define the MongoDB data volume for persistent local data
-- [ ] P0-022: decide whether a separate Composer cache volume is needed for developer speed
-- [ ] P0-023: define the default startup command for the application container
-- [ ] P0-024: start the Docker environment and confirm both services reach a healthy running state
+- [x] P0-011: create the Docker asset directory structure for the application image
+- [x] P0-012: create the PHP application Dockerfile with the selected PHP version
+- [x] P0-013: install the required system packages in the application image
+- [x] P0-014: install and enable the required PHP extensions in the application image
+- [x] P0-015: install Composer in the application image
+- [x] P0-016: define the container working directory used by the application service
+- [x] P0-017: create `docker-compose.yml` with an application service
+- [x] P0-018: add a MongoDB service to `docker-compose.yml`
+- [x] P0-019: define the shared network used by the application and database services
+- [x] P0-020: define the source-code bind mount for local development
+- [x] P0-021: define the MongoDB data volume for persistent local data
+- [x] P0-022: decide whether a separate Composer cache volume is needed for developer speed
+- [x] P0-023: define the default startup command for the application container
+- [x] P0-024: start the Docker environment and confirm both services reach a healthy running state
+
+Block B implementation notes:
+
+- Docker assets live under `docker/php/` with a dedicated PHP config override in `docker/php/conf.d/app.ini`
+- the application container is built from `php:8.4-cli-bookworm` and includes Composer plus the required Phase 0 extensions
+- the application service uses `/app` as its working directory and keeps the container alive with `sleep infinity` for console-driven development
+- the repository root is bind-mounted into `/app`
+- MongoDB state is stored in the named volume `mongo-data`
+- Composer cache is stored in the named volume `composer-cache`
+- both services share the `platform` bridge network
+- the stack was validated on 2026-03-26 with healthy `app` and `mongo` containers, PHP extension checks, app-to-Mongo TCP connectivity, and bind-mount visibility
 
 Block exit condition: `docker compose up` boots the app and MongoDB reliably from a clean clone.
 
