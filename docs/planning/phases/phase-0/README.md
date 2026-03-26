@@ -109,7 +109,7 @@ Load previous block files only if:
 
 - file: `docs/planning/phases/phase-0/block-f-mongodb-foundation.md`
 - task ids: `P0-053` to `P0-062`
-- status: pending
+- status: complete
 - outputs: MongoDB integration direction, connection config, persistence baseline
 
 ### G. Quality toolchain bootstrap
