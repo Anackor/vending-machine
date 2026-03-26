@@ -1,0 +1,49 @@
+services:
+  app:
+    build:
+      context: .
+      dockerfile: docker/php/Dockerfile
+    working_dir: /app
+    command: ["sleep", "infinity"]
+    depends_on:
+      mongo:
+        condition: service_healthy
+    environment:
+      APP_ENV: dev
+      COMPOSER_ALLOW_SUPERUSER: 1
+      COMPOSER_CACHE_DIR: /tmp/composer-cache
+    healthcheck:
+      test: ["CMD", "php", "-v"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+    stdin_open: true
+    tty: true
+    volumes:
+      - ./:/app
+      - composer-cache:/tmp/composer-cache
+    networks:
+      - platform
+
+  mongo:
+    image: mongo:8.0.19-noble
+    healthcheck:
+      test: ["CMD", "mongosh", "--quiet", "--eval", "db.adminCommand({ ping: 1 })"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    restart: unless-stopped
+    volumes:
+      - mongo-data:/data/db
+    networks:
+      - platform
+
+networks:
+  platform:
+    driver: bridge
+
+volumes:
+  composer-cache:
+  mongo-data:
