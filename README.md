@@ -40,4 +40,4 @@ The exercise explicitly points toward:
 
 ## Repository status
 
-At the moment this repository contains the project brief and the backend implementation plan. The next step is to bootstrap the PHP project structure and start with the vending machine domain model.
+The repository now includes the planning documents, the Docker-based local environment, and the initial Symfony skeleton. The next step is to freeze the core architecture and start implementing the vending machine domain model.
