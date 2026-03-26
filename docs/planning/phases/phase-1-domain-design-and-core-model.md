@@ -16,7 +16,7 @@ Design and implement the vending machine domain model and its business rules ind
 
 - `README.md`
 - `docs/challenges/backend/README.md`
-- `docs/planning/phases/phase-0-platform-bootstrap.md`
+- `docs/planning/phases/phase-0/README.md`
 
 ## Tasks
 

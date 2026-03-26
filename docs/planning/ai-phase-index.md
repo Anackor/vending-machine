@@ -21,9 +21,23 @@ Load previous phase documents only if:
 
 ### Phase 0
 
-- file: `docs/planning/phases/phase-0-platform-bootstrap.md`
+- file: `docs/planning/phases/phase-0/README.md`
+- block files:
+  - `docs/planning/phases/phase-0/block-a-runtime-and-tooling.md`
+  - `docs/planning/phases/phase-0/block-b-docker-workspace.md`
+  - `docs/planning/phases/phase-0/block-c-symfony-bootstrap.md`
+  - `docs/planning/phases/phase-0/block-d-architecture-and-namespace.md`
+  - `docs/planning/phases/phase-0/block-e-ddd-naming.md`
+  - `docs/planning/phases/phase-0/block-f-mongodb-foundation.md`
+  - `docs/planning/phases/phase-0/block-g-quality-toolchain.md`
+  - `docs/planning/phases/phase-0/block-h-developer-workflow.md`
+  - `docs/planning/phases/phase-0/block-i-final-phase-gate.md`
 - purpose: bootstrap Symfony, Docker, MongoDB, architecture boundaries, and quality tooling
 - depends on: challenge brief only
+- loading rule:
+  - always load `docs/planning/phases/phase-0/README.md`
+  - load only the block file you are actively executing
+  - load previous Phase 0 block files only when their frozen decisions or validated outputs are required
 - main outputs:
   - Docker local environment
   - Symfony project skeleton
@@ -105,7 +119,8 @@ Load previous phase documents only if:
 Load:
 
 - common context
-- Phase 0
+- `docs/planning/phases/phase-0/README.md`
+- the relevant `docs/planning/phases/phase-0/block-*.md` file
 
 ### Domain implementation work
 
@@ -160,3 +175,8 @@ Load:
 ## Rule for future updates
 
 If a new task only affects one phase, update only that phase document and keep the other phase files untouched unless a dependency contract changes.
+
+For Phase 0 specifically:
+
+- update the relevant block file first
+- update `docs/planning/phases/phase-0/README.md` only if block status, outputs, or loading guidance change
