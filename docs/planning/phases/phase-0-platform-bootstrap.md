@@ -20,64 +20,157 @@ Create the engineering foundation that allows backend development to start immed
 - `README.md`
 - `docs/challenges/backend/README.md`
 
-## Tasks
+## Recommended execution order
 
-### Stack baseline
+1. freeze runtime and tooling decisions
+2. bootstrap Docker and Symfony
+3. freeze architecture and naming conventions
+4. prepare MongoDB connectivity
+5. install and wire the quality toolchain
+6. document the developer workflow
+7. run the full phase gate from scratch
 
-- choose the PHP version compatible with the latest stable Symfony version
-- choose the MongoDB image version
-- define required PHP extensions
-- define the Composer and Symfony CLI strategy for local development
+Each block below is intended to be executed and reviewed independently. Do not start the next block until the current block exit condition is satisfied.
 
-### Docker environment
+## Atomic task backlog
 
-- create the application container
-- create the MongoDB container
-- define networking between services
-- define mounted volumes for development
-- decide whether separate development and production Docker files are needed now or later
+### A. Runtime and tooling decisions
 
-### Symfony bootstrap
+- [ ] P0-001: identify the latest stable Symfony release that will be the project target
+- [ ] P0-002: identify the minimum PHP version supported by that Symfony release
+- [ ] P0-003: select the exact PHP image tag for local development
+- [ ] P0-004: select the exact MongoDB image tag for local development
+- [ ] P0-005: list the PHP extensions required by the Symfony baseline
+- [ ] P0-006: list the PHP extensions required by the chosen MongoDB integration
+- [ ] P0-007: decide whether Composer is executed only inside Docker or also from the host
+- [ ] P0-008: decide whether Symfony CLI is required locally or if `bin/console` inside Docker is enough
+- [ ] P0-009: decide whether production-oriented Docker files are intentionally postponed to a later phase
+- [ ] P0-010: record the selected versions and bootstrap decisions in committed documentation
 
-- initialize the project with the latest stable Symfony version
-- configure local environment variables
-- ensure Symfony commands can run inside the container
-- prepare the initial source and configuration layout
+Block exit condition: runtime versions, extension list, and local-tooling strategy are frozen.
 
-### Architecture foundation
+### B. Docker workspace bootstrap
 
-- define domain, application, and infrastructure boundaries
-- make framework code depend on the core, not the reverse
-- define where Symfony adapters live
-- document the first dependency rules
+- [ ] P0-011: create the Docker asset directory structure for the application image
+- [ ] P0-012: create the PHP application Dockerfile with the selected PHP version
+- [ ] P0-013: install the required system packages in the application image
+- [ ] P0-014: install and enable the required PHP extensions in the application image
+- [ ] P0-015: install Composer in the application image or define the official Composer image strategy
+- [ ] P0-016: define the container working directory used by the application service
+- [ ] P0-017: create `docker-compose.yml` with an application service
+- [ ] P0-018: add a MongoDB service to `docker-compose.yml`
+- [ ] P0-019: define the shared network used by the application and database services
+- [ ] P0-020: define the source-code bind mount for local development
+- [ ] P0-021: define the MongoDB data volume for persistent local data
+- [ ] P0-022: decide whether a separate Composer cache volume is needed for developer speed
+- [ ] P0-023: define the default startup command for the application container
+- [ ] P0-024: start the Docker environment and confirm both services reach a healthy running state
 
-### DDD structure
+Block exit condition: `docker compose up` boots the app and MongoDB reliably from a clean clone.
 
-- define the bounded context naming
-- define the first module structure for the vending machine domain
-- define naming conventions for aggregates, value objects, repositories, domain services, and application services
+### C. Symfony project bootstrap
 
-### MongoDB foundation
+- [ ] P0-025: initialize the repository as a Symfony project on the selected stable version
+- [ ] P0-026: commit or document the exact bootstrap command needed to recreate the Symfony skeleton
+- [ ] P0-027: verify `composer.json`, `composer.lock`, and Symfony baseline files are present
+- [ ] P0-028: configure `.env` defaults needed for containerized local execution
+- [ ] P0-029: define the strategy for local overrides in `.env.local` without committing secrets
+- [ ] P0-030: ensure `var/` and cache directories are writable inside the container
+- [ ] P0-031: run a basic Symfony console command inside the application container
+- [ ] P0-032: run a basic bootstrap check to confirm the Symfony kernel starts without errors
+- [ ] P0-033: confirm that source-code changes are visible immediately through the bind mount
+- [ ] P0-034: decide whether the first runnable interface is the built-in server, PHP-FPM, or console-only for this phase
 
-- choose the Symfony-compatible MongoDB integration approach
-- define the database connection configuration
-- decide how machine state and inventory state will be stored
-- create the first persistence structure aligned with ports and adapters
+Block exit condition: Symfony boots successfully inside Docker and can be operated with documented commands only.
 
-### Quality toolchain
+### D. Architecture and namespace baseline
 
-- install PHPStan
-- install deptrac
-- install Rector
-- install ECS
-- define the first executable rules and configs
+- [ ] P0-035: choose the bounded context name for the vending machine core
+- [ ] P0-036: choose whether shared cross-context primitives live in `Shared`, `Common`, or an equivalent namespace
+- [ ] P0-037: define the top-level source directories for domain, application, and infrastructure code
+- [ ] P0-038: define the location for Symfony-specific adapters
+- [ ] P0-039: define the location for persistence-specific adapters
+- [ ] P0-040: configure Composer autoloading for the selected namespaces
+- [ ] P0-041: create the initial directory skeleton that expresses the chosen Hexagonal Architecture
+- [ ] P0-042: add placeholder files when needed so the intended directory layout is visible in Git
+- [ ] P0-043: write the first dependency direction rules in documentation
+- [ ] P0-044: confirm that the planned structure allows framework code to depend on the core, not the reverse
 
-### Developer workflow
+Block exit condition: the source tree shows the intended architecture before any business code is added.
 
-- define Composer scripts for setup, test, lint, and analysis
-- define the standard boot and shutdown flow for the environment
-- decide whether a `Makefile` improves the workflow
-- document the minimum local prerequisites
+### E. DDD naming baseline
+
+- [ ] P0-045: choose the first module name inside the vending machine bounded context
+- [ ] P0-046: define naming conventions for aggregates
+- [ ] P0-047: define naming conventions for entities
+- [ ] P0-048: define naming conventions for value objects
+- [ ] P0-049: define naming conventions for repositories and repository interfaces
+- [ ] P0-050: define naming conventions for domain services
+- [ ] P0-051: define naming conventions for application services or use-case handlers
+- [ ] P0-052: record the naming conventions in a short architecture note or README section
+
+Block exit condition: future phases can add classes without reopening naming and module-structure debates.
+
+### F. MongoDB foundation
+
+- [ ] P0-053: choose the Symfony-compatible MongoDB integration approach
+- [ ] P0-054: add the PHP driver or library packages required by that approach
+- [ ] P0-055: add the Symfony bundle or configuration package required by that approach, if any
+- [ ] P0-056: define environment variables for MongoDB host, port, database, and credentials strategy
+- [ ] P0-057: create the initial MongoDB-related Symfony configuration files
+- [ ] P0-058: decide the first persistence boundary for machine state and inventory state
+- [ ] P0-059: define where persistence mappers, documents, or collections will live in the infrastructure layer
+- [ ] P0-060: add a minimal connectivity check that proves the application can reach MongoDB from inside Docker
+- [ ] P0-061: add a minimal smoke path that writes and reads a trivial document without introducing domain coupling
+- [ ] P0-062: confirm the chosen persistence direction will not force Symfony or MongoDB concerns into the domain layer
+
+Block exit condition: MongoDB connectivity and a trivial round-trip work inside the local environment.
+
+### G. Quality toolchain bootstrap
+
+- [ ] P0-063: add PHPStan as a development dependency
+- [ ] P0-064: add deptrac as a development dependency
+- [ ] P0-065: add Rector as a development dependency
+- [ ] P0-066: add ECS as a development dependency
+- [ ] P0-067: create the initial PHPStan configuration file
+- [ ] P0-068: set the first PHPStan level and analysed paths
+- [ ] P0-069: create the initial deptrac configuration file
+- [ ] P0-070: encode the first architecture layers and forbidden dependency rules in deptrac
+- [ ] P0-071: create the initial Rector configuration file
+- [ ] P0-072: select the first Rector rule sets that are safe for the project baseline
+- [ ] P0-073: create the initial ECS configuration file
+- [ ] P0-074: select the first coding-standard sets to enforce
+- [ ] P0-075: run PHPStan successfully against the current codebase
+- [ ] P0-076: run deptrac successfully against the current codebase
+- [ ] P0-077: run Rector in dry-run mode successfully
+- [ ] P0-078: run ECS in check mode successfully
+
+Block exit condition: every agreed quality tool is executable and already protects the empty or near-empty baseline.
+
+### H. Developer workflow and documentation
+
+- [ ] P0-079: define the Composer script for project setup
+- [ ] P0-080: define the Composer script for linting and style checks
+- [ ] P0-081: define the Composer script for static analysis
+- [ ] P0-082: define the Composer script for tests or reserve the placeholder that later phases will fill
+- [ ] P0-083: decide whether a `Makefile` adds value on top of Composer scripts and Docker commands
+- [ ] P0-084: if a `Makefile` is used, add the first developer-facing commands
+- [ ] P0-085: document the standard environment startup flow
+- [ ] P0-086: document the standard environment shutdown flow
+- [ ] P0-087: document the first-run bootstrap flow for a clean machine
+- [ ] P0-088: document the minimum local prerequisites for contributors
+- [ ] P0-089: document where architecture rules and quality commands live
+- [ ] P0-090: validate the documented workflow from the perspective of a new developer with no hidden steps
+
+Block exit condition: a reviewer can reach a working local platform by following the committed documentation only.
+
+### I. Final phase gate
+
+- [ ] P0-091: run the full documented bootstrap flow from scratch
+- [ ] P0-092: run the full documented quality flow from scratch
+- [ ] P0-093: re-run the MongoDB smoke check after the quality setup is in place
+- [ ] P0-094: verify the source tree still respects the intended dependency direction
+- [ ] P0-095: confirm that Phase 1 can start without reopening platform, tooling, or directory-layout decisions
 
 ## Validations
 
