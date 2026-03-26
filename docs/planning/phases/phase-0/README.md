@@ -88,7 +88,7 @@ Load previous block files only if:
 
 - file: `docs/planning/phases/phase-0/block-c-symfony-bootstrap.md`
 - task ids: `P0-025` to `P0-034`
-- status: pending
+- status: complete
 - outputs: Symfony skeleton, environment defaults, runnable console baseline
 
 ### D. Architecture and namespace baseline
