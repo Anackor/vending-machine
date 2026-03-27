@@ -52,6 +52,27 @@
             "cache:clear": "symfony-cmd",
             "assets:install %PUBLIC_DIR%": "symfony-cmd"
         },
+        "project:setup": [
+            "@php bin/console cache:clear --no-warmup",
+            "@php bin/console about",
+            "@php bin/console app:mongodb:smoke"
+        ],
+        "lint": [
+            "@lint:ecs"
+        ],
+        "lint:ecs": "@php vendor/bin/ecs check --config=ecs.php",
+        "analyse": [
+            "@analyse:phpstan",
+            "@analyse:deptrac",
+            "@analyse:rector"
+        ],
+        "analyse:phpstan": "@php vendor/bin/phpstan analyse --configuration=phpstan.neon.dist",
+        "analyse:deptrac": "@php vendor/bin/deptrac analyse --config-file=deptrac.yaml",
+        "analyse:rector": "@php vendor/bin/rector process --dry-run --config=rector.php",
+        "test": [
+            "@test:placeholder"
+        ],
+        "test:placeholder": "@php -r \"fwrite(STDOUT, 'No automated tests are configured yet; Phase 1 and Phase 5 will define them.' . PHP_EOL);\"",
         "post-install-cmd": [
             "@auto-scripts"
         ],
