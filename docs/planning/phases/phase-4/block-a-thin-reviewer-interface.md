@@ -34,21 +34,74 @@ What Phase 4 should avoid:
 
 ## Tasks
 
-- [ ] P4-001: freeze the initial interface mode as one minimal Symfony HTTP JSON layer
-- [ ] P4-002: define the exact endpoint surface for machine state and the main mutation flows
-- [ ] P4-003: define the request payload for inserting a coin
-- [ ] P4-004: define the request payload for selecting a product
-- [ ] P4-005: define the request payload for returning inserted money
-- [ ] P4-006: define the request payload for servicing the machine stock and available change
-- [ ] P4-007: define the response shape for machine state snapshots
-- [ ] P4-008: define the response shape for successful mutation outcomes, including vended product and returned change
-- [ ] P4-009: define the transport mapping for application failures and their HTTP status codes
-- [ ] P4-010: implement the thin Symfony controller or action layer without business logic
-- [ ] P4-011: wire the controllers to Phase 2 handlers and query services only
-- [ ] P4-012: expose the persisted machine state through a reviewer-friendly read endpoint
-- [ ] P4-013: expose the main challenge actions through mutation endpoints backed by real persistence
-- [ ] P4-014: document representative request and response flows in reviewer-facing documentation
-- [ ] P4-015: validate the end-to-end interface path with tests, quality checks, and real example executions
+- [x] P4-001: freeze the initial interface mode as one minimal Symfony HTTP JSON layer
+- [x] P4-002: define the exact endpoint surface for machine state and the main mutation flows
+- [x] P4-003: define the request payload for inserting a coin
+- [x] P4-004: define the request payload for selecting a product
+- [x] P4-005: define the request payload for returning inserted money
+- [x] P4-006: define the request payload for servicing the machine stock and available change
+- [x] P4-007: define the response shape for machine state snapshots
+- [x] P4-008: define the response shape for successful mutation outcomes, including vended product and returned change
+- [x] P4-009: define the transport mapping for application failures and their HTTP status codes
+- [x] P4-010: implement the thin Symfony controller or action layer without business logic
+- [x] P4-011: wire the controllers to Phase 2 handlers and query services only
+- [x] P4-012: expose the persisted machine state through a reviewer-friendly read endpoint
+- [x] P4-013: expose the main challenge actions through mutation endpoints backed by real persistence
+- [x] P4-014: document representative request and response flows in reviewer-facing documentation
+- [x] P4-015: validate the end-to-end interface path with tests, quality checks, and real example executions
+
+## Implemented interface surface
+
+Phase 4 now exposes one thin HTTP JSON layer under `/api/machine`:
+
+- `GET /api/machine`
+- `POST /api/machine/insert-coin`
+- `POST /api/machine/select-product`
+- `POST /api/machine/return-coin`
+- `POST /api/machine/service`
+
+The transport shape stays deliberately small:
+
+- successful reads return `machine`
+- successful mutations return `event` plus `machine`
+- failures return `error` with `code`, `message`, and `context`
+
+HTTP failure mapping is now explicit:
+
+- `400`: invalid request payloads, unsupported coin, invalid service configuration
+- `404`: machine not found, product not found
+- `409`: insufficient balance, exact change unavailable, product out of stock, pending balance during service
+
+## Implementation notes
+
+The Symfony-facing adapter stays thin and depends only on the application
+handlers and contracts.
+
+The main infrastructure pieces are:
+
+- `Controller/Api/MachineController.php`
+- `Controller/Api/MachineJsonRequestFactory.php`
+- `Controller/Api/MachineJsonResponseFactory.php`
+
+To keep the reviewer path usable from a clean environment, setup now also
+seeds the default machine if it does not exist yet through:
+
+- `Command/SeedDefaultMachineCommand.php`
+- `composer run project:setup`
+
+This preserves the application contracts while avoiding hidden manual setup for
+reviewers.
+
+## Validation snapshot
+
+Validated during Phase 4 completion:
+
+- `make bootstrap`
+- `docker compose exec -T app php bin/console debug:router`
+- `make test`
+- `make quality`
+- `make coverage`
+- real HTTP requests against `localhost:8000`
 
 ## Output contract
 

@@ -34,7 +34,7 @@
         </include>
 
         <exclude>
-            <directory>src/VendingMachine/Infrastructure/Symfony</directory>
+            <directory>src/VendingMachine/Infrastructure/Symfony/Command</directory>
             <directory>src/VendingMachine/Domain/Machine/Exception</directory>
             <file>src/Kernel.php</file>
         </exclude>
