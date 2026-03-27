@@ -149,4 +149,12 @@ final class CoinStateTest extends TestCase
 
         AvailableChange::fromCounts([25 => 1])->remove(InsertedCoins::fromCounts([25 => 2])->toCoinInventory());
     }
+
+    public function testItKeepsRemainingCoinCountsAfterSubtraction(): void
+    {
+        $remainingChange = AvailableChange::fromCounts([25 => 2])
+            ->remove(InsertedCoins::fromCounts([25 => 1])->toCoinInventory());
+
+        self::assertSame([25 => 1], $remainingChange->counts());
+    }
 }
