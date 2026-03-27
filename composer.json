@@ -67,5 +67,11 @@
             "allow-contrib": false,
             "require": "8.0.*"
         }
+    },
+    "require-dev": {
+        "deptrac/deptrac": "^4.6",
+        "phpstan/phpstan": "^2.1",
+        "rector/rector": "^2.3",
+        "symplify/easy-coding-standard": "^13.0"
     }
 }
