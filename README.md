@@ -28,6 +28,8 @@ The first delivery is backend-only and should focus on:
 
 - `docs/challenges/backend/README.md`: backend challenge brief, extracted requirements, assumptions, and design guidance
 - `docs/planning/backend-implementation-plan.md`: implementation roadmap for the backend
+- `docs/development/conventions.md`: project conventions, class placement rules, and tool responsibilities
+- `docs/development/ai-development-guide.md`: short development guide for future AI-assisted changes
 
 ## Delivery expectations
 
@@ -40,4 +42,63 @@ The exercise explicitly points toward:
 
 ## Repository status
 
-The repository now includes the planning documents, the Docker-based local environment, and the initial Symfony skeleton. The next step is to freeze the core architecture and start implementing the vending machine domain model.
+The repository now includes the Dockerized Symfony baseline, MongoDB foundation, quality toolchain, and the documented developer workflow for Phase 0. The next step is to pass the final Phase 0 gate and start implementing the vending machine domain model.
+
+## Local prerequisites
+
+- Docker Desktop with Docker Compose support
+- GNU Make
+- a terminal capable of running `docker compose` and `make`
+
+Local PHP, Composer, Symfony CLI, and MongoDB installations are not required.
+
+## First run
+
+The preferred bootstrap flow is:
+
+```bash
+make bootstrap
+```
+
+This command:
+
+- builds the application image
+- starts the Docker environment
+- installs Composer dependencies inside the `app` container
+- runs the Phase 0 setup checks
+
+## Daily workflow
+
+Common commands:
+
+- `make up`
+- `make down`
+- `make status`
+- `make shell`
+- `make console cmd="about"`
+- `make mongodb-smoke`
+- `make lint`
+- `make analyse`
+- `make quality`
+- `make test`
+
+## Command mapping
+
+The `Makefile` is the preferred local entry point.
+
+It wraps the main containerized commands:
+
+- `make install` -> `docker compose exec -T app composer install`
+- `make setup` -> `docker compose exec -T app composer run project:setup`
+- `make lint` -> `docker compose exec -T app composer run lint`
+- `make analyse` -> `docker compose exec -T app composer run analyse`
+- `make test` -> `docker compose exec -T app composer run test`
+- `make console cmd="..."` -> `docker compose exec -T app php bin/console ...`
+
+## Development docs
+
+When changing the core or adding a feature, start here:
+
+- `docs/development/conventions.md`
+- `docs/development/ai-development-guide.md`
+- `src/VendingMachine/README.md`

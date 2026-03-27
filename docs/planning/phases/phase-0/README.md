@@ -123,8 +123,8 @@ Load previous block files only if:
 
 - file: `docs/planning/phases/phase-0/block-h-developer-workflow.md`
 - task ids: `P0-079` to `P0-091`
-- status: pending
-- outputs: Composer scripts, Makefile strategy, contributor-facing runbook, conventions guidance
+- status: complete
+- outputs: Composer scripts, Makefile strategy, contributor-facing runbook, conventions guidance, AI development guide
 
 ### I. Final phase gate
 
@@ -177,6 +177,7 @@ Load previous block files only if:
 - the project can be started with documented commands only
 - the preferred `Makefile` commands are documented and runnable
 - the lint and analysis workflow is documented and runnable
+- the documented bootstrap, quality, and test entry points run successfully
 - a new developer can reach a working local environment without hidden steps
 
 ## Deliverables

@@ -70,5 +70,5 @@ The backend MVP is done when:
 
 - add a public HTTP API on top of the same application layer
 - add more advanced logging and metrics
-- add CI automation for the full quality toolchain
+- extend CI beyond pull-request quality checks if needed
 - add deployment-oriented Docker optimizations
