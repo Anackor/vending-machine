@@ -50,7 +50,20 @@ final class MachineJsonResponseFactoryTest extends TestCase
         $event = $this->objectPayload($payload, 'event');
 
         self::assertSame('coin_inserted', $event['type']);
-        self::assertSame(25, $event['coinCents']);
+        self::assertSame(0.25, $event['coins']);
+    }
+
+    public function testItBuildsTheInsertCoinResponseWithWholeCoinValues(): void
+    {
+        $response = $this->responseFactory->insertCoin(
+            new InsertCoinCommand(100),
+            new InsertCoinResult(MachineSnapshotMother::create(insertedBalanceCents: 100, insertedCoins: [100 => 1])),
+        );
+        $payload = $this->payload($response->getContent());
+        $event = $this->objectPayload($payload, 'event');
+
+        self::assertSame('coin_inserted', $event['type']);
+        self::assertSame(1, $event['coins']);
     }
 
     public function testItBuildsTheSelectProductResponse(): void
@@ -121,7 +134,7 @@ final class MachineJsonResponseFactoryTest extends TestCase
     public function testItBuildsInvalidRequestResponses(): void
     {
         $response = $this->responseFactory->invalidRequest(
-            new InvalidArgumentException('Field "coinCents" must be an integer.'),
+            new InvalidArgumentException('Field "coins" must be numeric.'),
         );
         $payload = $this->payload($response->getContent());
         $error = $this->objectPayload($payload, 'error');

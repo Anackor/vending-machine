@@ -31,11 +31,90 @@ final class MachineJsonRequestFactoryTest extends TestCase
     public function testItCreatesAnInsertCoinCommandFromJson(): void
     {
         $command = $this->requestFactory->createInsertCoinCommand(
+            $this->jsonRequest(['coins' => 0.25]),
+        );
+
+        self::assertSame(25, $command->coinCents());
+        self::assertSame('default', $command->machineId());
+    }
+
+    public function testItStillCreatesAnInsertCoinCommandFromCoinCentsJson(): void
+    {
+        $command = $this->requestFactory->createInsertCoinCommand(
             $this->jsonRequest(['coinCents' => 25]),
         );
 
         self::assertSame(25, $command->coinCents());
         self::assertSame('default', $command->machineId());
+    }
+
+    public function testItAcceptsTheDocumentedDecimalCoinValues(): void
+    {
+        $command = $this->requestFactory->createInsertCoinCommand(
+            $this->jsonRequest(['coins' => 0.1]),
+        );
+
+        self::assertSame(10, $command->coinCents());
+    }
+
+    public function testItAcceptsTheSmallestDocumentedDecimalCoinValue(): void
+    {
+        $command = $this->requestFactory->createInsertCoinCommand(
+            $this->jsonRequest(['coins' => 0.05]),
+        );
+
+        self::assertSame(5, $command->coinCents());
+    }
+
+    public function testItAcceptsNumericStringCoins(): void
+    {
+        $command = $this->requestFactory->createInsertCoinCommand(
+            $this->jsonRequest(['coins' => ' 0.25 ']),
+        );
+
+        self::assertSame(25, $command->coinCents());
+    }
+
+    public function testItAcceptsWholeCoinNumericStringValues(): void
+    {
+        $command = $this->requestFactory->createInsertCoinCommand(
+            $this->jsonRequest(['coins' => '1.00']),
+        );
+
+        self::assertSame(100, $command->coinCents());
+    }
+
+    public function testItAcceptsOtherDocumentedNumericStringCoinValues(): void
+    {
+        $nickelCommand = $this->requestFactory->createInsertCoinCommand(
+            $this->jsonRequest(['coins' => '0.05']),
+        );
+        $dimeCommand = $this->requestFactory->createInsertCoinCommand(
+            $this->jsonRequest(['coins' => '0.10']),
+        );
+
+        self::assertSame(5, $nickelCommand->coinCents());
+        self::assertSame(10, $dimeCommand->coinCents());
+    }
+
+    public function testItRejectsUnsupportedFractionalCoinAmounts(): void
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Field "coins" must be one of 0.05, 0.10, 0.25, or 1.');
+
+        $this->requestFactory->createInsertCoinCommand(
+            $this->jsonRequest(['coins' => 0.249]),
+        );
+    }
+
+    public function testItRejectsUnsupportedNumericStringCoinAmounts(): void
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Field "coins" must be one of 0.05, 0.10, 0.25, or 1.');
+
+        $this->requestFactory->createInsertCoinCommand(
+            $this->jsonRequest(['coins' => '0.249']),
+        );
     }
 
     public function testItCreatesASelectProductCommandFromJson(): void
@@ -101,7 +180,7 @@ final class MachineJsonRequestFactoryTest extends TestCase
     public function testItRejectsMissingRequiredFields(): void
     {
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Field "coinCents" is required.');
+        $this->expectExceptionMessage('Field "coins" or "coinCents" is required.');
 
         $this->requestFactory->createInsertCoinCommand(
             Request::create(
@@ -146,7 +225,7 @@ final class MachineJsonRequestFactoryTest extends TestCase
     public function testItRejectsEmptyJsonBodiesForInsertCoin(): void
     {
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Field "coinCents" is required.');
+        $this->expectExceptionMessage('Field "coins" or "coinCents" is required.');
 
         $this->requestFactory->createInsertCoinCommand(
             Request::create(
@@ -158,7 +237,27 @@ final class MachineJsonRequestFactoryTest extends TestCase
         );
     }
 
-    public function testItRejectsNonIntegerCoinFields(): void
+    public function testItRejectsNonNumericCoinsFields(): void
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Field "coins" must be numeric.');
+
+        $this->requestFactory->createInsertCoinCommand(
+            $this->jsonRequest(['coins' => 'quarter']),
+        );
+    }
+
+    public function testItRejectsNonScalarCoinsFields(): void
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Field "coins" must be numeric.');
+
+        $this->requestFactory->createInsertCoinCommand(
+            $this->jsonRequest(['coins' => ['quarter']]),
+        );
+    }
+
+    public function testItRejectsNonIntegerCoinCentsFields(): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Field "coinCents" must be an integer.');
@@ -214,7 +313,7 @@ final class MachineJsonRequestFactoryTest extends TestCase
                 '/api/machine',
                 'POST',
                 server: ['CONTENT_TYPE' => 'application/json'],
-                content: '{"coinCents":',
+                content: '{"coins":',
             ),
         );
     }
