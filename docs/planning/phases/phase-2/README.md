@@ -81,7 +81,7 @@ Load Phase 0 block files only if:
 
 - file: `docs/planning/phases/phase-2/block-a-use-cases-and-boundaries.md`
 - task ids: `P2-001` to `P2-008`
-- status: pending
+- status: complete
 - outputs: application use-case map, handler boundaries, machine identity direction, dependency rules
 
 ### B. Application contracts
