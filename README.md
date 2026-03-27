@@ -51,8 +51,8 @@ mapping strategy, and persistence integration tests. Phase 4 is now complete,
 so the project also exposes a thin reviewer-facing HTTP JSON interface on top
 of the persisted application layer. Phase 5 is now complete as well, so the
 local safety net is explicit and pull requests run the agreed GitHub Actions
-quality baseline. The next step is Phase 6, where packaging and reviewer
-handoff can be finalized.
+quality baseline. Phase 6 is now complete as well, so the repository is ready
+for reviewer handoff with one documented Docker execution path.
 
 ## Local prerequisites
 
@@ -76,7 +76,7 @@ This command:
 - starts the Docker environment
 - installs Composer dependencies inside the `app` container
 - runs the setup checks
-- seeds the default machine if it does not exist yet
+- resets the default machine to the documented reviewer baseline
 
 After `make bootstrap`, the reviewer-facing HTTP interface is available at:
 
@@ -85,8 +85,8 @@ http://localhost:8000
 ```
 
 No extra local database setup is required for reviewers. The bootstrap flow
-already creates the local environment and seeds the default machine if it is
-missing.
+already creates the local environment and resets the default machine to the
+documented baseline.
 
 ## Daily workflow
 
@@ -101,6 +101,7 @@ Common commands:
 - `make lint`
 - `make analyse`
 - `make quality`
+- `make review`
 - `make test`
 - `make test-unit`
 - `make test-integration`
@@ -128,6 +129,23 @@ It wraps the main containerized commands:
 - `make ecs-fix` -> `docker compose exec -T app composer run lint:ecs:fix`
 - `make console cmd="..."` -> `docker compose exec -T app php bin/console ...`
 
+## Final delivery path
+
+The development Docker workflow is also the delivery workflow for reviewers.
+
+The intended handoff path is:
+
+1. `make bootstrap`
+2. `make review`
+3. exercise the HTTP API on `http://localhost:8000`
+
+This keeps the delivery simple:
+
+- no local PHP installation is required
+- no local Composer installation is required
+- no local MongoDB installation is required
+- no hidden seed or setup steps are required
+
 ## Pull request CI
 
 Pull requests now run the GitHub Actions workflow:
@@ -153,6 +171,17 @@ Local-to-CI command parity:
 MongoDB-backed integration tests remain outside this first PR workflow on
 purpose. They are still part of the local safety net through `make test` and
 can be run directly with `make test-integration`.
+
+## Challenge alignment snapshot
+
+The current delivery covers the expected challenge behaviors:
+
+- accepted coins: `5`, `10`, `25`, and `100` cents
+- products: `water` (`65`), `juice` (`100`), and `soda` (`150`)
+- supported flows: insert coin, select product, return coin, and service
+- persisted state: available items, available change, and inserted money
+- automated checks: unit tests, integration tests, static analysis, formatting,
+  architecture checks, and pull-request CI
 
 ## Reviewer validation guide
 
@@ -225,9 +254,7 @@ The seeded default machine uses the selectors `water`, `juice`, and `soda`.
 To validate the automated checks as part of the review:
 
 ```bash
-make test
-make quality
-make coverage
+make review
 ```
 
 ## Test suite split
@@ -240,6 +267,11 @@ The project now exposes two explicit test entry points:
 
 The default `make test` command runs both suites sequentially because it is the
 main local safety-net command.
+
+`make review` is the preferred final delivery check because it runs:
+
+- `make quality`
+- `make coverage`
 
 ## Coverage threshold
 
