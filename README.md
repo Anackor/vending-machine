@@ -88,6 +88,8 @@ Common commands:
 - `make test`
 - `make coverage`
 - `make coverage-html`
+- `make rector-fix`
+- `make ecs-fix`
 
 ## Command mapping
 
@@ -102,6 +104,8 @@ It wraps the main containerized commands:
 - `make test` -> `docker compose exec -T app composer run test`
 - `make coverage` -> `docker compose exec -T app composer run test:coverage`
 - `make coverage-html` -> `docker compose exec -T app composer run test:coverage:html`
+- `make rector-fix` -> `docker compose exec -T app composer run analyse:rector:fix`
+- `make ecs-fix` -> `docker compose exec -T app composer run lint:ecs:fix`
 - `make console cmd="..."` -> `docker compose exec -T app php bin/console ...`
 
 ## Development docs

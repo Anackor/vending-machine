@@ -8,7 +8,7 @@ APP_EXEC_INTERACTIVE := $(DOCKER_COMPOSE) exec $(APP_SERVICE)
 COMPOSER := $(APP_EXEC) composer
 CONSOLE := $(APP_EXEC) php bin/console
 
-.PHONY: help bootstrap build up down restart status install setup shell composer console lint analyse quality test coverage coverage-html phpstan deptrac rector ecs mongodb-smoke
+.PHONY: help bootstrap build up down restart status install setup shell composer console lint analyse quality test coverage coverage-html phpstan deptrac rector rector-fix ecs ecs-fix mongodb-smoke
 
 # Show the available local workflow targets.
 help:
@@ -33,7 +33,9 @@ help:
 	@echo   phpstan        Run PHPStan
 	@echo   deptrac        Run Deptrac
 	@echo   rector         Run Rector in dry-run mode
+	@echo   rector-fix     Run Rector and apply automatic refactors
 	@echo   ecs            Run ECS in check mode
+	@echo   ecs-fix        Run ECS and apply automatic fixes
 	@echo   mongodb-smoke  Run the MongoDB smoke command
 
 # Build the image, start the stack, install dependencies, and run setup checks.
@@ -113,9 +115,17 @@ deptrac:
 rector:
 	$(COMPOSER) run analyse:rector
 
+# Run Rector and apply automatic refactors directly.
+rector-fix:
+	$(COMPOSER) run analyse:rector:fix
+
 # Run ECS in check mode directly.
 ecs:
 	$(COMPOSER) run lint:ecs
+
+# Run ECS and apply automatic fixes directly.
+ecs-fix:
+	$(COMPOSER) run lint:ecs:fix
 
 # Run the MongoDB smoke command directly.
 mongodb-smoke:

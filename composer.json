@@ -61,6 +61,7 @@
             "@lint:ecs"
         ],
         "lint:ecs": "@php vendor/bin/ecs check --config=ecs.php",
+        "lint:ecs:fix": "@php vendor/bin/ecs check --config=ecs.php --fix",
         "analyse": [
             "@analyse:phpstan",
             "@analyse:deptrac",
@@ -69,6 +70,7 @@
         "analyse:phpstan": "@php vendor/bin/phpstan analyse --configuration=phpstan.neon.dist",
         "analyse:deptrac": "@php vendor/bin/deptrac analyse --config-file=deptrac.yaml",
         "analyse:rector": "@php vendor/bin/rector process --dry-run --config=rector.php",
+        "analyse:rector:fix": "@php vendor/bin/rector process --config=rector.php",
         "test": [
             "@test:unit"
         ],
