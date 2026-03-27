@@ -68,10 +68,19 @@ Load previous phase documents only if:
 
 ### Phase 2
 
-- file: `docs/planning/phases/phase-2-application-layer-and-ports.md`
+- file: `docs/planning/phases/phase-2/README.md`
+- block files:
+  - `docs/planning/phases/phase-2/block-a-use-cases-and-boundaries.md`
+  - `docs/planning/phases/phase-2/block-b-application-contracts.md`
+  - `docs/planning/phases/phase-2/block-c-handlers-and-ports.md`
+  - `docs/planning/phases/phase-2/block-d-application-tests-and-phase-gate.md`
 - purpose: implement use cases and persistence-facing ports
 - depends on:
   - Phase 1 outputs
+- loading rule:
+  - always load `docs/planning/phases/phase-2/README.md`
+  - load only the block file you are actively executing
+  - load previous Phase 2 block files only when their contracts or validated outputs are required
 - main outputs:
   - application services
   - ports
@@ -149,7 +158,8 @@ Load:
 Load:
 
 - common context
-- Phase 2
+- `docs/planning/phases/phase-2/README.md`
+- the relevant `docs/planning/phases/phase-2/block-*.md` file
 - Phase 1 if domain contracts are needed
 
 ### MongoDB or repository work

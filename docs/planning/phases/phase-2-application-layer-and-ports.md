@@ -1,44 +1,13 @@
 # Phase 2: Application Layer and Ports
 
-## Objective
+This file is kept as a compatibility pointer.
 
-Expose the domain model through use cases and ports so infrastructure can depend on stable contracts instead of coupling directly to business objects.
+The canonical Phase 2 planning documents now live in:
 
-## Scope
+- `docs/planning/phases/phase-2/README.md`
+- `docs/planning/phases/phase-2/block-a-use-cases-and-boundaries.md`
+- `docs/planning/phases/phase-2/block-b-application-contracts.md`
+- `docs/planning/phases/phase-2/block-c-handlers-and-ports.md`
+- `docs/planning/phases/phase-2/block-d-application-tests-and-phase-gate.md`
 
-- application services or command handlers
-- input and output models
-- persistence-facing ports
-- clear separation between domain failures and infrastructure concerns
-
-## Inputs
-
-- `README.md`
-- `docs/challenges/backend/README.md`
-- `docs/planning/phases/phase-1-domain-design-and-core-model.md`
-
-## Tasks
-
-- define use cases for inserting coins, refunding, selecting products, and servicing the machine
-- define stable input models for each use case
-- define stable output or result models for each use case
-- define repository ports needed by the application layer
-- define error translation boundaries between domain and infrastructure
-- keep orchestration logic in the application layer when it does not belong in the domain
-
-## Validations
-
-- use cases can orchestrate the domain without infrastructure details
-- ports are sufficient for persistence and adapters
-- outputs are stable enough for future interfaces
-- business failures remain understandable outside the domain layer
-
-## Deliverables
-
-- application services
-- repository and infrastructure-facing ports
-- stable input and output contracts
-
-## Exit criteria
-
-This phase is complete when upper layers can invoke business behavior through application contracts without direct knowledge of internal domain implementation details.
+Use `docs/planning/phases/phase-2/README.md` as the source of truth.
