@@ -111,13 +111,20 @@ Load previous phase documents only if:
 
 ### Phase 4
 
-- file: `docs/planning/phases/phase-4-initial-interface.md`
+- file: `docs/planning/phases/phase-4/README.md`
+- block files:
+  - `docs/planning/phases/phase-4/block-a-thin-reviewer-interface.md`
 - purpose: expose the backend through a thin Symfony-driven interface
 - depends on:
   - Phase 2 outputs
   - Phase 3 outputs
+- loading rule:
+  - always load `docs/planning/phases/phase-4/README.md`
+  - load only `docs/planning/phases/phase-4/block-a-thin-reviewer-interface.md`
+  - load Phase 3 only when persistence-backed behavior must be checked
+  - load Phase 2 only when handler contracts or application failures must be checked
 - main outputs:
-  - console or minimal HTTP interface
+  - thin reviewer-facing interface
   - documented usage examples
 
 ### Phase 5
@@ -187,7 +194,8 @@ Load:
 Load:
 
 - common context
-- Phase 4
+- `docs/planning/phases/phase-4/README.md`
+- `docs/planning/phases/phase-4/block-a-thin-reviewer-interface.md`
 - Phase 2 for use cases
 - Phase 3 if persistence-backed flows are exercised
 
