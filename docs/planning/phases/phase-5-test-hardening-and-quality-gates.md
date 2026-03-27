@@ -18,8 +18,8 @@ Strengthen behavioral confidence and architectural protection after the main fea
 
 - `README.md`
 - `docs/challenges/backend/README.md`
-- `docs/planning/phases/phase-1-domain-design-and-core-model.md`
-- `docs/planning/phases/phase-3-infrastructure-and-persistence.md`
+- `docs/planning/phases/phase-1/README.md`
+- `docs/planning/phases/phase-3/README.md`
 - `docs/planning/phases/phase-4-initial-interface.md`
 
 ## Tasks

@@ -27,7 +27,11 @@ The plan has been split into atomic phase documents so each implementation step 
 - `docs/planning/phases/phase-2/block-b-application-contracts.md`
 - `docs/planning/phases/phase-2/block-c-handlers-and-ports.md`
 - `docs/planning/phases/phase-2/block-d-application-tests-and-phase-gate.md`
-- `docs/planning/phases/phase-3-infrastructure-and-persistence.md`
+- `docs/planning/phases/phase-3/README.md`
+- `docs/planning/phases/phase-3/block-a-persistence-boundaries-and-document-shape.md`
+- `docs/planning/phases/phase-3/block-b-mongodb-repository-and-mapper.md`
+- `docs/planning/phases/phase-3/block-c-integration-fixtures-and-tests.md`
+- `docs/planning/phases/phase-3/block-d-persistence-phase-gate.md`
 - `docs/planning/phases/phase-4-initial-interface.md`
 - `docs/planning/phases/phase-5-test-hardening-and-quality-gates.md`
 - `docs/planning/phases/phase-6-packaging-and-delivery.md`
@@ -71,6 +75,12 @@ For Phase 2 specifically:
 - always load `docs/planning/phases/phase-2/README.md`
 - load only the block file you are actively executing
 - load previous Phase 2 block files only when their contracts or outputs are required
+
+For Phase 3 specifically:
+
+- always load `docs/planning/phases/phase-3/README.md`
+- load only the block file you are actively executing
+- load previous Phase 3 block files only when their persistence decisions or outputs are required
 
 Additional documents should only be loaded when the phase explicitly depends on them.
 

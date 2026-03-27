@@ -15,7 +15,7 @@ Expose the backend through a thin Symfony-driven interface that demonstrates the
 - `README.md`
 - `docs/challenges/backend/README.md`
 - `docs/planning/phases/phase-2/README.md`
-- `docs/planning/phases/phase-3-infrastructure-and-persistence.md`
+- `docs/planning/phases/phase-3/README.md`
 
 ## Tasks
 

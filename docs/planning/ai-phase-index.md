@@ -88,11 +88,21 @@ Load previous phase documents only if:
 
 ### Phase 3
 
-- file: `docs/planning/phases/phase-3-infrastructure-and-persistence.md`
+- file: `docs/planning/phases/phase-3/README.md`
+- block files:
+  - `docs/planning/phases/phase-3/block-a-persistence-boundaries-and-document-shape.md`
+  - `docs/planning/phases/phase-3/block-b-mongodb-repository-and-mapper.md`
+  - `docs/planning/phases/phase-3/block-c-integration-fixtures-and-tests.md`
+  - `docs/planning/phases/phase-3/block-d-persistence-phase-gate.md`
 - purpose: implement MongoDB adapters and persistence integration
 - depends on:
   - Phase 0 outputs
+  - Phase 1 outputs
   - Phase 2 ports
+- loading rule:
+  - always load `docs/planning/phases/phase-3/README.md`
+  - load only the block file you are actively executing
+  - load previous Phase 3 block files only when their persistence contracts or validated outputs are required
 - main outputs:
   - MongoDB repositories
   - persistence mapping
@@ -167,7 +177,8 @@ Load:
 Load:
 
 - common context
-- Phase 3
+- `docs/planning/phases/phase-3/README.md`
+- the relevant `docs/planning/phases/phase-3/block-*.md` file
 - Phase 2 for ports
 - Phase 1 for domain mapping rules
 
