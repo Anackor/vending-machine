@@ -88,7 +88,7 @@ Load Phase 0 block files only if:
 
 - file: `docs/planning/phases/phase-2/block-b-application-contracts.md`
 - task ids: `P2-009` to `P2-019`
-- status: pending
+- status: complete
 - outputs: command/query inputs, stable outputs, snapshot contract, application failure model
 
 ### C. Handlers and ports
