@@ -91,7 +91,7 @@ Load Phase 0 block files only if:
 
 - file: `docs/planning/phases/phase-1/block-c-core-machine-behaviors.md`
 - task ids: `P1-019` to `P1-029`
-- status: pending
+- status: complete
 - outputs: insert, select, refund, and service domain behaviors with protected invariants
 
 ### D. Domain test suite and phase gate

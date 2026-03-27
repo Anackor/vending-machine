@@ -9,6 +9,7 @@ use PHPUnit\Framework\TestCase;
 use VendingMachine\Domain\Machine\AvailableChange;
 use VendingMachine\Domain\Machine\Coin;
 use VendingMachine\Domain\Machine\InsertedCoins;
+use VendingMachine\Domain\Machine\Money;
 
 final class CoinStateTest extends TestCase
 {
@@ -39,5 +40,18 @@ final class CoinStateTest extends TestCase
         $this->expectExceptionMessage('Coin counts cannot be negative.');
 
         AvailableChange::fromCounts([25 => -1]);
+    }
+
+    public function testItAllocatesExactChangeWithoutRelyingOnAGreedyPick(): void
+    {
+        $availableChange = AvailableChange::fromCounts([
+            25 => 1,
+            10 => 3,
+        ]);
+
+        $allocatedCoins = $availableChange->allocateChange(Money::fromCents(30));
+
+        self::assertNotNull($allocatedCoins);
+        self::assertSame([10 => 3], $allocatedCoins->counts());
     }
 }
