@@ -56,7 +56,7 @@
             "@php bin/console cache:clear --no-warmup",
             "@php bin/console about",
             "@php bin/console app:mongodb:smoke",
-            "@php bin/console app:machine:seed-default"
+            "@php bin/console app:machine:seed-default --reset"
         ],
         "lint": [
             "@lint:ecs"
