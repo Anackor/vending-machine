@@ -100,6 +100,7 @@ Load previous phase documents only if:
   - stronger integration coverage
   - stricter PHPStan and deptrac gates
   - stable maintenance workflow
+  - GitHub Actions PR quality checks
 
 ### Phase 6
 

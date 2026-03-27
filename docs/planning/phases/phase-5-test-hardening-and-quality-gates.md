@@ -10,6 +10,7 @@ Strengthen behavioral confidence and architectural protection after the main fea
 - edge-case coverage
 - stronger analysis and architecture gates
 - stable maintenance workflow
+- GitHub Actions pull-request quality checks
 
 ## Inputs
 
@@ -28,6 +29,13 @@ Strengthen behavioral confidence and architectural protection after the main fea
 - validate service setup and replenishment behavior
 - tighten PHPStan and deptrac rules where useful
 - ensure Rector and ECS are part of the regular maintenance workflow
+- define GitHub Actions as the CI path for pull-request quality checks
+- add a GitHub Actions workflow triggered on pull requests
+- run ECS in the pull-request workflow
+- run Rector in dry-run mode in the pull-request workflow
+- run PHPStan in the pull-request workflow
+- run deptrac in the pull-request workflow
+- document the expected PR quality checks and their local command equivalents
 
 ## Validations
 
@@ -35,12 +43,15 @@ Strengthen behavioral confidence and architectural protection after the main fea
 - edge cases around money and change are explicitly tested
 - architecture rules are enforced by tooling
 - the regular quality workflow is easy to run and trusted by the team
+- pull requests trigger the agreed quality checks automatically
+- CI quality commands stay aligned with the documented local workflow
 
 ## Deliverables
 
 - stronger integration coverage
 - stricter static-analysis and architecture checks
 - stable quality workflow
+- GitHub Actions workflow for PR quality checks
 
 ## Exit criteria
 
