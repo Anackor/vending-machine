@@ -176,12 +176,35 @@ can be run directly with `make test-integration`.
 
 The current delivery covers the expected challenge behaviors:
 
-- accepted coins: `5`, `10`, `25`, and `100` cents
+- accepted coins at the HTTP boundary: `0.05`, `0.10`, `0.25`, and `1`
 - products: `water` (`65`), `juice` (`100`), and `soda` (`150`)
 - supported flows: insert coin, select product, return coin, and service
 - persisted state: available items, available change, and inserted money
 - automated checks: unit tests, integration tests, static analysis, formatting,
   architecture checks, and pull-request CI
+
+## Author note
+
+The application and domain layers model money in integer cents to avoid
+floating-point precision issues in balances, price comparisons, and change
+calculation.
+
+To stay aligned with the challenge wording, the HTTP adapter accepts both:
+
+- `coins`: reviewer-friendly decimal input such as `0.25` or `1`
+- `coinCents`: integer cents such as `25` or `100`
+
+`coins` is the preferred frontend-facing field. The adapter converts it to
+integer cents immediately before the value reaches the application layer.
+
+When `coins` is used, the adapter only accepts the exact challenge coin values:
+
+- `0.05`
+- `0.10`
+- `0.25`
+- `1`
+
+Values such as `0.249` are rejected instead of being rounded.
 
 ## Reviewer validation guide
 
@@ -216,12 +239,12 @@ make status
 curl http://localhost:8000/api/machine
 ```
 
-4. Insert a `100` cent coin:
+4. Insert a `1` coin:
 
 ```bash
 curl -X POST http://localhost:8000/api/machine/insert-coin \
   -H "Content-Type: application/json" \
-  -d '{"coinCents":100}'
+  -d '{"coins":1}'
 ```
 
 5. Buy a product, for example `water`:

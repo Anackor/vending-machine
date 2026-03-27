@@ -132,6 +132,16 @@ final class CoinStateTest extends TestCase
         self::assertSame([10 => 2, 25 => 1], $availableChange->counts());
     }
 
+    public function testItIgnoresZeroCoinCountsWhenNormalizingInventory(): void
+    {
+        $availableChange = AvailableChange::fromCounts([
+            5 => 0,
+            25 => 1,
+        ]);
+
+        self::assertSame([25 => 1], $availableChange->counts());
+    }
+
     public function testItRejectsCoinSubtractionsThatWouldBecomeNegative(): void
     {
         $this->expectException(InvalidArgumentException::class);
