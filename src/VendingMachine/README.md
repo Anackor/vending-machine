@@ -15,6 +15,9 @@ Do not split this into `Inventory`, `Cash`, `Catalog`, or `Transactions`
 until the model proves that a second module reduces complexity instead of
 adding it.
 
+The frozen Phase 1 domain assumptions for this module live in
+`Domain/Machine/README.md`.
+
 ## Baseline structure
 
 The current baseline for the core is:
