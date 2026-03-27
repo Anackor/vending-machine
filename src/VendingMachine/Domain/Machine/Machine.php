@@ -5,6 +5,12 @@ declare(strict_types=1);
 namespace VendingMachine\Domain\Machine;
 
 use InvalidArgumentException;
+use VendingMachine\Domain\Machine\Exception\ExactChangeNotAvailable;
+use VendingMachine\Domain\Machine\Exception\InsufficientBalance;
+use VendingMachine\Domain\Machine\Exception\InvalidServiceConfiguration;
+use VendingMachine\Domain\Machine\Exception\PendingBalanceDuringService;
+use VendingMachine\Domain\Machine\Exception\ProductNotFound;
+use VendingMachine\Domain\Machine\Exception\ProductOutOfStock;
 
 final readonly class Machine
 {
@@ -76,6 +82,107 @@ final readonly class Machine
         return !$this->insertedBalance()->isZero();
     }
 
+    public function insertCoin(Coin $coin): self
+    {
+        return new self(
+            array_values($this->productStocks),
+            $this->availableChange,
+            $this->insertedCoins->addCoin($coin),
+        );
+    }
+
+    public function insertCoinValue(int $cents): self
+    {
+        return $this->insertCoin(Coin::fromCents($cents));
+    }
+
+    public function canPurchase(Selector $selector): bool
+    {
+        try {
+            $this->preparePurchase($selector);
+        } catch (
+            ProductNotFound |
+            ProductOutOfStock |
+            InsufficientBalance |
+            ExactChangeNotAvailable
+        ) {
+            return false;
+        }
+
+        return true;
+    }
+
+    public function purchase(Selector $selector): PurchaseResult
+    {
+        [$productStock, $committedAvailableChange, $dispensedChange] = $this->preparePurchase($selector);
+
+        $updatedProductStocks = $this->productStocks;
+        $updatedProductStocks[$selector->value()] = $productStock->decrement();
+
+        $updatedMachine = new self(
+            array_values($updatedProductStocks),
+            $committedAvailableChange->remove($dispensedChange),
+            $this->insertedCoins->clear(),
+        );
+
+        return new PurchaseResult(
+            $updatedMachine,
+            $productStock->product(),
+            $dispensedChange,
+        );
+    }
+
+    public function refund(): RefundResult
+    {
+        return new RefundResult(
+            new self(
+                array_values($this->productStocks),
+                $this->availableChange,
+                $this->insertedCoins->clear(),
+            ),
+            $this->insertedCoins,
+        );
+    }
+
+    /**
+     * @param array<string, mixed> $stockCounts
+     * @param array<int|string, mixed> $availableChangeCounts
+     */
+    public function service(array $stockCounts, array $availableChangeCounts): self
+    {
+        if ($this->hasPendingBalance()) {
+            throw new PendingBalanceDuringService('Machine service requires no pending customer balance.');
+        }
+
+        $updatedProductStocks = [];
+
+        foreach ($this->productStocks as $selector => $productStock) {
+            if (!array_key_exists($selector, $stockCounts)) {
+                throw new InvalidServiceConfiguration(sprintf('Missing stock count for selector "%s".', $selector));
+            }
+
+            $quantity = $stockCounts[$selector];
+
+            if (!is_int($quantity)) {
+                throw new InvalidServiceConfiguration(sprintf('Stock count for selector "%s" must be an integer.', $selector));
+            }
+
+            $updatedProductStocks[$selector] = $productStock->withQuantity($quantity);
+        }
+
+        foreach (array_keys($stockCounts) as $selector) {
+            if (!isset($this->productStocks[$selector])) {
+                throw new InvalidServiceConfiguration(sprintf('Unknown selector "%s" in service stock configuration.', $selector));
+            }
+        }
+
+        return new self(
+            array_values($updatedProductStocks),
+            AvailableChange::fromCounts($availableChangeCounts),
+            $this->insertedCoins,
+        );
+    }
+
     /**
      * @param list<ProductStock> $productStocks
      *
@@ -96,5 +203,43 @@ final readonly class Machine
         }
 
         return $indexedStocks;
+    }
+
+    /**
+     * @return array{ProductStock, AvailableChange, CoinInventory}
+     */
+    private function preparePurchase(Selector $selector): array
+    {
+        $productStock = $this->productStockFor($selector);
+
+        if ($productStock === null) {
+            throw new ProductNotFound(sprintf('Unknown selector "%s".', $selector->value()));
+        }
+
+        if (!$productStock->isAvailable()) {
+            throw new ProductOutOfStock(sprintf('Product "%s" is out of stock.', $productStock->product()->name()));
+        }
+
+        if ($this->insertedBalance()->cents() < $productStock->price()->cents()) {
+            throw new InsufficientBalance(sprintf(
+                'Inserted balance "%d" is insufficient for product price "%d".',
+                $this->insertedBalance()->cents(),
+                $productStock->price()->cents(),
+            ));
+        }
+
+        $committedAvailableChange = $this->availableChange->addInsertedCoins($this->insertedCoins);
+        $changeAmount = $this->insertedBalance()->subtract($productStock->price());
+        $dispensedChange = $committedAvailableChange->allocateChange($changeAmount);
+
+        if ($dispensedChange === null) {
+            throw new ExactChangeNotAvailable(sprintf(
+                'Exact change "%d" cannot be returned for selector "%s".',
+                $changeAmount->cents(),
+                $selector->value(),
+            ));
+        }
+
+        return [$productStock, $committedAvailableChange, $dispensedChange];
     }
 }

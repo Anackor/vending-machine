@@ -37,6 +37,26 @@ final readonly class AvailableChange
         return $this->coins->countFor($coin);
     }
 
+    public function addInsertedCoins(InsertedCoins $insertedCoins): self
+    {
+        return new self($this->coins->add($insertedCoins->toCoinInventory()));
+    }
+
+    public function remove(CoinInventory $coins): self
+    {
+        return new self($this->coins->subtract($coins));
+    }
+
+    public function allocateChange(Money $amount): ?CoinInventory
+    {
+        return $this->coins->allocateForAmount($amount);
+    }
+
+    public function toCoinInventory(): CoinInventory
+    {
+        return $this->coins;
+    }
+
     public function total(): Money
     {
         return $this->coins->total();
