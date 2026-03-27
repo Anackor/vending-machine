@@ -146,7 +146,7 @@ Load previous phase documents only if:
   - explicit unit/integration/coverage workflow
   - stricter PHPStan and deptrac gates
   - stable maintenance workflow
-  - GitHub Actions PR quality checks
+  - GitHub Actions PR quality checks with the fast unit suite
 
 ### Phase 6
 
