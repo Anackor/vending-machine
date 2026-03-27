@@ -32,18 +32,51 @@ Unit tests may join the same workflow once Block A defines the final suite
 split. MongoDB-backed integration tests can remain a follow-up job or a later
 extension if they would slow down the first PR baseline too much.
 
+Implemented Block B decisions:
+
+- the first PR workflow now lives in `.github/workflows/pull-request-quality.yml`
+- GitHub Actions installs PHP `8.4` directly on `ubuntu-latest`
+- CI restores cached `vendor` and tool caches before running the checks
+- the workflow reuses existing Composer scripts for every automated check
+- `Unit` joins the first PR workflow because it is fast and does not require
+  MongoDB
+- `Integration` intentionally stays outside the first PR workflow to keep the
+  baseline quick and DB-free while remaining available locally through
+  `make test-integration`
+
+Local-to-CI parity:
+
+- ECS -> `make ecs`
+- Rector -> `make rector`
+- PHPStan -> `make phpstan`
+- deptrac -> `make deptrac`
+- unit tests -> `make test-unit`
+
 ## Tasks
 
-- [ ] P5-013: freeze the initial PR CI scope and execution strategy
-- [ ] P5-014: create the `.github/workflows` baseline for pull requests
-- [ ] P5-015: install PHP, Composer dependencies, and cache the vendor path appropriately in CI
-- [ ] P5-016: run ECS in the PR workflow
-- [ ] P5-017: run Rector in dry-run mode in the PR workflow
-- [ ] P5-018: run PHPStan in the PR workflow
-- [ ] P5-019: run deptrac in the PR workflow
-- [ ] P5-020: decide whether unit tests join the first PR workflow or a companion workflow
-- [ ] P5-021: document the local command equivalent for each CI check
-- [ ] P5-022: validate the final Phase 5 gate with local commands plus the new CI baseline
+- [x] P5-013: freeze the initial PR CI scope and execution strategy
+- [x] P5-014: create the `.github/workflows` baseline for pull requests
+- [x] P5-015: install PHP, Composer dependencies, and cache the vendor path appropriately in CI
+- [x] P5-016: run ECS in the PR workflow
+- [x] P5-017: run Rector in dry-run mode in the PR workflow
+- [x] P5-018: run PHPStan in the PR workflow
+- [x] P5-019: run deptrac in the PR workflow
+- [x] P5-020: decide whether unit tests join the first PR workflow or a companion workflow
+- [x] P5-021: document the local command equivalent for each CI check
+- [x] P5-022: validate the final Phase 5 gate with local commands plus the new CI baseline
+
+## Validation snapshot
+
+Validated at the end of Block B:
+
+- `make test-unit`: successful with `153` tests and `551` assertions
+- `make test-integration`: successful with `12` tests and `148` assertions
+- `make test`: successful with `165` tests and `699` assertions
+- `make quality`: successful
+- `make coverage`: successful
+
+The CI baseline is intentionally mirrored from existing local commands rather
+than introducing one-off CI-only commands.
 
 ## Output contract
 

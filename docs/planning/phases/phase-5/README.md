@@ -102,8 +102,9 @@ Load Phase 0 documents only when:
 
 - file: `docs/planning/phases/phase-5/block-b-ci-quality-gates.md`
 - task ids: `P5-013` to `P5-022`
-- status: pending
-- outputs: pull-request workflow, local-to-CI parity, final Phase 5 gate
+- status: complete
+- outputs: pull-request workflow, local-to-CI parity, unit-suite PR baseline,
+  final Phase 5 gate
 
 ## Current audit snapshot
 
@@ -124,10 +125,13 @@ Resolved in Block A:
 - the first minimum coverage threshold is enforced locally at `90%` for
   classes, methods, and lines
 
-Still open for Phase 5:
+Resolved in Block B:
 
-- no `.github/workflows` directory exists yet, so PR quality checks are still
-  manual only
+- `.github/workflows/pull-request-quality.yml` now runs on `pull_request`
+- pull requests now execute ECS, Rector, PHPStan, deptrac, and the unit suite
+- local-to-CI command parity is now documented explicitly
+- MongoDB-backed integration tests remain outside the first PR baseline on
+  purpose to keep the workflow fast and DB-free
 
 Current coverage snapshot from `make coverage`:
 
@@ -144,6 +148,27 @@ Current coverage snapshot from `make coverage`:
   explicitly protected
 - pull requests trigger the agreed quality checks automatically
 - CI commands stay aligned with documented local commands
+
+## Validation snapshot
+
+Validated at the end of Phase 5:
+
+- `make test-unit`: successful with `153` tests and `551` assertions
+- `make test-integration`: successful with `12` tests and `148` assertions
+- `make test`: successful with `165` tests and `699` assertions
+- `make quality`: successful
+- `make coverage`: successful
+- enforced coverage threshold:
+  - classes: `92.31%`
+  - methods: `96.73%`
+  - lines: `98.65%`
+
+Phase 5 result summary:
+
+- the local safety net is explicit, split, and green
+- coverage enforcement is now part of the local workflow contract
+- pull requests now run the agreed quality and fast test baseline
+- the next step is Phase 6
 
 ## Deliverables
 

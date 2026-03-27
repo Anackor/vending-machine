@@ -17,6 +17,7 @@ Finalize the repository so it is easy for reviewers to run, validate, and assess
 - `docs/planning/phases/phase-0/README.md`
 - `docs/planning/phases/phase-4/README.md`
 - `docs/planning/phases/phase-5/README.md`
+- `.github/workflows/pull-request-quality.yml`
 
 ## Tasks
 

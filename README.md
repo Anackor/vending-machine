@@ -49,8 +49,10 @@ tested, and validated. Phase 2 completed the application contracts and
 orchestration layer. Phase 3 added the MongoDB-backed persistence adapter,
 mapping strategy, and persistence integration tests. Phase 4 is now complete,
 so the project also exposes a thin reviewer-facing HTTP JSON interface on top
-of the persisted application layer. The next step is Phase 5, where tests and
-quality gates can be hardened further.
+of the persisted application layer. Phase 5 is now complete as well, so the
+local safety net is explicit and pull requests run the agreed GitHub Actions
+quality baseline. The next step is Phase 6, where packaging and reviewer
+handoff can be finalized.
 
 ## Local prerequisites
 
@@ -125,6 +127,32 @@ It wraps the main containerized commands:
 - `make rector-fix` -> `docker compose exec -T app composer run analyse:rector:fix`
 - `make ecs-fix` -> `docker compose exec -T app composer run lint:ecs:fix`
 - `make console cmd="..."` -> `docker compose exec -T app php bin/console ...`
+
+## Pull request CI
+
+Pull requests now run the GitHub Actions workflow:
+
+- `.github/workflows/pull-request-quality.yml`
+
+The first PR baseline intentionally stays small and fast:
+
+- ECS
+- Rector in dry-run mode
+- PHPStan
+- deptrac
+- unit test suite
+
+Local-to-CI command parity:
+
+- ECS -> `make ecs`
+- Rector -> `make rector`
+- PHPStan -> `make phpstan`
+- deptrac -> `make deptrac`
+- unit tests -> `make test-unit`
+
+MongoDB-backed integration tests remain outside this first PR workflow on
+purpose. They are still part of the local safety net through `make test` and
+can be run directly with `make test-integration`.
 
 ## Reviewer validation guide
 
