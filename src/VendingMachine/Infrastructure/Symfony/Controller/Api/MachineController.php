@@ -36,8 +36,6 @@ final readonly class MachineController
             );
         } catch (MachineOperationFailed $exception) {
             return $this->responseFactory->machineOperationFailed($exception);
-        } catch (InvalidArgumentException | JsonException $exception) {
-            return $this->responseFactory->invalidRequest($exception);
         }
     }
 
@@ -67,8 +65,6 @@ final readonly class MachineController
             );
         } catch (MachineOperationFailed $exception) {
             return $this->responseFactory->machineOperationFailed($exception);
-        } catch (InvalidArgumentException | JsonException $exception) {
-            return $this->responseFactory->invalidRequest($exception);
         }
     }
 

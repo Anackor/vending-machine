@@ -165,6 +165,25 @@ final class MachineDocumentMapperTest extends TestCase
             $mapper->fromPersistence([
                 '_id' => 'default',
                 'products' => [
+                    'water' => [
+                        'selector' => 'water',
+                        'name' => 'Water',
+                        'priceCents' => 65,
+                        'quantity' => 1,
+                    ],
+                ],
+                'availableChange' => [],
+                'insertedCoins' => [],
+            ]);
+            self::fail('The mapper should reject associative product collections.');
+        } catch (InvalidArgumentException $exception) {
+            self::assertSame('Persisted machine document products must be a list.', $exception->getMessage());
+        }
+
+        try {
+            $mapper->fromPersistence([
+                '_id' => 'default',
+                'products' => [
                     [
                         'selector' => 10,
                         'name' => 'Water',
