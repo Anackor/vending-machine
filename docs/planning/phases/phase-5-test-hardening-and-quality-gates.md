@@ -20,7 +20,7 @@ Strengthen behavioral confidence and architectural protection after the main fea
 - `docs/challenges/backend/README.md`
 - `docs/planning/phases/phase-1/README.md`
 - `docs/planning/phases/phase-3/README.md`
-- `docs/planning/phases/phase-4-initial-interface.md`
+- `docs/planning/phases/phase-4/README.md`
 
 ## Tasks
 
