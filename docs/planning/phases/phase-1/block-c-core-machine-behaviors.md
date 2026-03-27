@@ -13,17 +13,68 @@ the invariants defined in Block A.
 
 ## Tasks
 
-- [ ] P1-019: implement coin insertion behavior in the `Machine` aggregate
-- [ ] P1-020: reject unsupported coin insertion attempts
-- [ ] P1-021: expose inserted balance and purchase availability from the domain model
-- [ ] P1-022: implement product selection behavior
-- [ ] P1-023: reject unknown selectors and out-of-stock products
-- [ ] P1-024: reject purchases with insufficient inserted balance
-- [ ] P1-025: calculate and dispense change on successful overpayment
-- [ ] P1-026: reject purchases when exact change cannot be returned
-- [ ] P1-027: keep machine state consistent after failed purchase attempts
-- [ ] P1-028: implement refund behavior for all currently inserted money
-- [ ] P1-029: implement service setup and replenishment behavior for stock and available change
+- [x] P1-019: implement coin insertion behavior in the `Machine` aggregate
+- [x] P1-020: reject unsupported coin insertion attempts
+- [x] P1-021: expose inserted balance and purchase availability from the domain model
+- [x] P1-022: implement product selection behavior
+- [x] P1-023: reject unknown selectors and out-of-stock products
+- [x] P1-024: reject purchases with insufficient inserted balance
+- [x] P1-025: calculate and dispense change on successful overpayment
+- [x] P1-026: reject purchases when exact change cannot be returned
+- [x] P1-027: keep machine state consistent after failed purchase attempts
+- [x] P1-028: implement refund behavior for all currently inserted money
+- [x] P1-029: implement service setup and replenishment behavior for stock and available change
+
+## Behavior baseline
+
+Block C makes the `Machine` aggregate executable for the challenge-critical
+flows:
+
+- insert supported coins and expose the inserted balance
+- determine whether a selector is currently purchasable
+- purchase a product with exact payment or overpayment
+- commit inserted coins before calculating and dispensing change
+- refund the exact inserted coin multiset
+- service stock and available change through an explicit administrative action
+
+The purchase and refund flows now return explicit result objects:
+
+- `PurchaseResult`
+- `RefundResult`
+
+## Failure handling baseline
+
+Block C also introduces explicit domain failures for the main rejected flows:
+
+- `ProductNotFound`
+- `ProductOutOfStock`
+- `InsufficientBalance`
+- `ExactChangeNotAvailable`
+- `PendingBalanceDuringService`
+- `InvalidServiceConfiguration`
+
+The aggregate remains immutable, so failed operations do not corrupt the
+original machine state.
+
+## Validation snapshot
+
+Validated in Block C after implementing the behaviors:
+
+- `make test`: successful with `28` tests and `74` assertions
+- `make quality`: successful
+
+Quality result summary:
+
+- ECS: successful
+- PHPStan: successful
+- deptrac: successful with `0` violations and `0` errors
+- Rector dry-run: successful
+
+## Notes
+
+- exact change allocation uses the committed machine coin state, including newly inserted coins
+- refund returns the currently inserted coins without mutating available change
+- service remains a replacement-style setup operation and still requires no pending customer balance
 
 ## Output contract
 
