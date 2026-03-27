@@ -74,7 +74,7 @@ final class MachineControllerTest extends KernelTestCase
     {
         $this->seedDefaultMachine();
 
-        $response = $this->request('POST', '/api/machine/insert-coin', ['coinCents' => 25]);
+        $response = $this->request('POST', '/api/machine/insert-coin', ['coins' => 0.25]);
         $payload = $this->payload($response);
         $event = $this->eventPayload($payload);
         $machine = $this->machinePayload($payload);
@@ -83,11 +83,25 @@ final class MachineControllerTest extends KernelTestCase
 
         self::assertSame(Response::HTTP_OK, $response->getStatusCode());
         self::assertSame('coin_inserted', $event['type']);
-        self::assertSame(25, $event['coinCents']);
+        self::assertSame(0.25, $event['coins']);
         self::assertSame(25, $machine['insertedBalanceCents']);
         self::assertSame(1, $this->countValue($insertedCoins, '25'));
         self::assertNotNull($reloadedMachine);
         self::assertSame(25, $reloadedMachine->insertedBalance()->cents());
+    }
+
+    #[Test]
+    public function itStillAcceptsCoinCentsThroughTheHttpInterfaceForCompatibility(): void
+    {
+        $this->seedDefaultMachine();
+
+        $response = $this->request('POST', '/api/machine/insert-coin', ['coinCents' => 25]);
+        $payload = $this->payload($response);
+        $event = $this->eventPayload($payload);
+
+        self::assertSame(Response::HTTP_OK, $response->getStatusCode());
+        self::assertSame('coin_inserted', $event['type']);
+        self::assertSame(0.25, $event['coins']);
     }
 
     #[Test]
@@ -189,13 +203,13 @@ final class MachineControllerTest extends KernelTestCase
     {
         $this->seedDefaultMachine();
 
-        $response = $this->request('POST', '/api/machine/insert-coin', ['coinCents' => '25']);
+        $response = $this->request('POST', '/api/machine/insert-coin', ['coins' => 0.249]);
         $payload = $this->payload($response);
         $error = $this->errorPayload($payload);
 
         self::assertSame(Response::HTTP_BAD_REQUEST, $response->getStatusCode());
         self::assertSame('invalid_request', $error['code']);
-        self::assertSame('Field "coinCents" must be an integer.', $error['message']);
+        self::assertSame('Field "coins" must be one of 0.05, 0.10, 0.25, or 1.', $error['message']);
     }
 
     /**

@@ -64,7 +64,7 @@ final class MachineJsonResponseFactory
             [
                 'event' => [
                     'type' => 'coin_inserted',
-                    'coinCents' => $command->coinCents(),
+                    'coins' => $this->coins($command->coinCents()),
                 ],
                 'machine' => $this->machine($result->machineSnapshot()),
             ],
@@ -149,5 +149,14 @@ final class MachineJsonResponseFactory
             MachineFailureCode::PendingBalanceDuringService,
             MachineFailureCode::ProductOutOfStock => Response::HTTP_CONFLICT,
         };
+    }
+
+    private function coins(int $coinCents): int|float
+    {
+        if ($coinCents % 100 === 0) {
+            return intdiv($coinCents, 100);
+        }
+
+        return round($coinCents / 100, 2);
     }
 }
