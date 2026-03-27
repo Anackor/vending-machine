@@ -86,5 +86,32 @@ final class MachineDocumentTest extends TestCase
         } catch (InvalidArgumentException $exception) {
             self::assertSame('Persisted inserted coin counts must be integers.', $exception->getMessage());
         }
+
+        try {
+            new MachineDocument(
+                'default',
+                [new ProductStockDocument('water', 65, 1, 'Water')],
+                [25 => -1],
+                [],
+            );
+            self::fail('The document should reject negative available change counts.');
+        } catch (InvalidArgumentException $exception) {
+            self::assertSame('Persisted available change counts cannot be negative.', $exception->getMessage());
+        }
+
+        try {
+            new MachineDocument(
+                'default',
+                [new ProductStockDocument('water', 65, 1, 'Water')],
+                [],
+                ['quarter' => 1],
+            );
+            self::fail('The document should reject invalid inserted coin denomination keys.');
+        } catch (InvalidArgumentException $exception) {
+            self::assertSame(
+                'Persisted inserted coin counts must use integer denomination keys.',
+                $exception->getMessage(),
+            );
+        }
     }
 }
