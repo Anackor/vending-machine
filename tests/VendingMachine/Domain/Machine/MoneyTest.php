@@ -34,4 +34,18 @@ final class MoneyTest extends TestCase
 
         Money::fromCents(10)->subtract(Money::fromCents(25));
     }
+
+    public function testItComparesAndClassifiesAmounts(): void
+    {
+        $zero = Money::zero();
+        $amount = Money::fromCents(25);
+        $sameAmount = Money::fromCents(25);
+
+        self::assertTrue($amount->equals($sameAmount));
+        self::assertFalse($amount->equals($zero));
+        self::assertTrue($amount->isPositive());
+        self::assertFalse($zero->isPositive());
+        self::assertTrue($zero->isZero());
+        self::assertFalse($amount->isZero());
+    }
 }

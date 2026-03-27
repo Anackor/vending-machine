@@ -41,4 +41,23 @@ final class CoinAndSelectorTest extends TestCase
 
         Selector::fromString('water!');
     }
+
+    public function testItRejectsEmptySelectors(): void
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Selector cannot be empty.');
+
+        Selector::fromString('   ');
+    }
+
+    public function testItComparesAndStringifiesSelectors(): void
+    {
+        $selector = Selector::fromString('water');
+        $sameSelector = Selector::fromString('WATER');
+        $differentSelector = Selector::fromString('juice');
+
+        self::assertTrue($selector->equals($sameSelector));
+        self::assertFalse($selector->equals($differentSelector));
+        self::assertSame('water', (string) $selector);
+    }
 }

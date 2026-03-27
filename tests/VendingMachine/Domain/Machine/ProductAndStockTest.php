@@ -48,4 +48,16 @@ final class ProductAndStockTest extends TestCase
             -1,
         );
     }
+
+    public function testItRejectsProductsWithEmptyNames(): void
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Product name cannot be empty.');
+
+        new Product(
+            Selector::fromString('water'),
+            Money::fromCents(65),
+            '   ',
+        );
+    }
 }
