@@ -77,7 +77,7 @@ Load Phase 0 block files only if:
 
 - file: `docs/planning/phases/phase-1/block-a-assumptions-and-language.md`
 - task ids: `P1-001` to `P1-008`
-- status: pending
+- status: complete
 - outputs: domain assumptions, ubiquitous language, aggregate boundary, invariant list
 
 ### B. Money and machine primitives
