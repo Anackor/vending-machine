@@ -88,28 +88,28 @@ Load Phase 0 block files only if:
 
 - file: `docs/planning/phases/phase-3/block-a-persistence-boundaries-and-document-shape.md`
 - task ids: `P3-001` to `P3-009`
-- status: pending
+- status: complete
 - outputs: frozen persistence shape, collection naming, identifier direction, serialization rules
 
 ### B. MongoDB repository and mapper
 
 - file: `docs/planning/phases/phase-3/block-b-mongodb-repository-and-mapper.md`
 - task ids: `P3-010` to `P3-021`
-- status: pending
+- status: complete
 - outputs: MongoDB repository adapter, document mappers, Symfony service wiring
 
 ### C. Integration fixtures and tests
 
 - file: `docs/planning/phases/phase-3/block-c-integration-fixtures-and-tests.md`
 - task ids: `P3-022` to `P3-031`
-- status: pending
+- status: complete
 - outputs: repeatable fixture helpers, repository integration tests, persistence-backed application checks
 
 ### D. Persistence phase gate
 
 - file: `docs/planning/phases/phase-3/block-d-persistence-phase-gate.md`
 - task ids: `P3-032` to `P3-040`
-- status: pending
+- status: complete
 - outputs: validated persistence baseline, stable Phase 4 handoff, confirmed Phase 5 hardening path
 
 ## Mandatory persistence behaviors for Phase 3

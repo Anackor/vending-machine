@@ -45,10 +45,11 @@ The exercise explicitly points toward:
 The repository now includes the Dockerized Symfony baseline, MongoDB
 foundation, quality toolchain, and the documented developer workflow for
 Phase 0. Phase 1 is complete, so the core domain model is now implemented,
-tested, and validated. Phase 2 now includes the use-case map, the application
-contract set, handler orchestration, and the validated application-layer test
-suite. The next step is Phase 3, where persistence adapters can satisfy the
-existing application ports.
+tested, and validated. Phase 2 completed the application contracts and
+orchestration layer. Phase 3 now adds the MongoDB-backed persistence adapter,
+mapping strategy, and persistence integration tests. The next step is Phase 4,
+where a thin reviewer-facing interface can sit on top of the persisted
+application layer.
 
 ## Local prerequisites
 
