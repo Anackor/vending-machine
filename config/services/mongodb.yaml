@@ -7,3 +7,13 @@ services:
         factory: ['@MongoDB\Client', 'selectDatabase']
         arguments:
             - '%env(resolve:MONGODB_DATABASE)%'
+
+    VendingMachine\Infrastructure\Persistence\MongoDB\Machine\Mapper\MachineDocumentMapper: ~
+
+    VendingMachine\Infrastructure\Persistence\MongoDB\Machine\MongoDBMachineRepository:
+        arguments:
+            $database: '@MongoDB\Database'
+            $machineDocumentMapper: '@VendingMachine\Infrastructure\Persistence\MongoDB\Machine\Mapper\MachineDocumentMapper'
+
+    VendingMachine\Application\Machine\Repository\MachineRepository:
+        alias: VendingMachine\Infrastructure\Persistence\MongoDB\Machine\MongoDBMachineRepository
