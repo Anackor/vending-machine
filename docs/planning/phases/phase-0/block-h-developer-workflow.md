@@ -48,13 +48,13 @@ The baseline scripts added in Phase 0 are:
 - `analyse:deptrac`
 - `analyse:rector`
 - `test`
-- `test:placeholder`
+- `test:unit`
 
 Current intent:
 
 - `project:setup` performs the minimum environment checks after install
 - `lint` and `analyse` group the quality tools behind stable command names
-- `test` is intentionally a placeholder until the real automated test suites land
+- `test` runs the current automated unit suite through PHPUnit
 
 ## Makefile baseline
 
@@ -85,14 +85,14 @@ Validated in Phase 0 using only the documented entry points:
 - `make help`: successful
 - `make bootstrap`: successful
 - `make quality`: successful
-- `make test`: successful with the expected placeholder message
+- `make test`: successful
 - `make down`: successful
 
 ## Notes
 
 - local PHP, Composer, Symfony CLI, and MongoDB installations are not required
 - the host-facing contract is `make`; the container-facing contract is Composer scripts
-- the placeholder `test` entry point exists to keep the workflow stable before real suites are introduced
+- the `test` entry point now runs the PHPUnit suite introduced during Phase 1
 
 ## Output contract
 
