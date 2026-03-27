@@ -85,3 +85,26 @@ The initial application failure contract set is:
 - `Failure/MachineFailureCode.php`
 - `Failure/MachineFailure.php`
 - `Exception/MachineOperationFailed.php`
+
+## Handler and port baseline
+
+Phase 2 Block C adds the first executable application orchestration layer:
+
+- `Repository/MachineRepository.php`
+- `Handler/InsertCoinHandler.php`
+- `Handler/SelectProductHandler.php`
+- `Handler/ReturnInsertedMoneyHandler.php`
+- `Handler/ServiceMachineHandler.php`
+- `Handler/GetMachineStateHandler.php`
+
+The repository contract stays intentionally compact with `find()` and `save()`.
+For Phase 2, `save()` should be treated as one logical aggregate replacement
+from the handler perspective.
+
+Handlers are expected to:
+
+- load the machine through the repository port
+- invoke one domain behavior only once
+- save the updated aggregate when state changes
+- translate domain results into application contracts
+- translate rejected flows into `MachineOperationFailed`
