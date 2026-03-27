@@ -46,10 +46,11 @@ The repository now includes the Dockerized Symfony baseline, MongoDB
 foundation, quality toolchain, and the documented developer workflow for
 Phase 0. Phase 1 is complete, so the core domain model is now implemented,
 tested, and validated. Phase 2 completed the application contracts and
-orchestration layer. Phase 3 now adds the MongoDB-backed persistence adapter,
-mapping strategy, and persistence integration tests. The next step is Phase 4,
-where a thin reviewer-facing interface can sit on top of the persisted
-application layer.
+orchestration layer. Phase 3 added the MongoDB-backed persistence adapter,
+mapping strategy, and persistence integration tests. Phase 4 is now complete,
+so the project also exposes a thin reviewer-facing HTTP JSON interface on top
+of the persisted application layer. The next step is Phase 5, where tests and
+quality gates can be hardened further.
 
 ## Local prerequisites
 
@@ -72,7 +73,14 @@ This command:
 - builds the application image
 - starts the Docker environment
 - installs Composer dependencies inside the `app` container
-- runs the Phase 0 setup checks
+- runs the setup checks
+- seeds the default machine if it does not exist yet
+
+After `make bootstrap`, the reviewer-facing HTTP interface is available at:
+
+```text
+http://localhost:8000
+```
 
 ## Daily workflow
 
@@ -109,6 +117,50 @@ It wraps the main containerized commands:
 - `make rector-fix` -> `docker compose exec -T app composer run analyse:rector:fix`
 - `make ecs-fix` -> `docker compose exec -T app composer run lint:ecs:fix`
 - `make console cmd="..."` -> `docker compose exec -T app php bin/console ...`
+
+## HTTP interface
+
+The first reviewer-facing interface is a thin HTTP JSON layer served by the
+`app` container on `localhost:8000`.
+
+Available endpoints:
+
+- `GET /api/machine`
+- `POST /api/machine/insert-coin`
+- `POST /api/machine/select-product`
+- `POST /api/machine/return-coin`
+- `POST /api/machine/service`
+
+Example flows:
+
+```bash
+curl http://localhost:8000/api/machine
+```
+
+```bash
+curl -X POST http://localhost:8000/api/machine/insert-coin \
+  -H "Content-Type: application/json" \
+  -d '{"coinCents":100}'
+```
+
+```bash
+curl -X POST http://localhost:8000/api/machine/select-product \
+  -H "Content-Type: application/json" \
+  -d '{"selector":"water"}'
+```
+
+```bash
+curl -X POST http://localhost:8000/api/machine/return-coin
+```
+
+```bash
+curl -X POST http://localhost:8000/api/machine/service \
+  -H "Content-Type: application/json" \
+  -d '{
+    "productQuantities":{"water":10,"juice":8,"soda":5},
+    "availableChangeCounts":{"5":20,"10":20,"25":20,"100":10}
+  }'
+```
 
 ## Development docs
 

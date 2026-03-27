@@ -79,7 +79,7 @@ Load Phase 0 documents only if:
 
 - file: `docs/planning/phases/phase-4/block-a-thin-reviewer-interface.md`
 - task ids: `P4-001` to `P4-015`
-- status: pending
+- status: complete
 - outputs: initial interface surface, Symfony adapter wiring, documented usage examples, validated end-to-end reviewer flow
 
 ## Mandatory interface behaviors for Phase 4
@@ -103,6 +103,24 @@ Load Phase 0 documents only if:
 - runnable initial interface
 - documented request and response examples
 - validated end-to-end reviewer flow on top of persistence
+
+## Validation snapshot
+
+Validated at the end of Phase 4:
+
+- `make bootstrap`: successful
+- `docker compose exec -T app php bin/console debug:router`: successful
+- `make test`: successful with `154` tests and `651` assertions
+- `make quality`: successful
+- `make coverage`: successful
+- representative HTTP calls against `localhost:8000`: successful
+
+Interface result summary:
+
+- Symfony serves a thin JSON HTTP layer from the `app` container
+- the default machine is seeded during setup if it does not exist yet
+- the main challenge flows can be exercised through HTTP on top of real MongoDB persistence
+- the next step is Phase 5
 
 ## Exit criteria
 
