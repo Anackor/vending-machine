@@ -49,12 +49,15 @@ The baseline scripts added in Phase 0 are:
 - `analyse:rector`
 - `test`
 - `test:unit`
+- `test:coverage`
+- `test:coverage:html`
 
 Current intent:
 
 - `project:setup` performs the minimum environment checks after install
 - `lint` and `analyse` group the quality tools behind stable command names
 - `test` runs the current automated unit suite through PHPUnit
+- the coverage commands are opt-in and activate the coverage driver only for dedicated runs
 
 ## Makefile baseline
 
@@ -64,6 +67,7 @@ The first `Makefile` covers:
 - dependency and setup flow: `install`, `setup`, `bootstrap`
 - container access: `shell`, `composer`, `console`
 - quality and verification: `lint`, `analyse`, `quality`, `test`
+- coverage: `coverage`, `coverage-html`
 - direct tool targets: `phpstan`, `deptrac`, `rector`, `ecs`, `mongodb-smoke`
 
 The `Makefile` is the preferred local entry point because it keeps Docker and
@@ -93,6 +97,7 @@ Validated in Phase 0 using only the documented entry points:
 - local PHP, Composer, Symfony CLI, and MongoDB installations are not required
 - the host-facing contract is `make`; the container-facing contract is Composer scripts
 - the `test` entry point now runs the PHPUnit suite introduced during Phase 1
+- coverage is available through dedicated commands and does not slow down the default test path
 
 ## Output contract
 
