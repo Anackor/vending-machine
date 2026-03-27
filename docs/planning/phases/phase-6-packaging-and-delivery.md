@@ -27,6 +27,36 @@ Finalize the repository so it is easy for reviewers to run, validate, and assess
 - verify the repository is understandable for an external reviewer
 - prepare the handoff baseline
 
+## Implemented Phase 6 decisions
+
+- the delivery path is the same Dockerized path used during development
+- `make bootstrap` remains the single setup entry point for reviewers
+- `make bootstrap` now resets the default machine to the documented baseline
+- `make review` is now the final reviewer-facing validation command
+- the root `README.md` now acts as the handoff guide, including:
+  - local requirements
+  - bootstrap instructions
+  - HTTP validation examples
+  - challenge alignment snapshot
+  - CI and local workflow parity
+
+## Validation snapshot
+
+Validated at the end of Phase 6:
+
+- `make down`: successful
+- `make bootstrap`: successful
+- `make review`: successful
+- `make status`: successful
+- representative HTTP calls against `localhost:8000`: successful
+
+Delivery result summary:
+
+- the project can be bootstrapped from Docker only
+- the reviewer workflow is explicit and reproducible
+- the repository no longer depends on hidden local knowledge
+- the handoff baseline is ready
+
 ## Validations
 
 - the documented setup works from a clean environment
