@@ -82,6 +82,10 @@ After `make bootstrap`, the reviewer-facing HTTP interface is available at:
 http://localhost:8000
 ```
 
+No extra local database setup is required for reviewers. The bootstrap flow
+already creates the local environment and seeds the default machine if it is
+missing.
+
 ## Daily workflow
 
 Common commands:
@@ -118,7 +122,7 @@ It wraps the main containerized commands:
 - `make ecs-fix` -> `docker compose exec -T app composer run lint:ecs:fix`
 - `make console cmd="..."` -> `docker compose exec -T app php bin/console ...`
 
-## HTTP interface
+## Reviewer validation guide
 
 The first reviewer-facing interface is a thin HTTP JSON layer served by the
 `app` container on `localhost:8000`.
@@ -131,11 +135,27 @@ Available endpoints:
 - `POST /api/machine/return-coin`
 - `POST /api/machine/service`
 
-Example flows:
+Recommended validation flow:
+
+1. Bootstrap the local environment:
+
+```bash
+make bootstrap
+```
+
+2. Confirm the containers are up:
+
+```bash
+make status
+```
+
+3. Inspect the current machine state:
 
 ```bash
 curl http://localhost:8000/api/machine
 ```
+
+4. Insert a `100` cent coin:
 
 ```bash
 curl -X POST http://localhost:8000/api/machine/insert-coin \
@@ -143,15 +163,21 @@ curl -X POST http://localhost:8000/api/machine/insert-coin \
   -d '{"coinCents":100}'
 ```
 
+5. Buy a product, for example `water`:
+
 ```bash
 curl -X POST http://localhost:8000/api/machine/select-product \
   -H "Content-Type: application/json" \
   -d '{"selector":"water"}'
 ```
 
+6. Return the currently inserted money:
+
 ```bash
 curl -X POST http://localhost:8000/api/machine/return-coin
 ```
+
+7. Reset the machine state with a service call when needed:
 
 ```bash
 curl -X POST http://localhost:8000/api/machine/service \
@@ -160,6 +186,16 @@ curl -X POST http://localhost:8000/api/machine/service \
     "productQuantities":{"water":10,"juice":8,"soda":5},
     "availableChangeCounts":{"5":20,"10":20,"25":20,"100":10}
   }'
+```
+
+The seeded default machine uses the selectors `water`, `juice`, and `soda`.
+
+To validate the automated checks as part of the review:
+
+```bash
+make test
+make quality
+make coverage
 ```
 
 ## Development docs
