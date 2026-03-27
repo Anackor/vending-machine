@@ -22,7 +22,9 @@ RUN apt-get update \
         zip \
     && docker-php-ext-install -j"$(nproc)" intl mbstring opcache simplexml zip \
     && pecl install mongodb \
+    && pecl install pcov \
     && docker-php-ext-enable mongodb \
+    && docker-php-ext-enable pcov \
     && curl -fsSL https://getcomposer.org/installer -o /tmp/composer-setup.php \
     && php /tmp/composer-setup.php --install-dir=/usr/local/bin --filename=composer \
     && rm -f /tmp/composer-setup.php \

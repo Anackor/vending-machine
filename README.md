@@ -44,8 +44,9 @@ The exercise explicitly points toward:
 
 The repository now includes the Dockerized Symfony baseline, MongoDB
 foundation, quality toolchain, and the documented developer workflow for
-Phase 0. Phase 1 is in progress: Blocks A, B, and C are complete, and the next
-step is the final domain test suite and phase gate.
+Phase 0. Phase 1 is complete, so the core domain model is now implemented,
+tested, and validated. The next step is Phase 2, where the application layer
+will start orchestrating the domain use cases.
 
 ## Local prerequisites
 
@@ -84,6 +85,8 @@ Common commands:
 - `make analyse`
 - `make quality`
 - `make test`
+- `make coverage`
+- `make coverage-html`
 
 ## Command mapping
 
@@ -96,6 +99,8 @@ It wraps the main containerized commands:
 - `make lint` -> `docker compose exec -T app composer run lint`
 - `make analyse` -> `docker compose exec -T app composer run analyse`
 - `make test` -> `docker compose exec -T app composer run test`
+- `make coverage` -> `docker compose exec -T app composer run test:coverage`
+- `make coverage-html` -> `docker compose exec -T app composer run test:coverage:html`
 - `make console cmd="..."` -> `docker compose exec -T app php bin/console ...`
 
 ## Development docs

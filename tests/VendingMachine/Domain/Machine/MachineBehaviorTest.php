@@ -9,6 +9,7 @@ use PHPUnit\Framework\TestCase;
 use VendingMachine\Domain\Machine\AvailableChange;
 use VendingMachine\Domain\Machine\Exception\ExactChangeNotAvailable;
 use VendingMachine\Domain\Machine\Exception\InsufficientBalance;
+use VendingMachine\Domain\Machine\Exception\InvalidServiceConfiguration;
 use VendingMachine\Domain\Machine\Exception\PendingBalanceDuringService;
 use VendingMachine\Domain\Machine\Exception\ProductNotFound;
 use VendingMachine\Domain\Machine\Exception\ProductOutOfStock;
@@ -40,6 +41,15 @@ final class MachineBehaviorTest extends TestCase
         $this->expectExceptionMessage('Unsupported coin denomination "50".');
 
         $this->machine()->insertCoinValue(50);
+    }
+
+    public function testItReportsWhenAProductCannotBePurchasedBecauseExactChangeIsUnavailable(): void
+    {
+        $machine = $this->machine()->insertCoinValue(100);
+
+        self::assertFalse($machine->canPurchase(Selector::fromString('water')));
+        self::assertSame(100, $machine->insertedBalance()->cents());
+        self::assertSame([], $machine->availableChange()->counts());
     }
 
     public function testItPurchasesWithTheExactAmount(): void
@@ -151,6 +161,19 @@ final class MachineBehaviorTest extends TestCase
         self::assertSame([], $refund->machine()->availableChange()->counts());
     }
 
+    public function testItRefundsWithoutMutatingTheOriginalMachine(): void
+    {
+        $machine = $this->machine()
+            ->insertCoinValue(100)
+            ->insertCoinValue(25);
+
+        $refund = $machine->refund();
+
+        self::assertSame([25 => 1, 100 => 1], $machine->insertedCoins()->counts());
+        self::assertSame(125, $machine->insertedBalance()->cents());
+        self::assertTrue($refund->machine()->insertedCoins()->isEmpty());
+    }
+
     public function testItServicesStockAndAvailableChangeWhenNoBalanceIsPending(): void
     {
         $machine = $this->machine()->service(
@@ -183,6 +206,51 @@ final class MachineBehaviorTest extends TestCase
                 'water' => 2,
                 'juice' => 3,
                 'soda' => 4,
+            ],
+            [25 => 1],
+        );
+    }
+
+    public function testItRejectsServiceWhenAStockCountIsMissing(): void
+    {
+        $this->expectException(InvalidServiceConfiguration::class);
+        $this->expectExceptionMessage('Missing stock count for selector "juice".');
+
+        $this->machine()->service(
+            [
+                'water' => 2,
+                'soda' => 4,
+            ],
+            [25 => 1],
+        );
+    }
+
+    public function testItRejectsServiceWhenAStockCountIsNotAnInteger(): void
+    {
+        $this->expectException(InvalidServiceConfiguration::class);
+        $this->expectExceptionMessage('Stock count for selector "water" must be an integer.');
+
+        $this->machine()->service(
+            [
+                'water' => '2',
+                'juice' => 3,
+                'soda' => 4,
+            ],
+            [25 => 1],
+        );
+    }
+
+    public function testItRejectsServiceWhenAnUnknownSelectorIsProvided(): void
+    {
+        $this->expectException(InvalidServiceConfiguration::class);
+        $this->expectExceptionMessage('Unknown selector "chips" in service stock configuration.');
+
+        $this->machine()->service(
+            [
+                'water' => 2,
+                'juice' => 3,
+                'soda' => 4,
+                'chips' => 1,
             ],
             [25 => 1],
         );
