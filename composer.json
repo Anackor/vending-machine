@@ -32,7 +32,7 @@
     },
     "autoload-dev": {
         "psr-4": {
-            "App\\Tests\\": "tests/"
+            "Tests\\": "tests/"
         }
     },
     "replace": {
@@ -70,9 +70,9 @@
         "analyse:deptrac": "@php vendor/bin/deptrac analyse --config-file=deptrac.yaml",
         "analyse:rector": "@php vendor/bin/rector process --dry-run --config=rector.php",
         "test": [
-            "@test:placeholder"
+            "@test:unit"
         ],
-        "test:placeholder": "@php -r \"fwrite(STDOUT, 'No automated tests are configured yet; Phase 1 and Phase 5 will define them.' . PHP_EOL);\"",
+        "test:unit": "@php bin/phpunit",
         "post-install-cmd": [
             "@auto-scripts"
         ],
@@ -92,6 +92,7 @@
     "require-dev": {
         "deptrac/deptrac": "^4.6",
         "phpstan/phpstan": "^2.1",
+        "phpunit/phpunit": "^11.5",
         "rector/rector": "^2.3",
         "symplify/easy-coding-standard": "^13.0"
     }

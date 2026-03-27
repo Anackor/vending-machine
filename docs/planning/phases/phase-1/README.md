@@ -84,8 +84,8 @@ Load Phase 0 block files only if:
 
 - file: `docs/planning/phases/phase-1/block-b-money-and-machine-primitives.md`
 - task ids: `P1-009` to `P1-018`
-- status: pending
-- outputs: money and selector value objects, stock and change primitives, machine aggregate skeleton
+- status: complete
+- outputs: money and selector value objects, stock and change primitives, machine aggregate skeleton, primitive unit-test baseline
 
 ### C. Core machine behaviors
 
