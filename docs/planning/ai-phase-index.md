@@ -129,10 +129,18 @@ Load previous phase documents only if:
 
 ### Phase 5
 
-- file: `docs/planning/phases/phase-5-test-hardening-and-quality-gates.md`
+- file: `docs/planning/phases/phase-5/README.md`
+- block files:
+  - `docs/planning/phases/phase-5/block-a-local-safety-net-hardening.md`
+  - `docs/planning/phases/phase-5/block-b-ci-quality-gates.md`
 - purpose: harden tests and tighten architecture and analysis rules
 - depends on:
   - Phases 1 to 4 outputs
+- loading rule:
+  - always load `docs/planning/phases/phase-5/README.md`
+  - load only the active Phase 5 block file
+  - load Phase 4 when HTTP adapter regressions or interface-level tests are being hardened
+  - load Phase 3 when MongoDB fixtures or integration expectations are being updated
 - main outputs:
   - stronger integration coverage
   - explicit unit/integration/coverage workflow
@@ -204,7 +212,8 @@ Load:
 Load:
 
 - common context
-- Phase 5
+- `docs/planning/phases/phase-5/README.md`
+- the relevant Phase 5 block file
 - whichever phase is being hardened
 
 ### Delivery and handoff work

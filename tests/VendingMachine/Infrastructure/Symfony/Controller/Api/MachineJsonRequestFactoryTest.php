@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Tests\VendingMachine\Infrastructure\Symfony\Controller\Api;
 
 use InvalidArgumentException;
+use JsonException;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 use VendingMachine\Infrastructure\Symfony\Controller\Api\MachineJsonRequestFactory;
@@ -108,6 +109,112 @@ final class MachineJsonRequestFactoryTest extends TestCase
                 'POST',
                 server: ['CONTENT_TYPE' => 'application/json'],
                 content: '{}',
+            ),
+        );
+    }
+
+    public function testItRejectsMissingSelectorFields(): void
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Field "selector" is required.');
+
+        $this->requestFactory->createSelectProductCommand(
+            Request::create(
+                '/api/machine',
+                'POST',
+                server: ['CONTENT_TYPE' => 'application/json'],
+                content: '{}',
+            ),
+        );
+    }
+
+    public function testItRejectsMissingServiceObjectFields(): void
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Field "productQuantities" is required.');
+
+        $this->requestFactory->createServiceMachineCommand(
+            Request::create(
+                '/api/machine',
+                'POST',
+                server: ['CONTENT_TYPE' => 'application/json'],
+                content: '{}',
+            ),
+        );
+    }
+
+    public function testItRejectsEmptyJsonBodiesForInsertCoin(): void
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Field "coinCents" is required.');
+
+        $this->requestFactory->createInsertCoinCommand(
+            Request::create(
+                '/api/machine',
+                'POST',
+                server: ['CONTENT_TYPE' => 'application/json'],
+                content: '',
+            ),
+        );
+    }
+
+    public function testItRejectsNonIntegerCoinFields(): void
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Field "coinCents" must be an integer.');
+
+        $this->requestFactory->createInsertCoinCommand(
+            $this->jsonRequest(['coinCents' => '25']),
+        );
+    }
+
+    public function testItRejectsNonStringSelectors(): void
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Field "selector" must be a string.');
+
+        $this->requestFactory->createSelectProductCommand(
+            $this->jsonRequest(['selector' => 10]),
+        );
+    }
+
+    public function testItRejectsNonObjectServiceFields(): void
+    {
+        try {
+            $this->requestFactory->createServiceMachineCommand(
+                $this->jsonRequest([
+                    'productQuantities' => [1, 2, 3],
+                    'availableChangeCounts' => [],
+                ]),
+            );
+            self::fail('The request factory should reject list-based product quantities.');
+        } catch (InvalidArgumentException $exception) {
+            self::assertSame('Field "productQuantities" must be a JSON object.', $exception->getMessage());
+        }
+
+        try {
+            $this->requestFactory->createServiceMachineCommand(
+                $this->jsonRequest([
+                    'productQuantities' => ['water' => 1],
+                    'availableChangeCounts' => [5, 10],
+                ]),
+            );
+            self::fail('The request factory should reject list-based available change counts.');
+        } catch (InvalidArgumentException $exception) {
+            self::assertSame('Field "availableChangeCounts" must be a JSON object.', $exception->getMessage());
+        }
+    }
+
+    public function testItRejectsMalformedJsonBodies(): void
+    {
+        $this->expectException(JsonException::class);
+
+        $this->requestFactory->createInsertCoinCommand(
+            Request::create(
+                '/api/machine',
+                'POST',
+                server: ['CONTENT_TYPE' => 'application/json'],
+                content: '{"coinCents":',
             ),
         );
     }

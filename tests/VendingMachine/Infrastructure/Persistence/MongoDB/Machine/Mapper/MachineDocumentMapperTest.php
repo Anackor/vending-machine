@@ -148,5 +148,77 @@ final class MachineDocumentMapperTest extends TestCase
                 $exception->getMessage(),
             );
         }
+
+        try {
+            $mapper->fromPersistence([
+                '_id' => 'default',
+                'products' => ['invalid'],
+                'availableChange' => [],
+                'insertedCoins' => [],
+            ]);
+            self::fail('The mapper should reject non-array product documents.');
+        } catch (InvalidArgumentException $exception) {
+            self::assertSame('Persisted machine products must be document arrays.', $exception->getMessage());
+        }
+
+        try {
+            $mapper->fromPersistence([
+                '_id' => 'default',
+                'products' => [
+                    [
+                        'selector' => 10,
+                        'name' => 'Water',
+                        'priceCents' => 65,
+                        'quantity' => 1,
+                    ],
+                ],
+                'availableChange' => [],
+                'insertedCoins' => [],
+            ]);
+            self::fail('The mapper should reject non-string selectors.');
+        } catch (InvalidArgumentException $exception) {
+            self::assertSame('Persisted product selector must be a string.', $exception->getMessage());
+        }
+
+        try {
+            $mapper->fromPersistence([
+                '_id' => 'default',
+                'products' => [
+                    [
+                        'selector' => 'water',
+                        'name' => 10,
+                        'priceCents' => 65,
+                        'quantity' => 1,
+                    ],
+                ],
+                'availableChange' => [],
+                'insertedCoins' => [],
+            ]);
+            self::fail('The mapper should reject non-string names.');
+        } catch (InvalidArgumentException $exception) {
+            self::assertSame('Persisted product name must be a string.', $exception->getMessage());
+        }
+
+        try {
+            $mapper->fromPersistence([
+                '_id' => 'default',
+                'products' => [
+                    [
+                        'selector' => 'water',
+                        'name' => 'Water',
+                        'priceCents' => 65,
+                        'quantity' => 1,
+                    ],
+                ],
+                'availableChange' => [],
+                'insertedCoins' => 'invalid',
+            ]);
+            self::fail('The mapper should reject non-array inserted coin fields.');
+        } catch (InvalidArgumentException $exception) {
+            self::assertSame(
+                'Persisted machine document field "insertedCoins" must be an array.',
+                $exception->getMessage(),
+            );
+        }
     }
 }
