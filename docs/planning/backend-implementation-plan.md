@@ -34,7 +34,9 @@ The plan has been split into atomic phase documents so each implementation step 
 - `docs/planning/phases/phase-3/block-d-persistence-phase-gate.md`
 - `docs/planning/phases/phase-4/README.md`
 - `docs/planning/phases/phase-4/block-a-thin-reviewer-interface.md`
-- `docs/planning/phases/phase-5-test-hardening-and-quality-gates.md`
+- `docs/planning/phases/phase-5/README.md`
+- `docs/planning/phases/phase-5/block-a-local-safety-net-hardening.md`
+- `docs/planning/phases/phase-5/block-b-ci-quality-gates.md`
 - `docs/planning/phases/phase-6-packaging-and-delivery.md`
 
 ## Global objective

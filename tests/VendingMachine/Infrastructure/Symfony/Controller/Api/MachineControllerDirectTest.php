@@ -6,6 +6,7 @@ namespace Tests\VendingMachine\Infrastructure\Symfony\Controller\Api;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 use Tests\VendingMachine\Application\Machine\Double\InMemoryMachineRepository;
 use Tests\VendingMachine\Infrastructure\Persistence\MongoDB\Machine\Fixture\DefaultMachineFixture;
 use VendingMachine\Application\Machine\Factory\MachineFailureFactory;
@@ -27,7 +28,7 @@ final class MachineControllerDirectTest extends TestCase
 
         $response = $controller->machineState($getMachineStateHandler);
 
-        self::assertSame(200, $response->getStatusCode());
+        self::assertSame(Response::HTTP_OK, $response->getStatusCode());
     }
 
     public function testItInsertsCoinDirectly(): void
@@ -39,18 +40,20 @@ final class MachineControllerDirectTest extends TestCase
             $insertCoinHandler,
         );
 
-        self::assertSame(200, $response->getStatusCode());
+        self::assertSame(Response::HTTP_OK, $response->getStatusCode());
     }
 
     public function testItReturnsCoinDirectly(): void
     {
         [$controller, , , $returnInsertedMoneyHandler] = $this->controllerSuite(
-            DefaultMachineFixture::machine(insertedCoinCounts: [25 => 1]),
+            DefaultMachineFixture::machine(insertedCoinCounts: [10 => 1, 25 => 1]),
         );
 
         $response = $controller->returnCoin($returnInsertedMoneyHandler);
+        $payload = $this->payload($response);
 
-        self::assertSame(200, $response->getStatusCode());
+        self::assertSame(Response::HTTP_OK, $response->getStatusCode());
+        self::assertSame('money_returned', $this->eventType($payload));
     }
 
     public function testItSelectsProductDirectly(): void
@@ -67,7 +70,7 @@ final class MachineControllerDirectTest extends TestCase
             $selectProductHandler,
         );
 
-        self::assertSame(200, $response->getStatusCode());
+        self::assertSame(Response::HTTP_OK, $response->getStatusCode());
     }
 
     public function testItServicesTheMachineDirectly(): void
@@ -91,7 +94,65 @@ final class MachineControllerDirectTest extends TestCase
             $serviceMachineHandler,
         );
 
-        self::assertSame(200, $response->getStatusCode());
+        self::assertSame(Response::HTTP_OK, $response->getStatusCode());
+    }
+
+    public function testItMapsMissingMachinesToNotFoundResponsesDirectly(): void
+    {
+        [$controller, $getMachineStateHandler] = $this->controllerSuite(seedDefaultMachine: false);
+
+        $response = $controller->machineState($getMachineStateHandler);
+        $payload = $this->payload($response);
+
+        self::assertSame(Response::HTTP_NOT_FOUND, $response->getStatusCode());
+        self::assertSame('machine_not_found', $this->errorCode($payload));
+    }
+
+    public function testItMapsInvalidInsertCoinPayloadsToBadRequestResponsesDirectly(): void
+    {
+        [$controller, , $insertCoinHandler] = $this->controllerSuite();
+
+        $response = $controller->insertCoin(
+            $this->jsonRequest(['coinCents' => '25']),
+            $insertCoinHandler,
+        );
+        $payload = $this->payload($response);
+
+        self::assertSame(Response::HTTP_BAD_REQUEST, $response->getStatusCode());
+        self::assertSame('invalid_request', $this->errorCode($payload));
+    }
+
+    public function testItMapsSelectProductFailuresToConflictResponsesDirectly(): void
+    {
+        [$controller, , , , $selectProductHandler] = $this->controllerSuite();
+
+        $response = $controller->selectProduct(
+            $this->jsonRequest(['selector' => 'water']),
+            $selectProductHandler,
+        );
+        $payload = $this->payload($response);
+
+        self::assertSame(Response::HTTP_CONFLICT, $response->getStatusCode());
+        self::assertSame('insufficient_balance', $this->errorCode($payload));
+    }
+
+    public function testItMapsInvalidServicePayloadsToBadRequestResponsesDirectly(): void
+    {
+        [$controller, , , , , $serviceMachineHandler] = $this->controllerSuite();
+
+        $response = $controller->service(
+            Request::create(
+                '/api/machine/service',
+                'POST',
+                server: ['CONTENT_TYPE' => 'application/json'],
+                content: '[1]',
+            ),
+            $serviceMachineHandler,
+        );
+        $payload = $this->payload($response);
+
+        self::assertSame(Response::HTTP_BAD_REQUEST, $response->getStatusCode());
+        self::assertSame('invalid_request', $this->errorCode($payload));
     }
 
     /**
@@ -104,11 +165,17 @@ final class MachineControllerDirectTest extends TestCase
      *     5: ServiceMachineHandler
      * }
      */
-    private function controllerSuite(?\VendingMachine\Domain\Machine\Machine $machine = null): array
-    {
-        $machineRepository = new InMemoryMachineRepository([
-            'default' => $machine ?? DefaultMachineFixture::machine(),
-        ]);
+    private function controllerSuite(
+        ?\VendingMachine\Domain\Machine\Machine $machine = null,
+        bool $seedDefaultMachine = true,
+    ): array {
+        $machines = [];
+
+        if ($seedDefaultMachine) {
+            $machines['default'] = $machine ?? DefaultMachineFixture::machine();
+        }
+
+        $machineRepository = new InMemoryMachineRepository($machines);
         $machineSnapshotFactory = new MachineSnapshotFactory();
         $machineFailureFactory = new MachineFailureFactory();
 
@@ -156,5 +223,48 @@ final class MachineControllerDirectTest extends TestCase
             server: ['CONTENT_TYPE' => 'application/json'],
             content: json_encode($payload, JSON_THROW_ON_ERROR),
         );
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private function payload(Response $response): array
+    {
+        $content = $response->getContent();
+
+        self::assertIsString($content);
+
+        $payload = json_decode($content, true, 512, JSON_THROW_ON_ERROR);
+
+        self::assertIsArray($payload);
+
+        /** @var array<string, mixed> $payload */
+        return $payload;
+    }
+
+    /**
+     * @param array<string, mixed> $payload
+     */
+    private function errorCode(array $payload): string
+    {
+        $error = $payload['error'] ?? null;
+
+        self::assertIsArray($error);
+        self::assertIsString($error['code'] ?? null);
+
+        return $error['code'];
+    }
+
+    /**
+     * @param array<string, mixed> $payload
+     */
+    private function eventType(array $payload): string
+    {
+        $event = $payload['event'] ?? null;
+
+        self::assertIsArray($event);
+        self::assertIsString($event['type'] ?? null);
+
+        return $event['type'];
     }
 }

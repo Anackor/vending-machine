@@ -100,6 +100,8 @@ Common commands:
 - `make analyse`
 - `make quality`
 - `make test`
+- `make test-unit`
+- `make test-integration`
 - `make coverage`
 - `make coverage-html`
 - `make rector-fix`
@@ -116,6 +118,8 @@ It wraps the main containerized commands:
 - `make lint` -> `docker compose exec -T app composer run lint`
 - `make analyse` -> `docker compose exec -T app composer run analyse`
 - `make test` -> `docker compose exec -T app composer run test`
+- `make test-unit` -> `docker compose exec -T app composer run test:unit`
+- `make test-integration` -> `docker compose exec -T app composer run test:integration`
 - `make coverage` -> `docker compose exec -T app composer run test:coverage`
 - `make coverage-html` -> `docker compose exec -T app composer run test:coverage:html`
 - `make rector-fix` -> `docker compose exec -T app composer run analyse:rector:fix`
@@ -197,6 +201,28 @@ make test
 make quality
 make coverage
 ```
+
+## Test suite split
+
+The project now exposes two explicit test entry points:
+
+- `make test-unit`: fast unit-oriented suite for domain, application, mappers,
+  in-memory adapters, and transport factories
+- `make test-integration`: MongoDB-backed repository and HTTP integration suite
+
+The default `make test` command runs both suites sequentially because it is the
+main local safety-net command.
+
+## Coverage threshold
+
+`make coverage` now enforces a minimum coverage threshold of `90%` for:
+
+- classes
+- methods
+- lines
+
+The threshold is checked from a generated Cobertura report through
+`bin/check-coverage-threshold.php`.
 
 ## Development docs
 

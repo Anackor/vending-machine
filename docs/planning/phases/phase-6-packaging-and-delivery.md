@@ -16,7 +16,7 @@ Finalize the repository so it is easy for reviewers to run, validate, and assess
 - `docs/challenges/backend/README.md`
 - `docs/planning/phases/phase-0/README.md`
 - `docs/planning/phases/phase-4/README.md`
-- `docs/planning/phases/phase-5-test-hardening-and-quality-gates.md`
+- `docs/planning/phases/phase-5/README.md`
 
 ## Tasks
 
