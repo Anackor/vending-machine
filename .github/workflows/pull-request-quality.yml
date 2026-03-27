@@ -1,0 +1,61 @@
+name: Pull Request Quality
+
+on:
+  pull_request:
+
+concurrency:
+  group: pull-request-quality-${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  quality-baseline:
+    name: Quality baseline
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup PHP
+        id: setup-php
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.4'
+          coverage: none
+          extensions: intl, mbstring, mongodb, zip
+          tools: composer:v2
+
+      - name: Restore Composer and tool caches
+        uses: actions/cache@v4
+        with:
+          path: |
+            vendor
+            ~/.composer/cache/files
+            .phpunit.cache
+            var/cache/phpstan
+            var/cache/deptrac.cache
+          key: ${{ runner.os }}-php-${{ steps.setup-php.outputs.php-version }}-${{ hashFiles('composer.lock', 'ecs.php', 'rector.php', 'phpstan.neon.dist', 'deptrac.yaml', 'phpunit.dist.xml') }}
+          restore-keys: |
+            ${{ runner.os }}-php-${{ steps.setup-php.outputs.php-version }}-
+
+      - name: Install Composer dependencies
+        run: composer install --no-interaction --no-progress --prefer-dist --no-scripts
+
+      - name: ECS
+        run: composer run lint:ecs
+
+      - name: Rector (dry-run)
+        run: composer run analyse:rector
+
+      - name: PHPStan
+        run: composer run analyse:phpstan
+
+      - name: Deptrac
+        run: composer run analyse:deptrac
+
+      - name: Unit test suite
+        run: composer run test:unit
