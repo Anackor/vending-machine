@@ -17,7 +17,7 @@ Implement MongoDB-backed infrastructure adapters that satisfy the application po
 - `README.md`
 - `docs/challenges/backend/README.md`
 - `docs/planning/phases/phase-0/README.md`
-- `docs/planning/phases/phase-2-application-layer-and-ports.md`
+- `docs/planning/phases/phase-2/README.md`
 
 ## Tasks
 

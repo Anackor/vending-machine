@@ -22,7 +22,11 @@ The plan has been split into atomic phase documents so each implementation step 
 - `docs/planning/phases/phase-1/block-b-money-and-machine-primitives.md`
 - `docs/planning/phases/phase-1/block-c-core-machine-behaviors.md`
 - `docs/planning/phases/phase-1/block-d-domain-test-suite-and-phase-gate.md`
-- `docs/planning/phases/phase-2-application-layer-and-ports.md`
+- `docs/planning/phases/phase-2/README.md`
+- `docs/planning/phases/phase-2/block-a-use-cases-and-boundaries.md`
+- `docs/planning/phases/phase-2/block-b-application-contracts.md`
+- `docs/planning/phases/phase-2/block-c-handlers-and-ports.md`
+- `docs/planning/phases/phase-2/block-d-application-tests-and-phase-gate.md`
 - `docs/planning/phases/phase-3-infrastructure-and-persistence.md`
 - `docs/planning/phases/phase-4-initial-interface.md`
 - `docs/planning/phases/phase-5-test-hardening-and-quality-gates.md`
@@ -61,6 +65,12 @@ For Phase 1 specifically:
 - always load `docs/planning/phases/phase-1/README.md`
 - load only the block file you are actively executing
 - load previous Phase 1 block files only when their assumptions or outputs are required
+
+For Phase 2 specifically:
+
+- always load `docs/planning/phases/phase-2/README.md`
+- load only the block file you are actively executing
+- load previous Phase 2 block files only when their contracts or outputs are required
 
 Additional documents should only be loaded when the phase explicitly depends on them.
 
