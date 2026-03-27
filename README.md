@@ -42,7 +42,7 @@ The exercise explicitly points toward:
 
 ## Repository status
 
-The repository now includes the Dockerized Symfony baseline, MongoDB foundation, quality toolchain, and the documented developer workflow for Phase 0. The next step is to pass the final Phase 0 gate and start implementing the vending machine domain model.
+The repository now includes the Dockerized Symfony baseline, MongoDB foundation, quality toolchain, and the documented developer workflow for Phase 0. Phase 0 is complete, and the next step is to start implementing the vending machine domain model.
 
 ## Local prerequisites
 
