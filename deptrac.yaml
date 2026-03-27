@@ -1,0 +1,42 @@
+deptrac:
+  cache_file: var/cache/deptrac.cache
+  paths:
+    - ./src
+  exclude_files:
+    - '#.*\.gitkeep$#'
+  layers:
+    - name: Kernel
+      collectors:
+        - type: classLike
+          value: '^App\\Kernel$'
+    - name: Domain
+      collectors:
+        - type: classLike
+          value: '^VendingMachine\\Domain\\.*'
+    - name: Application
+      collectors:
+        - type: classLike
+          value: '^VendingMachine\\Application\\.*'
+    - name: InfrastructureSymfony
+      collectors:
+        - type: classLike
+          value: '^VendingMachine\\Infrastructure\\Symfony\\.*'
+    - name: InfrastructurePersistence
+      collectors:
+        - type: classLike
+          value: '^VendingMachine\\Infrastructure\\Persistence\\.*'
+  ruleset:
+    Kernel:
+      - Domain
+      - Application
+      - InfrastructureSymfony
+      - InfrastructurePersistence
+    Domain:
+    Application:
+      - Domain
+    InfrastructureSymfony:
+      - Domain
+      - Application
+    InfrastructurePersistence:
+      - Domain
+      - Application

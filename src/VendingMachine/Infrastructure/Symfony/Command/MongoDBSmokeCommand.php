@@ -61,7 +61,7 @@ final class MongoDBSmokeCommand extends Command
         $collection->insertOne([
             '_id' => $documentId,
             'scope' => 'phase_0_foundation',
-            'createdAt' => (new DateTimeImmutable())->format(DATE_ATOM),
+            'createdAt' => new DateTimeImmutable()->format(DATE_ATOM),
         ]);
     }
 }
