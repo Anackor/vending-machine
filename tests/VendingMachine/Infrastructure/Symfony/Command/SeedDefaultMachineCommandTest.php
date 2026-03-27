@@ -54,4 +54,40 @@ final class SeedDefaultMachineCommandTest extends TestCase
         self::assertSame(4, $persistedMachine->productStockFor(Selector::fromString('juice'))?->quantity());
         self::assertSame(2, $persistedMachine->productStockFor(Selector::fromString('soda'))?->quantity());
     }
+
+    public function testItResetsAnExistingMachineWhenRequested(): void
+    {
+        $existingMachine = DefaultMachineFixture::machine(
+            stockQuantities: [
+                'water' => 3,
+                'juice' => 4,
+                'soda' => 2,
+            ],
+            availableChangeCounts: [
+                5 => 1,
+                10 => 2,
+                25 => 3,
+                100 => 4,
+            ],
+            insertedCoinCounts: [
+                25 => 1,
+            ],
+        );
+        $repository = new InMemoryMachineRepository(['default' => $existingMachine]);
+        $command = new SeedDefaultMachineCommand($repository);
+        $tester = new CommandTester($command);
+
+        $exitCode = $tester->execute(['--reset' => true]);
+        $persistedMachine = $repository->find('default');
+
+        self::assertSame(Command::SUCCESS, $exitCode);
+        self::assertStringContainsString('reset to the documented reviewer baseline', $tester->getDisplay());
+        self::assertNotNull($persistedMachine);
+        self::assertSame(20, $persistedMachine->availableChange()->countFor(Coin::fromCents(5)));
+        self::assertSame(10, $persistedMachine->availableChange()->countFor(Coin::fromCents(100)));
+        self::assertSame(0, $persistedMachine->insertedBalance()->cents());
+        self::assertSame(10, $persistedMachine->productStockFor(Selector::fromString('water'))?->quantity());
+        self::assertSame(8, $persistedMachine->productStockFor(Selector::fromString('juice'))?->quantity());
+        self::assertSame(5, $persistedMachine->productStockFor(Selector::fromString('soda'))?->quantity());
+    }
 }
