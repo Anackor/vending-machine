@@ -95,7 +95,7 @@ Load Phase 0 block files only if:
 
 - file: `docs/planning/phases/phase-2/block-c-handlers-and-ports.md`
 - task ids: `P2-020` to `P2-030`
-- status: pending
+- status: complete
 - outputs: repository ports, handler orchestration baseline, contract-to-domain mapping direction
 
 ### D. Application tests and phase gate
