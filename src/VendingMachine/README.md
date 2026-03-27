@@ -18,6 +18,9 @@ adding it.
 The frozen Phase 1 domain assumptions for this module live in
 `Domain/Machine/README.md`.
 
+The frozen Phase 2 application-boundary assumptions for this module live in
+`Application/Machine/README.md`.
+
 ## Baseline structure
 
 The current baseline for the core is:
@@ -71,8 +74,8 @@ mirror business modules when a concrete adapter needs that split.
 - name handlers with an imperative verb phrase plus the `Handler` suffix
 - prefer names such as `InsertCoinHandler`, `ReturnInsertedMoneyHandler`,
   `SelectProductHandler`, and `ServiceMachineHandler`
-- when input and output models are needed, pair handlers with `Command` and
-  `Result` classes that reuse the same use-case name
+- when input and output models are needed, pair handlers with `Command`,
+  `Query`, and `Result` classes that reuse the same use-case name
 
 ## Symfony alignment
 
