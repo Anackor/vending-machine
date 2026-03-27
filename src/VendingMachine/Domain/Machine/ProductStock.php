@@ -27,8 +27,28 @@ final readonly class ProductStock
         return $this->product->selector();
     }
 
+    public function price(): Money
+    {
+        return $this->product->price();
+    }
+
     public function quantity(): int
     {
         return $this->quantity;
+    }
+
+    public function isAvailable(): bool
+    {
+        return $this->quantity > 0;
+    }
+
+    public function decrement(): self
+    {
+        return $this->withQuantity($this->quantity - 1);
+    }
+
+    public function withQuantity(int $quantity): self
+    {
+        return new self($this->product, $quantity);
     }
 }

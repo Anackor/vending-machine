@@ -37,6 +37,21 @@ final readonly class InsertedCoins
         return $this->coins->countFor($coin);
     }
 
+    public function addCoin(Coin $coin): self
+    {
+        return new self($this->coins->addCoin($coin));
+    }
+
+    public function clear(): self
+    {
+        return self::empty();
+    }
+
+    public function toCoinInventory(): CoinInventory
+    {
+        return $this->coins;
+    }
+
     public function total(): Money
     {
         return $this->coins->total();

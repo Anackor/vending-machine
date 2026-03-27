@@ -63,6 +63,71 @@ final readonly class CoinInventory
         return $this->counts[$coin->value] ?? 0;
     }
 
+    public function addCoin(Coin $coin): self
+    {
+        $counts = $this->counts;
+        $counts[$coin->value] = ($counts[$coin->value] ?? 0) + 1;
+        ksort($counts);
+
+        return new self($counts);
+    }
+
+    public function add(self $other): self
+    {
+        $counts = $this->counts;
+
+        foreach ($other->counts() as $denomination => $count) {
+            $counts[$denomination] = ($counts[$denomination] ?? 0) + $count;
+        }
+
+        ksort($counts);
+
+        return new self($counts);
+    }
+
+    public function subtract(self $other): self
+    {
+        $counts = $this->counts;
+
+        foreach ($other->counts() as $denomination => $count) {
+            $currentCount = $counts[$denomination] ?? 0;
+
+            if ($currentCount < $count) {
+                throw new InvalidArgumentException('Coin inventory subtraction cannot produce negative counts.');
+            }
+
+            $remainingCount = $currentCount - $count;
+
+            if ($remainingCount === 0) {
+                unset($counts[$denomination]);
+
+                continue;
+            }
+
+            $counts[$denomination] = $remainingCount;
+        }
+
+        ksort($counts);
+
+        return new self($counts);
+    }
+
+    public function allocateForAmount(Money $amount): ?self
+    {
+        if ($amount->isZero()) {
+            return self::empty();
+        }
+
+        $allocatedCounts = self::findChangeCounts(
+            $amount->cents(),
+            array_reverse(array_map(static fn (Coin $coin): int => $coin->value, Coin::cases())),
+            $this->counts,
+            0,
+        );
+
+        return $allocatedCounts === null ? null : new self($allocatedCounts);
+    }
+
     public function total(): Money
     {
         $totalCents = 0;
@@ -77,6 +142,63 @@ final readonly class CoinInventory
     public function isEmpty(): bool
     {
         return $this->counts === [];
+    }
+
+    /**
+     * @param list<int> $denominations
+     * @param array<int, int> $availableCounts
+     *
+     * @return array<int, int>|null
+     */
+    private static function findChangeCounts(
+        int $remainingAmount,
+        array $denominations,
+        array $availableCounts,
+        int $index,
+    ): ?array {
+        if ($remainingAmount === 0) {
+            return [];
+        }
+
+        if ($index >= count($denominations)) {
+            return null;
+        }
+
+        $denomination = $denominations[$index];
+        $availableCount = $availableCounts[$denomination] ?? 0;
+        $maxUsableCoins = min(intdiv($remainingAmount, $denomination), $availableCount);
+
+        for ($coinsToUse = $maxUsableCoins; $coinsToUse >= 0; --$coinsToUse) {
+            $nextAvailableCounts = $availableCounts;
+
+            if ($coinsToUse > 0) {
+                $nextAvailableCounts[$denomination] -= $coinsToUse;
+
+                if ($nextAvailableCounts[$denomination] === 0) {
+                    unset($nextAvailableCounts[$denomination]);
+                }
+            }
+
+            $nextResult = self::findChangeCounts(
+                $remainingAmount - ($coinsToUse * $denomination),
+                $denominations,
+                $nextAvailableCounts,
+                $index + 1,
+            );
+
+            if ($nextResult === null) {
+                continue;
+            }
+
+            if ($coinsToUse > 0) {
+                $nextResult[$denomination] = $coinsToUse;
+                ksort($nextResult);
+            }
+
+            return $nextResult;
+        }
+
+        return null;
     }
 
     private static function normalizeDenomination(int|string $denomination): int
