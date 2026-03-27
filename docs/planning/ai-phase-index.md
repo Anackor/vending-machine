@@ -47,13 +47,23 @@ Load previous phase documents only if:
 
 ### Phase 1
 
-- file: `docs/planning/phases/phase-1-domain-design-and-core-model.md`
+- file: `docs/planning/phases/phase-1/README.md`
+- block files:
+  - `docs/planning/phases/phase-1/block-a-assumptions-and-language.md`
+  - `docs/planning/phases/phase-1/block-b-money-and-machine-primitives.md`
+  - `docs/planning/phases/phase-1/block-c-core-machine-behaviors.md`
+  - `docs/planning/phases/phase-1/block-d-domain-test-suite-and-phase-gate.md`
 - purpose: design and implement the domain model and business rules
 - depends on:
   - Phase 0 outputs
+- loading rule:
+  - always load `docs/planning/phases/phase-1/README.md`
+  - load only the block file you are actively executing
+  - load previous Phase 1 block files only when their assumptions or validated outputs are required
 - main outputs:
   - domain assumptions
   - aggregates and value objects
+  - implemented machine behaviors
   - unit tests for core rules
 
 ### Phase 2
@@ -128,7 +138,8 @@ Load:
 Load:
 
 - common context
-- Phase 1
+- `docs/planning/phases/phase-1/README.md`
+- the relevant `docs/planning/phases/phase-1/block-*.md` file
 - Phase 0 only if architecture or tooling decisions must be checked
 
 ### Application orchestration work

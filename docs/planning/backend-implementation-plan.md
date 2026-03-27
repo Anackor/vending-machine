@@ -17,7 +17,11 @@ The plan has been split into atomic phase documents so each implementation step 
 - `docs/planning/phases/phase-0/block-g-quality-toolchain.md`
 - `docs/planning/phases/phase-0/block-h-developer-workflow.md`
 - `docs/planning/phases/phase-0/block-i-final-phase-gate.md`
-- `docs/planning/phases/phase-1-domain-design-and-core-model.md`
+- `docs/planning/phases/phase-1/README.md`
+- `docs/planning/phases/phase-1/block-a-assumptions-and-language.md`
+- `docs/planning/phases/phase-1/block-b-money-and-machine-primitives.md`
+- `docs/planning/phases/phase-1/block-c-core-machine-behaviors.md`
+- `docs/planning/phases/phase-1/block-d-domain-test-suite-and-phase-gate.md`
 - `docs/planning/phases/phase-2-application-layer-and-ports.md`
 - `docs/planning/phases/phase-3-infrastructure-and-persistence.md`
 - `docs/planning/phases/phase-4-initial-interface.md`
@@ -51,6 +55,12 @@ For Phase 0 specifically:
 - always load `docs/planning/phases/phase-0/README.md`
 - load only the block file you are actively executing
 - load previous Phase 0 block files only when their decisions or outputs are required
+
+For Phase 1 specifically:
+
+- always load `docs/planning/phases/phase-1/README.md`
+- load only the block file you are actively executing
+- load previous Phase 1 block files only when their assumptions or outputs are required
 
 Additional documents should only be loaded when the phase explicitly depends on them.
 
