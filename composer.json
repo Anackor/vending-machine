@@ -73,10 +73,16 @@
         "analyse:rector": "@php vendor/bin/rector process --dry-run --config=rector.php",
         "analyse:rector:fix": "@php vendor/bin/rector process --config=rector.php",
         "test": [
-            "@test:unit"
+            "@test:unit",
+            "@test:integration"
         ],
-        "test:unit": "@php bin/phpunit",
-        "test:coverage": "@php -d pcov.enabled=1 -d pcov.directory=src bin/phpunit --coverage-text",
+        "test:unit": "@php bin/phpunit --testsuite Unit",
+        "test:integration": "@php bin/phpunit --testsuite Integration",
+        "test:coverage": [
+            "@php -d pcov.enabled=1 -d pcov.directory=src bin/phpunit --coverage-text --coverage-cobertura var/coverage/cobertura.xml",
+            "@test:coverage:check"
+        ],
+        "test:coverage:check": "@php bin/check-coverage-threshold.php var/coverage/cobertura.xml 90",
         "test:coverage:html": "@php -d pcov.enabled=1 -d pcov.directory=src bin/phpunit --coverage-html var/coverage/html",
         "post-install-cmd": [
             "@auto-scripts"

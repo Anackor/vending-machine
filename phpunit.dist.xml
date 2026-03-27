@@ -19,9 +19,23 @@
     </php>
 
     <testsuites>
-        <testsuite name="Project Test Suite">
-            <directory>tests</directory>
+        <testsuite name="Unit">
+            <file>tests/App/KernelTest.php</file>
+            <directory>tests/VendingMachine/Application</directory>
+            <directory>tests/VendingMachine/Domain</directory>
+            <directory>tests/VendingMachine/Infrastructure/Persistence/MongoDB/Machine/Document</directory>
+            <directory>tests/VendingMachine/Infrastructure/Persistence/MongoDB/Machine/Mapper</directory>
+            <file>tests/VendingMachine/Infrastructure/Symfony/Command/SeedDefaultMachineCommandTest.php</file>
+            <file>tests/VendingMachine/Infrastructure/Symfony/Controller/Api/MachineControllerDirectTest.php</file>
+            <file>tests/VendingMachine/Infrastructure/Symfony/Controller/Api/MachineJsonRequestFactoryTest.php</file>
+            <file>tests/VendingMachine/Infrastructure/Symfony/Controller/Api/MachineJsonResponseFactoryTest.php</file>
         </testsuite>
+
+        <testsuite name="Integration">
+            <directory>tests/VendingMachine/Infrastructure/Persistence/MongoDB/Machine/Integration</directory>
+            <file>tests/VendingMachine/Infrastructure/Symfony/Controller/Api/MachineControllerTest.php</file>
+        </testsuite>
+
     </testsuites>
 
     <source ignoreSuppressionOfDeprecations="true"
