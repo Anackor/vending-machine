@@ -4,7 +4,7 @@ services:
       context: .
       dockerfile: docker/php/Dockerfile
     working_dir: /app
-    command: ["sleep", "infinity"]
+    command: ["php", "-S", "0.0.0.0:8000", "-t", "public", "public/index.php"]
     depends_on:
       mongo:
         condition: service_healthy
@@ -23,6 +23,8 @@ services:
     volumes:
       - ./:/app
       - composer-cache:/tmp/composer-cache
+    ports:
+      - "8000:8000"
     networks:
       - platform
 

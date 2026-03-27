@@ -46,10 +46,11 @@ The repository now includes the Dockerized Symfony baseline, MongoDB
 foundation, quality toolchain, and the documented developer workflow for
 Phase 0. Phase 1 is complete, so the core domain model is now implemented,
 tested, and validated. Phase 2 completed the application contracts and
-orchestration layer. Phase 3 now adds the MongoDB-backed persistence adapter,
-mapping strategy, and persistence integration tests. The next step is Phase 4,
-where a thin reviewer-facing interface can sit on top of the persisted
-application layer.
+orchestration layer. Phase 3 added the MongoDB-backed persistence adapter,
+mapping strategy, and persistence integration tests. Phase 4 is now complete,
+so the project also exposes a thin reviewer-facing HTTP JSON interface on top
+of the persisted application layer. The next step is Phase 5, where tests and
+quality gates can be hardened further.
 
 ## Local prerequisites
 
@@ -72,7 +73,18 @@ This command:
 - builds the application image
 - starts the Docker environment
 - installs Composer dependencies inside the `app` container
-- runs the Phase 0 setup checks
+- runs the setup checks
+- seeds the default machine if it does not exist yet
+
+After `make bootstrap`, the reviewer-facing HTTP interface is available at:
+
+```text
+http://localhost:8000
+```
+
+No extra local database setup is required for reviewers. The bootstrap flow
+already creates the local environment and seeds the default machine if it is
+missing.
 
 ## Daily workflow
 
@@ -109,6 +121,82 @@ It wraps the main containerized commands:
 - `make rector-fix` -> `docker compose exec -T app composer run analyse:rector:fix`
 - `make ecs-fix` -> `docker compose exec -T app composer run lint:ecs:fix`
 - `make console cmd="..."` -> `docker compose exec -T app php bin/console ...`
+
+## Reviewer validation guide
+
+The first reviewer-facing interface is a thin HTTP JSON layer served by the
+`app` container on `localhost:8000`.
+
+Available endpoints:
+
+- `GET /api/machine`
+- `POST /api/machine/insert-coin`
+- `POST /api/machine/select-product`
+- `POST /api/machine/return-coin`
+- `POST /api/machine/service`
+
+Recommended validation flow:
+
+1. Bootstrap the local environment:
+
+```bash
+make bootstrap
+```
+
+2. Confirm the containers are up:
+
+```bash
+make status
+```
+
+3. Inspect the current machine state:
+
+```bash
+curl http://localhost:8000/api/machine
+```
+
+4. Insert a `100` cent coin:
+
+```bash
+curl -X POST http://localhost:8000/api/machine/insert-coin \
+  -H "Content-Type: application/json" \
+  -d '{"coinCents":100}'
+```
+
+5. Buy a product, for example `water`:
+
+```bash
+curl -X POST http://localhost:8000/api/machine/select-product \
+  -H "Content-Type: application/json" \
+  -d '{"selector":"water"}'
+```
+
+6. Return the currently inserted money:
+
+```bash
+curl -X POST http://localhost:8000/api/machine/return-coin
+```
+
+7. Reset the machine state with a service call when needed:
+
+```bash
+curl -X POST http://localhost:8000/api/machine/service \
+  -H "Content-Type: application/json" \
+  -d '{
+    "productQuantities":{"water":10,"juice":8,"soda":5},
+    "availableChangeCounts":{"5":20,"10":20,"25":20,"100":10}
+  }'
+```
+
+The seeded default machine uses the selectors `water`, `juice`, and `soda`.
+
+To validate the automated checks as part of the review:
+
+```bash
+make test
+make quality
+make coverage
+```
 
 ## Development docs
 
