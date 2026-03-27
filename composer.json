@@ -73,6 +73,8 @@
             "@test:unit"
         ],
         "test:unit": "@php bin/phpunit",
+        "test:coverage": "@php -d pcov.enabled=1 -d pcov.directory=src bin/phpunit --coverage-text",
+        "test:coverage:html": "@php -d pcov.enabled=1 -d pcov.directory=src bin/phpunit --coverage-html var/coverage/html",
         "post-install-cmd": [
             "@auto-scripts"
         ],

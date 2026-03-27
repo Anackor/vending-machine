@@ -8,7 +8,7 @@ APP_EXEC_INTERACTIVE := $(DOCKER_COMPOSE) exec $(APP_SERVICE)
 COMPOSER := $(APP_EXEC) composer
 CONSOLE := $(APP_EXEC) php bin/console
 
-.PHONY: help bootstrap build up down restart status install setup shell composer console lint analyse quality test phpstan deptrac rector ecs mongodb-smoke
+.PHONY: help bootstrap build up down restart status install setup shell composer console lint analyse quality test coverage coverage-html phpstan deptrac rector ecs mongodb-smoke
 
 # Show the available local workflow targets.
 help:
@@ -28,6 +28,8 @@ help:
 	@echo   analyse        Run static analysis and architecture checks
 	@echo   quality        Run lint and analysis together
 	@echo   test           Run the current test entry point
+	@echo   coverage       Run PHPUnit with text coverage output
+	@echo   coverage-html  Generate the PHPUnit HTML coverage report under var/coverage/html
 	@echo   phpstan        Run PHPStan
 	@echo   deptrac        Run Deptrac
 	@echo   rector         Run Rector in dry-run mode
@@ -90,6 +92,14 @@ quality: lint analyse
 # Run the current test entry point.
 test:
 	$(COMPOSER) run test
+
+# Run PHPUnit with text coverage output.
+coverage:
+	$(COMPOSER) run test:coverage
+
+# Generate the PHPUnit HTML coverage report.
+coverage-html:
+	$(COMPOSER) run test:coverage:html
 
 # Run PHPStan directly.
 phpstan:
