@@ -36,7 +36,7 @@ final class MachineControllerDirectTest extends TestCase
         [$controller, , $insertCoinHandler] = $this->controllerSuite();
 
         $response = $controller->insertCoin(
-            $this->jsonRequest(['coinCents' => 25]),
+            $this->jsonRequest(['coins' => 0.25]),
             $insertCoinHandler,
         );
 
@@ -113,13 +113,27 @@ final class MachineControllerDirectTest extends TestCase
         [$controller, , $insertCoinHandler] = $this->controllerSuite();
 
         $response = $controller->insertCoin(
-            $this->jsonRequest(['coinCents' => '25']),
+            $this->jsonRequest(['coins' => 0.249]),
             $insertCoinHandler,
         );
         $payload = $this->payload($response);
 
         self::assertSame(Response::HTTP_BAD_REQUEST, $response->getStatusCode());
         self::assertSame('invalid_request', $this->errorCode($payload));
+    }
+
+    public function testItMapsMissingMachinesDuringInsertCoinToNotFoundResponsesDirectly(): void
+    {
+        [$controller, , $insertCoinHandler] = $this->controllerSuite(seedDefaultMachine: false);
+
+        $response = $controller->insertCoin(
+            $this->jsonRequest(['coins' => 0.25]),
+            $insertCoinHandler,
+        );
+        $payload = $this->payload($response);
+
+        self::assertSame(Response::HTTP_NOT_FOUND, $response->getStatusCode());
+        self::assertSame('machine_not_found', $this->errorCode($payload));
     }
 
     public function testItMapsSelectProductFailuresToConflictResponsesDirectly(): void
@@ -134,6 +148,20 @@ final class MachineControllerDirectTest extends TestCase
 
         self::assertSame(Response::HTTP_CONFLICT, $response->getStatusCode());
         self::assertSame('insufficient_balance', $this->errorCode($payload));
+    }
+
+    public function testItMapsInvalidSelectProductPayloadsToBadRequestResponsesDirectly(): void
+    {
+        [$controller, , , , $selectProductHandler] = $this->controllerSuite();
+
+        $response = $controller->selectProduct(
+            $this->jsonRequest(['selector' => 10]),
+            $selectProductHandler,
+        );
+        $payload = $this->payload($response);
+
+        self::assertSame(Response::HTTP_BAD_REQUEST, $response->getStatusCode());
+        self::assertSame('invalid_request', $this->errorCode($payload));
     }
 
     public function testItMapsInvalidServicePayloadsToBadRequestResponsesDirectly(): void
@@ -153,6 +181,45 @@ final class MachineControllerDirectTest extends TestCase
 
         self::assertSame(Response::HTTP_BAD_REQUEST, $response->getStatusCode());
         self::assertSame('invalid_request', $this->errorCode($payload));
+    }
+
+    public function testItMapsServiceFailuresToConflictResponsesDirectly(): void
+    {
+        [$controller, , , , , $serviceMachineHandler] = $this->controllerSuite(
+            DefaultMachineFixture::machine(insertedCoinCounts: [25 => 1]),
+        );
+
+        $response = $controller->service(
+            $this->jsonRequest([
+                'productQuantities' => [
+                    'water' => 6,
+                    'juice' => 7,
+                    'soda' => 4,
+                ],
+                'availableChangeCounts' => [
+                    '5' => 4,
+                    '10' => 5,
+                    '25' => 6,
+                    '100' => 2,
+                ],
+            ]),
+            $serviceMachineHandler,
+        );
+        $payload = $this->payload($response);
+
+        self::assertSame(Response::HTTP_CONFLICT, $response->getStatusCode());
+        self::assertSame('pending_balance_during_service', $this->errorCode($payload));
+    }
+
+    public function testItMapsReturnCoinFailuresToNotFoundResponsesDirectly(): void
+    {
+        [$controller, , , $returnInsertedMoneyHandler] = $this->controllerSuite(seedDefaultMachine: false);
+
+        $response = $controller->returnCoin($returnInsertedMoneyHandler);
+        $payload = $this->payload($response);
+
+        self::assertSame(Response::HTTP_NOT_FOUND, $response->getStatusCode());
+        self::assertSame('machine_not_found', $this->errorCode($payload));
     }
 
     /**
