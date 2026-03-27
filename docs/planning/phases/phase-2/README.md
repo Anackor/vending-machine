@@ -102,7 +102,7 @@ Load Phase 0 block files only if:
 
 - file: `docs/planning/phases/phase-2/block-d-application-tests-and-phase-gate.md`
 - task ids: `P2-031` to `P2-040`
-- status: pending
+- status: complete
 - outputs: application-layer unit coverage, validated orchestration baseline, Phase 3 handoff confirmation
 
 ## Mandatory use cases for Phase 2
