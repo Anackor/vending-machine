@@ -55,6 +55,23 @@ Preferred examples:
 - `ServiceMachineCommand`, `ServiceMachineResult`, `ServiceMachineHandler`
 - `GetMachineStateQuery`, `GetMachineStateResult`, `GetMachineStateHandler`
 
+## Contract baseline
+
+Phase 2 Block B now freezes the first application-facing contract set:
+
+- `Command/InsertCoinCommand.php`
+- `Command/SelectProductCommand.php`
+- `Command/ReturnInsertedMoneyCommand.php`
+- `Command/ServiceMachineCommand.php`
+- `Query/GetMachineStateQuery.php`
+- `Result/MachineSnapshot.php`
+- `Result/ProductSnapshot.php`
+- one `Result` class per use case
+
+These contracts normalize external string identifiers and expose primitive
+values only, so adapters can depend on stable inputs and outputs without
+carrying domain entities across the application boundary.
+
 ## Failure boundary
 
 Phase 2 will keep domain exceptions inside the application layer boundary.
@@ -62,3 +79,9 @@ Phase 2 will keep domain exceptions inside the application layer boundary.
 Handlers may catch domain failures and re-express them as application-facing
 exceptions or failure contracts, but upper layers should not depend directly on
 the domain exception classes.
+
+The initial application failure contract set is:
+
+- `Failure/MachineFailureCode.php`
+- `Failure/MachineFailure.php`
+- `Exception/MachineOperationFailed.php`

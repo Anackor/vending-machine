@@ -45,8 +45,9 @@ The exercise explicitly points toward:
 The repository now includes the Dockerized Symfony baseline, MongoDB
 foundation, quality toolchain, and the documented developer workflow for
 Phase 0. Phase 1 is complete, so the core domain model is now implemented,
-tested, and validated. The next step is Phase 2, where the application layer
-will start orchestrating the domain use cases.
+tested, and validated. Phase 2 has already frozen the application use-case
+map and contract set, so the next step is handler orchestration and repository
+ports.
 
 ## Local prerequisites
 
