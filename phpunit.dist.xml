@@ -29,8 +29,14 @@
             restrictWarnings="true"
     >
         <include>
-            <directory>src</directory>
+            <directory>src/VendingMachine</directory>
         </include>
+
+        <exclude>
+            <directory>src/VendingMachine/Infrastructure</directory>
+            <directory>src/VendingMachine/Domain/Machine/Exception</directory>
+            <file>src/Kernel.php</file>
+        </exclude>
 
         <deprecationTrigger>
             <method>Doctrine\Deprecations\Deprecation::trigger</method>

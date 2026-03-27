@@ -98,7 +98,7 @@ Load Phase 0 block files only if:
 
 - file: `docs/planning/phases/phase-1/block-d-domain-test-suite-and-phase-gate.md`
 - task ids: `P1-030` to `P1-039`
-- status: pending
+- status: complete
 - outputs: unit coverage for mandatory business cases and phase-completion confirmation
 
 ## Mandatory business cases

@@ -87,6 +87,7 @@ Load previous phase documents only if:
 - main outputs:
   - MongoDB repositories
   - persistence mapping
+  - MongoDB fixture baseline
   - persistence integration tests
 
 ### Phase 4
@@ -108,6 +109,7 @@ Load previous phase documents only if:
   - Phases 1 to 4 outputs
 - main outputs:
   - stronger integration coverage
+  - explicit unit/integration/coverage workflow
   - stricter PHPStan and deptrac gates
   - stable maintenance workflow
   - GitHub Actions PR quality checks
