@@ -200,7 +200,7 @@ The current delivery covers the expected challenge behaviors:
 - automated checks: unit tests, integration tests, static analysis, formatting,
   architecture checks, and pull-request CI
 - reviewer experience: raw HTTP API plus a small visual UI with request and
-  response inspection
+  response inspection normalized to `coins`
 
 ## Author note
 
@@ -208,10 +208,16 @@ The application and domain layers model money in integer cents to avoid
 floating-point precision issues in balances, price comparisons, and change
 calculation.
 
-To stay aligned with the challenge wording, the HTTP adapter accepts both:
+To stay aligned with the challenge wording, the HTTP adapter exposes `coins`
+at the HTTP boundary while still keeping integer cents inside the core.
+
+For insert-coin requests it accepts both:
 
 - `coins`: reviewer-friendly decimal input such as `0.25` or `1`
 - `coinCents`: integer cents such as `25` or `100`
+
+For all reviewer-facing responses, balances, prices, and denomination keys are
+serialized back as `coins`.
 
 `coins` is the preferred frontend-facing field. The adapter converts it to
 integer cents immediately before the value reaches the application layer.
@@ -232,8 +238,8 @@ These short notes summarize the main technical decisions behind the solution:
 - Money is modeled as integer cents inside the application and domain layers to
   avoid floating-point precision issues during balance checks and change
   allocation.
-- The HTTP adapter accepts both `coins` and `coinCents`, but `coins` is the
-  preferred reviewer-facing field and is converted to integer cents immediately.
+- The HTTP adapter speaks `coins` at the HTTP boundary and converts values to
+  integer cents immediately so the core never handles decimal money.
 - The machine aggregate is persisted as one MongoDB document, which keeps the
   write model simple and hides storage details behind the repository port.
 - The controller layer stays intentionally thin: it only parses transport
@@ -287,7 +293,7 @@ http://localhost:4173
 - buy products
 - return inserted money
 - service the machine
-- inspect the latest raw request and response payloads
+- inspect the latest request and response payloads normalized for the reviewer UI
 
 5. Run the full delivery validation:
 
@@ -342,7 +348,7 @@ curl -X POST http://localhost:8000/api/machine/service \
   -H "Content-Type: application/json" \
   -d '{
     "productQuantities":{"water":10,"juice":8,"soda":5},
-    "availableChangeCounts":{"5":20,"10":20,"25":20,"100":10}
+    "availableChangeCounts":{"0.05":20,"0.10":20,"0.25":20,"1":10}
   }'
 ```
 
