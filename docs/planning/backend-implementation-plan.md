@@ -38,6 +38,10 @@ The plan has been split into atomic phase documents so each implementation step 
 - `docs/planning/phases/phase-5/block-a-local-safety-net-hardening.md`
 - `docs/planning/phases/phase-5/block-b-ci-quality-gates.md`
 - `docs/planning/phases/phase-6-packaging-and-delivery.md`
+- `docs/planning/phases/phase-7/README.md`
+- `docs/planning/phases/phase-7/block-a-frontend-foundation.md`
+- `docs/planning/phases/phase-7/block-b-reviewer-flows.md`
+- `docs/planning/phases/phase-7/block-c-ui-tests-docker-and-handoff.md`
 
 ## Global objective
 
@@ -52,6 +56,7 @@ Deliver a production-minded backend foundation for the vending machine challenge
 5. Phase 4: initial interface
 6. Phase 5: test hardening and quality gates
 7. Phase 6: packaging and delivery
+8. Optional Phase 7: reviewer UI monorepo follow-up
 
 ## Always-relevant context
 
@@ -98,6 +103,7 @@ The backend MVP is done when:
 - MongoDB persists the required machine state
 - quality tools protect code quality and architectural boundaries
 - the repository is understandable and runnable by a reviewer
+- an optional reviewer UI can be added without reopening the backend architecture
 
 ## Optional follow-up work
 
@@ -105,3 +111,4 @@ The backend MVP is done when:
 - add more advanced logging and metrics
 - extend CI beyond pull-request quality checks if needed
 - add deployment-oriented Docker optimizations
+- add an optional reviewer-facing frontend UI inside the same repository
