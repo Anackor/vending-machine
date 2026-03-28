@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace VendingMachine\Application\Machine\Failure;
 
+/**
+ * Enumerates the failure codes exposed by the application layer.
+ */
 enum MachineFailureCode: string
 {
     case ExactChangeUnavailable = 'exact_change_unavailable';

@@ -19,6 +19,9 @@ use VendingMachine\Domain\Machine\Product;
 use VendingMachine\Domain\Machine\ProductStock;
 use VendingMachine\Domain\Machine\Selector;
 
+/**
+ * Seeds or resets the documented default machine used by reviewers and local setup.
+ */
 #[AsCommand(
     name: 'app:machine:seed-default',
     description: 'Seeds the default machine for reviewer-facing HTTP flows.',
@@ -43,6 +46,7 @@ final class SeedDefaultMachineCommand extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
+        // Bootstrap stays deterministic by reusing one documented baseline for the default machine.
         $io = new SymfonyStyle($input, $output);
         $reset = $input->getOption('reset');
 
@@ -64,6 +68,7 @@ final class SeedDefaultMachineCommand extends Command
 
     private function defaultMachine(): Machine
     {
+        // These values match the baseline described in the README and reviewer guide.
         return Machine::initialize(
             [
                 $this->productStock('water', 'Water', 65, 10),

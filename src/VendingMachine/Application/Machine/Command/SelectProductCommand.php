@@ -6,6 +6,9 @@ namespace VendingMachine\Application\Machine\Command;
 
 use InvalidArgumentException;
 
+/**
+ * Carries the input required to select a product from the machine.
+ */
 final readonly class SelectProductCommand
 {
     private string $machineId;

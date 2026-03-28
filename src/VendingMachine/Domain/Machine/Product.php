@@ -6,6 +6,9 @@ namespace VendingMachine\Domain\Machine;
 
 use InvalidArgumentException;
 
+/**
+ * Immutable definition of a vendable product in the catalog.
+ */
 final readonly class Product
 {
     private string $name;

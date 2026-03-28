@@ -15,6 +15,9 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Throwable;
 
+/**
+ * Small operational command used to confirm MongoDB connectivity and a full round-trip.
+ */
 #[AsCommand(
     name: 'app:mongodb:smoke',
     description: 'Runs a MongoDB connectivity and round-trip smoke check.',

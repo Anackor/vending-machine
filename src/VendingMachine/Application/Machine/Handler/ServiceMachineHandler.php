@@ -13,6 +13,9 @@ use VendingMachine\Application\Machine\Result\ServiceMachineResult;
 use VendingMachine\Domain\Machine\Exception\InvalidServiceConfiguration;
 use VendingMachine\Domain\Machine\Exception\PendingBalanceDuringService;
 
+/**
+ * Coordinates the service use case that resets stock and available change.
+ */
 final readonly class ServiceMachineHandler
 {
     public function __construct(

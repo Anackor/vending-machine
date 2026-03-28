@@ -6,6 +6,9 @@ namespace VendingMachine\Application\Machine\Query;
 
 use InvalidArgumentException;
 
+/**
+ * Requests the current machine snapshot without mutating state.
+ */
 final readonly class GetMachineStateQuery
 {
     private string $machineId;

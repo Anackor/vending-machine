@@ -6,6 +6,9 @@ namespace VendingMachine\Domain\Machine;
 
 use InvalidArgumentException;
 
+/**
+ * Normalizes the canonical selector used to address products across the system.
+ */
 final readonly class Selector implements \Stringable
 {
     private function __construct(

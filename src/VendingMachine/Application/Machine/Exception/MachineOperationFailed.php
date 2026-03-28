@@ -7,6 +7,9 @@ namespace VendingMachine\Application\Machine\Exception;
 use RuntimeException;
 use VendingMachine\Application\Machine\Failure\MachineFailure;
 
+/**
+ * Exception wrapper used to move stable application failures across adapters.
+ */
 final class MachineOperationFailed extends RuntimeException
 {
     public function __construct(

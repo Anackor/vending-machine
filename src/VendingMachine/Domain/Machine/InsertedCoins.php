@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace VendingMachine\Domain\Machine;
 
+/**
+ * Wraps the coins inserted by the current customer session.
+ */
 final readonly class InsertedCoins
 {
     public function __construct(
