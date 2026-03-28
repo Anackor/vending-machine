@@ -159,6 +159,29 @@ Load previous phase documents only if:
   - reviewer-ready setup instructions
   - delivery-ready repository baseline
 
+### Optional Phase 7
+
+- file: `docs/planning/phases/phase-7/README.md`
+- block files:
+  - `docs/planning/phases/phase-7/block-a-frontend-foundation.md`
+  - `docs/planning/phases/phase-7/block-b-reviewer-flows.md`
+  - `docs/planning/phases/phase-7/block-c-ui-tests-docker-and-handoff.md`
+- purpose: add a small reviewer-facing frontend on top of the existing API
+- depends on:
+  - Phase 4 outputs
+  - Phase 5 outputs
+  - Phase 6 handoff decisions
+- loading rule:
+  - always load `docs/planning/phases/phase-7/README.md`
+  - load only the active Phase 7 block file
+  - load Phase 4 when API payloads or routes must stay aligned
+  - load Phase 6 when Docker or reviewer handoff rules must remain consistent
+- main outputs:
+  - lightweight frontend app
+  - Dockerized reviewer UI
+  - request and response inspector
+  - frontend test baseline
+
 ## Recommended loading strategy by task type
 
 ### Environment and tooling work
@@ -223,6 +246,16 @@ Load:
 - common context
 - Phase 6
 - Phase 0 if Docker or workflow decisions must be confirmed
+
+### Reviewer UI work
+
+Load:
+
+- common context
+- `docs/planning/phases/phase-7/README.md`
+- the relevant `docs/planning/phases/phase-7/block-*.md` file
+- Phase 4 for HTTP contracts
+- Phase 6 for Dockerized reviewer expectations
 
 ## Rule for future updates
 
