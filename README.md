@@ -286,14 +286,24 @@ make status
 http://localhost:4173
 ```
 
+You can also keep the raw API open in parallel at:
+
+```text
+http://localhost:8000/api/machine
+```
+
 4. Use the visual console to:
 
 - inspect the current machine snapshot
+- see the machine id, inserted balance, and total stock at a glance
+- see product names, selectors, prices, and quantities in reviewer-friendly `coins`
+- see inserted coins and available change rendered with coin denominations such as `0.25` and `1`
 - insert coins
 - buy products
 - return inserted money
 - service the machine
 - inspect the latest request and response payloads normalized for the reviewer UI
+- compare the visual result with the raw API behavior if you want to validate the transport contract directly
 
 5. Run the full delivery validation:
 
