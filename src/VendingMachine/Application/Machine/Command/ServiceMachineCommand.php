@@ -6,6 +6,9 @@ namespace VendingMachine\Application\Machine\Command;
 
 use InvalidArgumentException;
 
+/**
+ * Carries the stock and change configuration used by the service operation.
+ */
 final readonly class ServiceMachineCommand
 {
     private string $machineId;

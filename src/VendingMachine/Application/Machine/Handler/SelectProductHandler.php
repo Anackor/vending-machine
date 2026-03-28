@@ -16,6 +16,9 @@ use VendingMachine\Domain\Machine\Exception\ProductNotFound;
 use VendingMachine\Domain\Machine\Exception\ProductOutOfStock;
 use VendingMachine\Domain\Machine\Selector;
 
+/**
+ * Coordinates product selection, purchase rules, and the resulting state persistence.
+ */
 final readonly class SelectProductHandler
 {
     public function __construct(
@@ -27,6 +30,7 @@ final readonly class SelectProductHandler
 
     public function handle(SelectProductCommand $command): SelectProductResult
     {
+        // The handler keeps orchestration outside the domain while the aggregate owns all purchase rules.
         $machine = $this->machineRepository->find($command->machineId());
 
         if ($machine === null) {

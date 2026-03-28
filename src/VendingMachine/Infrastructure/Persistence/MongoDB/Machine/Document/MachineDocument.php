@@ -6,6 +6,9 @@ namespace VendingMachine\Infrastructure\Persistence\MongoDB\Machine\Document;
 
 use InvalidArgumentException;
 
+/**
+ * Persistence DTO that stores one complete machine aggregate as a single MongoDB document.
+ */
 final readonly class MachineDocument
 {
     private string $machineId;

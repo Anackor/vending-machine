@@ -10,6 +10,9 @@ use VendingMachine\Application\Machine\Repository\MachineRepository;
 use VendingMachine\Domain\Machine\Machine;
 use VendingMachine\Infrastructure\Persistence\MongoDB\Machine\Mapper\MachineDocumentMapper;
 
+/**
+ * MongoDB adapter that implements the application repository port for one machine aggregate.
+ */
 final readonly class MongoDBMachineRepository implements MachineRepository
 {
     public const string COLLECTION_NAME = 'machines';
@@ -36,6 +39,7 @@ final readonly class MongoDBMachineRepository implements MachineRepository
 
     public function find(string $machineId): ?Machine
     {
+        // MongoDB returns arrays here so the mapper can validate the persisted shape explicitly.
         $document = $this->collection->findOne(['_id' => $machineId], self::TYPE_MAP);
 
         if ($document === null) {
@@ -50,6 +54,7 @@ final readonly class MongoDBMachineRepository implements MachineRepository
 
     public function save(string $machineId, Machine $machine): void
     {
+        // The aggregate is persisted as one logical replacement to keep the write model simple.
         $document = $this->machineDocumentMapper->fromDomain($machineId, $machine);
 
         $this->collection->replaceOne(

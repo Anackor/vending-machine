@@ -6,6 +6,9 @@ namespace VendingMachine\Application\Machine\Command;
 
 use InvalidArgumentException;
 
+/**
+ * Carries the input required to insert one supported coin into a machine.
+ */
 final readonly class InsertCoinCommand
 {
     private string $machineId;

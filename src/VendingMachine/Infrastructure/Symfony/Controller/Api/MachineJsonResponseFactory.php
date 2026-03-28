@@ -19,6 +19,9 @@ use VendingMachine\Application\Machine\Result\ReturnInsertedMoneyResult;
 use VendingMachine\Application\Machine\Result\SelectProductResult;
 use VendingMachine\Application\Machine\Result\ServiceMachineResult;
 
+/**
+ * Serializes application results and failures into the stable JSON API contract.
+ */
 final class MachineJsonResponseFactory
 {
     public function invalidRequest(InvalidArgumentException|JsonException $exception): JsonResponse
@@ -60,6 +63,7 @@ final class MachineJsonResponseFactory
 
     public function insertCoin(InsertCoinCommand $command, InsertCoinResult $result): JsonResponse
     {
+        // The response stays reviewer-friendly while the application still works with integer cents.
         return new JsonResponse(
             [
                 'event' => [
@@ -153,6 +157,7 @@ final class MachineJsonResponseFactory
 
     private function coins(int $coinCents): int|float
     {
+        // Render clean decimal values for the HTTP boundary without reintroducing floats into the core.
         if ($coinCents % 100 === 0) {
             return intdiv($coinCents, 100);
         }
