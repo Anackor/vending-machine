@@ -46,8 +46,8 @@ final class MachineJsonResponseFactory
             [
                 'error' => [
                     'code' => $failure->code()->value,
-                    'message' => $failure->message(),
-                    'context' => $failure->context(),
+                    'message' => $this->failureMessage($failure->code(), $failure->message()),
+                    'context' => $this->failureContext($failure->context()),
                 ],
             ],
             $this->statusCodeFor($failure->code()),
@@ -81,7 +81,7 @@ final class MachineJsonResponseFactory
             [
                 'event' => [
                     'type' => 'money_returned',
-                    'returnedCoinCounts' => $result->returnedCoinCounts(),
+                    'returnedCoinCounts' => $this->coinCounts($result->returnedCoinCounts()),
                 ],
                 'machine' => $this->machine($result->machineSnapshot()),
             ],
@@ -110,7 +110,7 @@ final class MachineJsonResponseFactory
                         'name' => $result->dispensedProductName(),
                         'selector' => $result->dispensedProductSelector(),
                     ],
-                    'dispensedChangeCounts' => $result->dispensedChangeCounts(),
+                    'dispensedChangeCounts' => $this->coinCounts($result->dispensedChangeCounts()),
                 ],
                 'machine' => $this->machine($result->machineSnapshot()),
             ],
@@ -124,15 +124,15 @@ final class MachineJsonResponseFactory
     {
         return [
             'machineId' => $snapshot->machineId(),
-            'insertedBalanceCents' => $snapshot->insertedBalanceCents(),
+            'insertedBalanceCoins' => $this->coins($snapshot->insertedBalanceCents()),
             'hasPendingBalance' => $snapshot->hasPendingBalance(),
-            'insertedCoins' => $snapshot->insertedCoins(),
-            'availableChangeCounts' => $snapshot->availableChangeCounts(),
+            'insertedCoins' => $this->coinCounts($snapshot->insertedCoins()),
+            'availableChangeCounts' => $this->coinCounts($snapshot->availableChangeCounts()),
             'products' => array_map(
-                static fn (ProductSnapshot $product): array => [
+                fn (ProductSnapshot $product): array => [
                     'selector' => $product->selector(),
                     'name' => $product->name(),
-                    'priceCents' => $product->priceCents(),
+                    'priceCoins' => $this->coins($product->priceCents()),
                     'quantity' => $product->quantity(),
                     'available' => $product->isAvailable(),
                 ],
@@ -163,5 +163,74 @@ final class MachineJsonResponseFactory
         }
 
         return round($coinCents / 100, 2);
+    }
+
+    /**
+     * @param array<int|string, int> $coinCounts
+     *
+     * @return array<string, int>
+     */
+    private function coinCounts(array $coinCounts): array
+    {
+        $normalized = [];
+        ksort($coinCounts);
+
+        foreach ($coinCounts as $coinCents => $quantity) {
+            $normalized[$this->coinKey((int) $coinCents)] = $quantity;
+        }
+
+        return $normalized;
+    }
+
+    /**
+     * @param array<string, bool|float|int|string> $context
+     *
+     * @return array<string, bool|float|int|string>
+     */
+    private function failureContext(array $context): array
+    {
+        $normalized = [];
+
+        foreach ($context as $key => $value) {
+            if ($key === 'coinCents' && is_int($value)) {
+                $normalized['coins'] = $this->coins($value);
+                continue;
+            }
+
+            if (str_ends_with($key, 'Cents') && is_int($value)) {
+                $normalized[sprintf('%sCoins', substr($key, 0, -5))] = $this->coins($value);
+                continue;
+            }
+
+            $normalized[$key] = $value;
+        }
+
+        return $normalized;
+    }
+
+    private function failureMessage(MachineFailureCode $code, string $message): string
+    {
+        return match ($code) {
+            MachineFailureCode::ExactChangeUnavailable,
+            MachineFailureCode::InsufficientBalance,
+            MachineFailureCode::InvalidServiceConfiguration,
+            MachineFailureCode::UnsupportedCoin => preg_replace_callback(
+                '/"(\d+)"/',
+                fn (array $matches): string => sprintf('"%s"', $this->coinKey((int) $matches[1])),
+                $message,
+            ) ?? $message,
+            default => $message,
+        };
+    }
+
+    private function coinKey(int $coinCents): string
+    {
+        $coins = $this->coins($coinCents);
+
+        if (is_int($coins)) {
+            return (string) $coins;
+        }
+
+        return number_format($coins, 2, '.', '');
     }
 }

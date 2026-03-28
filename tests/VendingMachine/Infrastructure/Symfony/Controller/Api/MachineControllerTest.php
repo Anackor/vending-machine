@@ -61,7 +61,8 @@ final class MachineControllerTest extends KernelTestCase
 
         self::assertSame(Response::HTTP_OK, $response->getStatusCode());
         self::assertSame('default', $machine['machineId']);
-        self::assertSame(0, $machine['insertedBalanceCents']);
+        self::assertSame(0, $this->numberValue($machine, 'insertedBalanceCoins'));
+        self::assertArrayNotHasKey('insertedBalanceCents', $machine);
         self::assertFalse($machine['hasPendingBalance']);
         self::assertCount(3, $this->productsPayload($machine));
         self::assertSame(10, $this->productQuantity($payload, 'water'));
@@ -84,8 +85,8 @@ final class MachineControllerTest extends KernelTestCase
         self::assertSame(Response::HTTP_OK, $response->getStatusCode());
         self::assertSame('coin_inserted', $event['type']);
         self::assertSame(0.25, $event['coins']);
-        self::assertSame(25, $machine['insertedBalanceCents']);
-        self::assertSame(1, $this->countValue($insertedCoins, '25'));
+        self::assertSame(0.25, $this->numberValue($machine, 'insertedBalanceCoins'));
+        self::assertSame(1, $this->countValue($insertedCoins, '0.25'));
         self::assertNotNull($reloadedMachine);
         self::assertSame(25, $reloadedMachine->insertedBalance()->cents());
     }
@@ -124,9 +125,9 @@ final class MachineControllerTest extends KernelTestCase
         self::assertSame('product_selected', $event['type']);
         self::assertSame('water', $dispensedProduct['selector']);
         self::assertSame('Water', $dispensedProduct['name']);
-        self::assertSame(1, $this->countValue($dispensedChangeCounts, '10'));
-        self::assertSame(1, $this->countValue($dispensedChangeCounts, '25'));
-        self::assertSame(0, $machine['insertedBalanceCents']);
+        self::assertSame(1, $this->countValue($dispensedChangeCounts, '0.10'));
+        self::assertSame(1, $this->countValue($dispensedChangeCounts, '0.25'));
+        self::assertSame(0, $this->numberValue($machine, 'insertedBalanceCoins'));
         self::assertNotNull($reloadedMachine);
         self::assertSame(9, $reloadedMachine->productStockFor(Selector::fromString('water'))?->quantity());
     }
@@ -147,9 +148,9 @@ final class MachineControllerTest extends KernelTestCase
 
         self::assertSame(Response::HTTP_OK, $response->getStatusCode());
         self::assertSame('money_returned', $event['type']);
-        self::assertSame(1, $this->countValue($returnedCoinCounts, '10'));
-        self::assertSame(1, $this->countValue($returnedCoinCounts, '25'));
-        self::assertSame(0, $machine['insertedBalanceCents']);
+        self::assertSame(1, $this->countValue($returnedCoinCounts, '0.10'));
+        self::assertSame(1, $this->countValue($returnedCoinCounts, '0.25'));
+        self::assertSame(0, $this->numberValue($machine, 'insertedBalanceCoins'));
         self::assertSame([], $insertedCoins);
     }
 
@@ -165,10 +166,10 @@ final class MachineControllerTest extends KernelTestCase
                 'soda' => 4,
             ],
             'availableChangeCounts' => [
-                '5' => 4,
-                '10' => 5,
-                '25' => 6,
-                '100' => 2,
+                '0.05' => 4,
+                '0.10' => 5,
+                '0.25' => 6,
+                '1' => 2,
             ],
         ]);
         $payload = $this->payload($response);
@@ -181,8 +182,25 @@ final class MachineControllerTest extends KernelTestCase
         self::assertSame(6, $this->productQuantity($payload, 'water'));
         self::assertSame(7, $this->productQuantity($payload, 'juice'));
         self::assertSame(4, $this->productQuantity($payload, 'soda'));
-        self::assertSame(4, $this->countValue($availableChangeCounts, '5'));
-        self::assertSame(2, $this->countValue($availableChangeCounts, '100'));
+        self::assertSame(4, $this->countValue($availableChangeCounts, '0.05'));
+        self::assertSame(2, $this->countValue($availableChangeCounts, '1'));
+    }
+
+    #[Test]
+    public function itReturnsConflictMessagesInCoinsThroughTheHttpInterface(): void
+    {
+        $this->seedDefaultMachine(DefaultMachineFixture::machine(
+            availableChangeCounts: [],
+            insertedCoinCounts: [100 => 3],
+        ));
+
+        $response = $this->request('POST', '/api/machine/select-product', ['selector' => 'soda']);
+        $payload = $this->payload($response);
+        $error = $this->errorPayload($payload);
+
+        self::assertSame(Response::HTTP_CONFLICT, $response->getStatusCode());
+        self::assertSame('exact_change_unavailable', $error['code']);
+        self::assertSame('Exact change "1.50" cannot be returned for selector "soda".', $error['message']);
     }
 
     #[Test]
@@ -317,6 +335,18 @@ final class MachineControllerTest extends KernelTestCase
         $value = $payload[$field] ?? null;
 
         self::assertIsInt($value);
+
+        return $value;
+    }
+
+    /**
+     * @param array<string, mixed> $payload
+     */
+    private function numberValue(array $payload, string $field): int|float
+    {
+        $value = $payload[$field] ?? null;
+
+        self::assertTrue(is_int($value) || is_float($value));
 
         return $value;
     }

@@ -31,13 +31,22 @@ final class MachineJsonResponseFactoryTest extends TestCase
     public function testItBuildsTheMachineStateResponse(): void
     {
         $response = $this->responseFactory->machineState(
-            new GetMachineStateResult(MachineSnapshotMother::create()),
+            new GetMachineStateResult(MachineSnapshotMother::create(insertedBalanceCents: 25, insertedCoins: [25 => 1])),
         );
         $payload = $this->payload($response->getContent());
         $machine = $this->objectPayload($payload, 'machine');
+        $insertedCoins = $this->objectPayload($machine, 'insertedCoins');
+        $availableChangeCounts = $this->objectPayload($machine, 'availableChangeCounts');
+        $products = $this->listPayload($machine, 'products');
 
         self::assertSame('default', $machine['machineId']);
-        self::assertCount(3, $this->listPayload($machine, 'products'));
+        self::assertSame(0.25, $this->numberValue($machine, 'insertedBalanceCoins'));
+        self::assertArrayNotHasKey('insertedBalanceCents', $machine);
+        self::assertSame(1, $this->intValue($insertedCoins, '0.25'));
+        self::assertSame(20, $this->intValue($availableChangeCounts, '0.10'));
+        self::assertCount(3, $products);
+        self::assertSame(1.5, $this->numberValue($this->productPayload($products, 'soda'), 'priceCoins'));
+        self::assertArrayNotHasKey('priceCents', $this->productPayload($products, 'soda'));
     }
 
     public function testItBuildsTheInsertCoinResponse(): void
@@ -83,7 +92,8 @@ final class MachineJsonResponseFactoryTest extends TestCase
 
         self::assertSame('product_selected', $event['type']);
         self::assertSame('water', $dispensedProduct['selector']);
-        self::assertSame(1, $this->intValue($dispensedChangeCounts, '10'));
+        self::assertSame(1, $this->intValue($dispensedChangeCounts, '0.10'));
+        self::assertSame(1, $this->intValue($dispensedChangeCounts, '0.25'));
     }
 
     public function testItBuildsTheReturnInsertedMoneyResponse(): void
@@ -99,7 +109,8 @@ final class MachineJsonResponseFactoryTest extends TestCase
         $returnedCoinCounts = $this->objectPayload($event, 'returnedCoinCounts');
 
         self::assertSame('money_returned', $event['type']);
-        self::assertSame(1, $this->intValue($returnedCoinCounts, '25'));
+        self::assertSame(1, $this->intValue($returnedCoinCounts, '0.10'));
+        self::assertSame(1, $this->intValue($returnedCoinCounts, '0.25'));
     }
 
     public function testItBuildsTheServiceMachineResponse(): void
@@ -113,22 +124,31 @@ final class MachineJsonResponseFactoryTest extends TestCase
         self::assertSame('machine_serviced', $event['type']);
     }
 
-    public function testItBuildsApplicationFailureResponsesWithStatusMapping(): void
+    public function testItBuildsApplicationFailureResponsesWithCoinsAndStatusMapping(): void
     {
         $response = $this->responseFactory->machineOperationFailed(
             new MachineOperationFailed(
                 new MachineFailure(
-                    MachineFailureCode::InsufficientBalance,
-                    'Insufficient balance.',
-                    ['machineId' => 'default'],
+                    MachineFailureCode::ExactChangeUnavailable,
+                    'Exact change "150" cannot be returned for selector "soda".',
+                    [
+                        'machineId' => 'default',
+                        'coinCents' => 150,
+                        'requiredBalanceCents' => 150,
+                    ],
                 ),
             ),
         );
         $payload = $this->payload($response->getContent());
         $error = $this->objectPayload($payload, 'error');
+        $context = $this->objectPayload($error, 'context');
 
         self::assertSame(409, $response->getStatusCode());
-        self::assertSame('insufficient_balance', $error['code']);
+        self::assertSame('exact_change_unavailable', $error['code']);
+        self::assertSame('Exact change "1.50" cannot be returned for selector "soda".', $error['message']);
+        self::assertSame(1.5, $this->numberValue($context, 'coins'));
+        self::assertSame(1.5, $this->numberValue($context, 'requiredBalanceCoins'));
+        self::assertArrayNotHasKey('coinCents', $context);
     }
 
     public function testItBuildsInvalidRequestResponses(): void
@@ -202,5 +222,33 @@ final class MachineJsonResponseFactoryTest extends TestCase
         self::assertIsInt($value);
 
         return $value;
+    }
+
+    /**
+     * @param array<string, mixed> $payload
+     */
+    private function numberValue(array $payload, string $field): int|float
+    {
+        $value = $payload[$field] ?? null;
+
+        self::assertTrue(is_int($value) || is_float($value));
+
+        return $value;
+    }
+
+    /**
+     * @param list<array<string, mixed>> $products
+     *
+     * @return array<string, mixed>
+     */
+    private function productPayload(array $products, string $selector): array
+    {
+        foreach ($products as $product) {
+            if (($product['selector'] ?? null) === $selector) {
+                return $product;
+            }
+        }
+
+        self::fail(sprintf('Product "%s" was not found in the payload.', $selector));
     }
 }

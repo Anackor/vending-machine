@@ -127,7 +127,35 @@ final class MachineJsonRequestFactoryTest extends TestCase
         self::assertSame('default', $command->machineId());
     }
 
-    public function testItCreatesAServiceMachineCommandFromJson(): void
+    public function testItCreatesAServiceMachineCommandFromCoinsJson(): void
+    {
+        $command = $this->requestFactory->createServiceMachineCommand(
+            $this->jsonRequest([
+                'productQuantities' => [
+                    'water' => 6,
+                    'juice' => 7,
+                    'soda' => 4,
+                ],
+                'availableChangeCounts' => [
+                    '0.05' => 4,
+                    '0.10' => 5,
+                    '0.25' => 6,
+                    '1' => 2,
+                ],
+            ]),
+        );
+
+        self::assertSame(
+            ['juice' => 7, 'soda' => 4, 'water' => 6],
+            $command->productQuantities(),
+        );
+        self::assertSame(
+            [5 => 4, 10 => 5, 25 => 6, 100 => 2],
+            $command->availableChangeCounts(),
+        );
+    }
+
+    public function testItStillCreatesAServiceMachineCommandFromCoinCentsJsonForCompatibility(): void
     {
         $command = $this->requestFactory->createServiceMachineCommand(
             $this->jsonRequest([
@@ -145,14 +173,25 @@ final class MachineJsonRequestFactoryTest extends TestCase
             ]),
         );
 
-        self::assertSame(
-            ['juice' => 7, 'soda' => 4, 'water' => 6],
-            $command->productQuantities(),
+        self::assertSame([5 => 4, 10 => 5, 25 => 6, 100 => 2], $command->availableChangeCounts());
+    }
+
+    public function testItAcceptsOneDecimalCoinKeysForServiceChangeCounts(): void
+    {
+        $command = $this->requestFactory->createServiceMachineCommand(
+            $this->jsonRequest([
+                'productQuantities' => [
+                    'water' => 6,
+                    'juice' => 7,
+                    'soda' => 4,
+                ],
+                'availableChangeCounts' => [
+                    '0.1' => 5,
+                ],
+            ]),
         );
-        self::assertSame(
-            [5 => 4, 10 => 5, 25 => 6, 100 => 2],
-            $command->availableChangeCounts(),
-        );
+
+        self::assertSame([10 => 5], $command->availableChangeCounts());
     }
 
     public function testItCreatesTheDefaultReturnInsertedMoneyCommand(): void
@@ -302,6 +341,45 @@ final class MachineJsonRequestFactoryTest extends TestCase
         } catch (InvalidArgumentException $exception) {
             self::assertSame('Field "availableChangeCounts" must be a JSON object.', $exception->getMessage());
         }
+    }
+
+    public function testItRejectsEmptyAvailableChangeDenominationKeys(): void
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Available change denomination keys cannot be empty.');
+
+        $this->requestFactory->createServiceMachineCommand(
+            $this->jsonRequest([
+                'productQuantities' => ['water' => 1],
+                'availableChangeCounts' => ['' => 1],
+            ]),
+        );
+    }
+
+    public function testItRejectsInexactDecimalAvailableChangeDenominationKeys(): void
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Available change denomination keys must represent exact coin values.');
+
+        $this->requestFactory->createServiceMachineCommand(
+            $this->jsonRequest([
+                'productQuantities' => ['water' => 1],
+                'availableChangeCounts' => ['0.005' => 1],
+            ]),
+        );
+    }
+
+    public function testItRejectsNonNumericAvailableChangeDenominationKeys(): void
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Available change denomination keys must be numeric.');
+
+        $this->requestFactory->createServiceMachineCommand(
+            $this->jsonRequest([
+                'productQuantities' => ['water' => 1],
+                'availableChangeCounts' => ['quarter' => 1],
+            ]),
+        );
     }
 
     public function testItRejectsMalformedJsonBodies(): void

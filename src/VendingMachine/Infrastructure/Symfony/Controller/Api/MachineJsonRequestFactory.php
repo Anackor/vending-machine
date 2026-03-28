@@ -43,7 +43,7 @@ final class MachineJsonRequestFactory
 
         return new ServiceMachineCommand(
             $this->requiredObject($payload, 'productQuantities'),
-            $this->requiredObject($payload, 'availableChangeCounts'),
+            $this->requiredCoinCountObject($payload, 'availableChangeCounts'),
         );
     }
 
@@ -105,6 +105,24 @@ final class MachineJsonRequestFactory
         }
 
         return $value;
+    }
+
+    /**
+     * @param array<string, mixed> $payload
+     *
+     * @return array<int, mixed>
+     */
+    private function requiredCoinCountObject(array $payload, string $field): array
+    {
+        $value = $this->requiredObject($payload, $field);
+        $normalized = [];
+
+        foreach ($value as $coinKey => $quantity) {
+            $normalized[$this->normalizeCoinCountKeyToCents($coinKey)] = $quantity;
+        }
+
+        /** @var array<int, mixed> $normalized */
+        return $normalized;
     }
 
     /**
@@ -173,6 +191,44 @@ final class MachineJsonRequestFactory
                 'Field "coins" must be one of 0.05, 0.10, 0.25, or 1.',
             ),
         };
+    }
+
+    private function normalizeCoinCountKeyToCents(int|string $value): int
+    {
+        if (is_int($value)) {
+            return $value === 1 ? 100 : $value;
+        }
+
+        $normalizedValue = trim($value);
+
+        if ($normalizedValue === '') {
+            throw new InvalidArgumentException('Available change denomination keys cannot be empty.');
+        }
+
+        if (is_numeric($normalizedValue) && str_contains($normalizedValue, '.')) {
+            return $this->normalizeExactMoneyStringToCents(
+                $normalizedValue,
+                'Available change denomination keys must represent exact coin values.',
+            );
+        }
+
+        throw new InvalidArgumentException('Available change denomination keys must be numeric.');
+    }
+
+    private function normalizeExactMoneyStringToCents(string $value, string $errorMessage): int
+    {
+        if (!preg_match('/^(?<whole>\d+)\.(?<fraction>\d{1,2})$/', $value, $matches)) {
+            throw new InvalidArgumentException($errorMessage);
+        }
+
+        $whole = (int) $matches['whole'];
+        $fraction = $matches['fraction'];
+
+        if (strlen($fraction) === 1) {
+            $fraction .= '0';
+        }
+
+        return ($whole * 100) + (int) $fraction;
     }
 
     /**
