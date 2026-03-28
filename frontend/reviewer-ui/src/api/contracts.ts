@@ -1,17 +1,20 @@
+export type CoinAmount = number;
+export type CoinCountMap = Record<string, number>;
+
 export interface ProductSnapshot {
   selector: string;
   name: string;
-  priceCents: number;
+  priceCoins: CoinAmount;
   quantity: number;
   available: boolean;
 }
 
 export interface MachineSnapshot {
   machineId: string;
-  insertedBalanceCents: number;
+  insertedBalanceCoins: CoinAmount;
   hasPendingBalance: boolean;
-  insertedCoins: Record<string, number>;
-  availableChangeCounts: Record<string, number>;
+  insertedCoins: CoinCountMap;
+  availableChangeCounts: CoinCountMap;
   products: ProductSnapshot[];
 }
 
@@ -22,7 +25,7 @@ export interface GetMachineStateResponse {
 export interface InsertCoinResponse {
   event: {
     type: 'coin_inserted';
-    coins: number;
+    coins: CoinAmount;
   };
   machine: MachineSnapshot;
 }
@@ -34,7 +37,7 @@ export interface SelectProductResponse {
       name: string;
       selector: string;
     };
-    dispensedChangeCounts: Record<string, number>;
+    dispensedChangeCounts: CoinCountMap;
   };
   machine: MachineSnapshot;
 }
@@ -42,7 +45,7 @@ export interface SelectProductResponse {
 export interface ReturnInsertedMoneyResponse {
   event: {
     type: 'money_returned';
-    returnedCoinCounts: Record<string, number>;
+    returnedCoinCounts: CoinCountMap;
   };
   machine: MachineSnapshot;
 }
@@ -56,7 +59,7 @@ export interface ServiceMachineResponse {
 
 export interface ServiceMachinePayload {
   productQuantities: Record<string, number>;
-  availableChangeCounts: Record<string, number>;
+  availableChangeCounts: CoinCountMap;
 }
 
 export interface ApiExchange {

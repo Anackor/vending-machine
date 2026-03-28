@@ -9,9 +9,9 @@ export const DEFAULT_SERVICE_PAYLOAD: ServiceMachinePayload = {
     soda: 5,
   },
   availableChangeCounts: {
-    5: 20,
-    10: 20,
-    25: 20,
-    100: 10,
+    '0.05': 20,
+    '0.10': 20,
+    '0.25': 20,
+    '1': 10,
   },
 };
