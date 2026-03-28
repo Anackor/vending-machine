@@ -101,7 +101,7 @@ Load `docs/challenges/frontend/README.md` only when:
 
 - file: `docs/planning/phases/phase-7/block-a-frontend-foundation.md`
 - task ids: `P7-001` to `P7-011`
-- status: pending
+- status: complete
 - outputs: frontend app baseline, Docker wiring, API client contract, visual
   foundation
 
@@ -109,7 +109,7 @@ Load `docs/challenges/frontend/README.md` only when:
 
 - file: `docs/planning/phases/phase-7/block-b-reviewer-flows.md`
 - task ids: `P7-012` to `P7-024`
-- status: pending
+- status: complete
 - outputs: complete visual interaction flows, response inspector, polished
   reviewer path
 
@@ -117,7 +117,7 @@ Load `docs/challenges/frontend/README.md` only when:
 
 - file: `docs/planning/phases/phase-7/block-c-ui-tests-docker-and-handoff.md`
 - task ids: `P7-025` to `P7-034`
-- status: pending
+- status: complete
 - outputs: frontend safety net, Dockerized local workflow, reviewer-facing UI
   documentation, final phase gate
 
@@ -147,6 +147,25 @@ Load `docs/challenges/frontend/README.md` only when:
 - visual API explorer for the vending machine flows
 - frontend test baseline
 - updated handoff documentation
+
+## Validation snapshot
+
+Validated at the end of Phase 7:
+
+- `make bootstrap`: successful with `app`, `mongo`, and `frontend`
+- `docker compose exec -T frontend npm run test`: successful with `6` tests
+- `docker compose exec -T frontend npm run build`: successful
+- `make test`: successful
+- `make review`: successful
+- `http://localhost:4173`: available from the local Dockerized stack
+
+Phase 7 result summary:
+
+- the repository now exposes a small visual reviewer UI in addition to the raw
+  HTTP API
+- the frontend remains a thin client over the existing backend contract
+- reviewers can inspect both the friendly UI state and the exact latest API
+  payloads
 
 ## Exit criteria
 

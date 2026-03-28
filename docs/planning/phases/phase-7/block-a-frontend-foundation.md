@@ -13,17 +13,33 @@ overcomplicating the repository.
 
 ## Tasks
 
-- [ ] P7-001: choose the frontend folder path inside the repository
-- [ ] P7-002: choose the frontend toolchain and justify the no-framework or low-framework direction
-- [ ] P7-003: decide whether the frontend uses a dedicated package manager path without extra monorepo tooling
-- [ ] P7-004: define the browser-to-backend communication strategy and avoid unnecessary backend CORS changes
-- [ ] P7-005: define the Docker service shape for the frontend and how it joins the current stack
-- [ ] P7-006: scaffold the frontend project with development, test, and build scripts
-- [ ] P7-007: define the frontend folder structure for app shell, API client, state, UI pieces, and styles
-- [ ] P7-008: create typed API models aligned with the current vending machine HTTP contract
-- [ ] P7-009: create a thin frontend API client for machine state, insert, select, refund, and service operations
-- [ ] P7-010: establish the initial visual language, layout direction, and responsive baseline
-- [ ] P7-011: expose the initial frontend service through Docker and `make` without breaking the current backend flow
+- [x] P7-001: choose the frontend folder path inside the repository
+- [x] P7-002: choose the frontend toolchain and justify the no-framework or low-framework direction
+- [x] P7-003: decide whether the frontend uses a dedicated package manager path without extra monorepo tooling
+- [x] P7-004: define the browser-to-backend communication strategy and avoid unnecessary backend CORS changes
+- [x] P7-005: define the Docker service shape for the frontend and how it joins the current stack
+- [x] P7-006: scaffold the frontend project with development, test, and build scripts
+- [x] P7-007: define the frontend folder structure for app shell, API client, state, UI pieces, and styles
+- [x] P7-008: create typed API models aligned with the current vending machine HTTP contract
+- [x] P7-009: create a thin frontend API client for machine state, insert, select, refund, and service operations
+- [x] P7-010: establish the initial visual language, layout direction, and responsive baseline
+- [x] P7-011: expose the initial frontend service through Docker and `make` without breaking the current backend flow
+
+## Implementation baseline
+
+The frontend baseline is now frozen around:
+
+- frontend path: `frontend/reviewer-ui`
+- toolchain: `Vite + TypeScript`
+- rendering direction: plain DOM and TypeScript, without a heavy UI framework
+- browser strategy: same-origin browser calls through the Vite proxy for `/api`
+- Docker service: `frontend` on `localhost:4173`
+
+The repository intentionally stays monorepo-light:
+
+- no extra workspace orchestrator
+- one dedicated `package.json`
+- Docker and `make` integration at the repo root
 
 ## Direction to freeze
 
@@ -42,6 +58,15 @@ The block is expected to leave behind:
 - one explicit API client boundary
 - a reproducible Dockerized startup path
 - a visual baseline ready to receive reviewer flows
+
+That baseline is now implemented through:
+
+- `frontend/reviewer-ui/package.json`
+- `frontend/reviewer-ui/vite.config.ts`
+- `frontend/reviewer-ui/src/api/`
+- `frontend/reviewer-ui/src/app/`
+- `docker-compose.yml`
+- `Makefile`
 
 ## Exit condition
 
