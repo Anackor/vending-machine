@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace VendingMachine\Domain\Machine;
 
+/**
+ * Wraps the machine-owned coin inventory that can be used to return change.
+ */
 final readonly class AvailableChange
 {
     public function __construct(

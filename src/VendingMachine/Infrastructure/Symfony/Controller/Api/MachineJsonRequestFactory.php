@@ -13,6 +13,9 @@ use VendingMachine\Application\Machine\Command\SelectProductCommand;
 use VendingMachine\Application\Machine\Command\ServiceMachineCommand;
 use VendingMachine\Application\Machine\Query\GetMachineStateQuery;
 
+/**
+ * Parses HTTP JSON input and normalizes it into application commands and queries.
+ */
 final class MachineJsonRequestFactory
 {
     public function createGetMachineStateQuery(): GetMachineStateQuery
@@ -58,6 +61,7 @@ final class MachineJsonRequestFactory
      */
     private function payload(Request $request): array
     {
+        // The transport contract stays predictable by accepting only JSON objects at the boundary.
         $content = trim($request->getContent());
 
         if ($content === '') {
@@ -108,6 +112,7 @@ final class MachineJsonRequestFactory
      */
     private function requiredCoinCents(array $payload): int
     {
+        // The adapter accepts reviewer-friendly "coins" while keeping integer cents inside the core.
         if (array_key_exists('coins', $payload)) {
             return $this->normalizeCoinsToCents($payload['coins']);
         }
@@ -121,6 +126,7 @@ final class MachineJsonRequestFactory
 
     private function normalizeCoinsToCents(mixed $value): int
     {
+        // Input is normalized here once so the application layer never deals with decimal money.
         if (is_string($value)) {
             $value = trim($value);
         }
@@ -138,6 +144,7 @@ final class MachineJsonRequestFactory
 
     private function normalizeNumericStringCoinsToCents(string $value): int
     {
+        // Only the exact challenge denominations are accepted; near matches are rejected, not rounded.
         if (!is_numeric($value)) {
             throw new InvalidArgumentException('Field "coins" must be numeric.');
         }

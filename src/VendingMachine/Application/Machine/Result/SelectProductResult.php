@@ -6,6 +6,9 @@ namespace VendingMachine\Application\Machine\Result;
 
 use InvalidArgumentException;
 
+/**
+ * Wraps the dispensed product, change, and resulting machine snapshot of a purchase.
+ */
 final readonly class SelectProductResult
 {
     /**

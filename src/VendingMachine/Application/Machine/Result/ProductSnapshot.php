@@ -6,6 +6,9 @@ namespace VendingMachine\Application\Machine\Result;
 
 use InvalidArgumentException;
 
+/**
+ * Flat application snapshot of one product entry in the machine.
+ */
 final readonly class ProductSnapshot
 {
     private string $name;

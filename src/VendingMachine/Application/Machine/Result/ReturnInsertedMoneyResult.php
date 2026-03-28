@@ -6,6 +6,9 @@ namespace VendingMachine\Application\Machine\Result;
 
 use InvalidArgumentException;
 
+/**
+ * Wraps the returned coin counts and the machine snapshot after a refund.
+ */
 final readonly class ReturnInsertedMoneyResult
 {
     /**

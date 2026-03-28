@@ -10,6 +10,9 @@ use VendingMachine\Application\Machine\Factory\MachineSnapshotFactory;
 use VendingMachine\Application\Machine\Repository\MachineRepository;
 use VendingMachine\Application\Machine\Result\ReturnInsertedMoneyResult;
 
+/**
+ * Coordinates the refund use case and persists the cleared customer session.
+ */
 final readonly class ReturnInsertedMoneyHandler
 {
     public function __construct(

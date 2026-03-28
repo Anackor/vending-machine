@@ -6,6 +6,9 @@ namespace VendingMachine\Domain\Machine;
 
 use InvalidArgumentException;
 
+/**
+ * Reusable coin-state helper used by both available change and inserted coins.
+ */
 final readonly class CoinInventory
 {
     /**
@@ -26,6 +29,7 @@ final readonly class CoinInventory
      */
     public static function fromCounts(array $counts): self
     {
+        // Normalize raw input once so every caller works with the same sorted shape.
         $normalized = [];
 
         foreach ($counts as $denomination => $count) {
@@ -87,6 +91,7 @@ final readonly class CoinInventory
 
     public function subtract(self $other): self
     {
+        // The inventory never allows negative counts after a subtraction.
         $counts = $this->counts;
 
         foreach ($other->counts() as $denomination => $count) {
@@ -114,6 +119,7 @@ final readonly class CoinInventory
 
     public function allocateForAmount(Money $amount): ?self
     {
+        // Change allocation stays exact; callers decide how to react when no exact match exists.
         if ($amount->isZero()) {
             return self::empty();
         }
@@ -156,6 +162,7 @@ final readonly class CoinInventory
         array $availableCounts,
         int $index,
     ): ?array {
+        // Explore the available denominations recursively until an exact combination is found.
         if ($remainingAmount === 0) {
             return [];
         }

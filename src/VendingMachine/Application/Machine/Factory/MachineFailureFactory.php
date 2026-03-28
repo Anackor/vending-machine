@@ -16,6 +16,9 @@ use VendingMachine\Domain\Machine\Exception\PendingBalanceDuringService;
 use VendingMachine\Domain\Machine\Exception\ProductNotFound;
 use VendingMachine\Domain\Machine\Exception\ProductOutOfStock;
 
+/**
+ * Translates domain and orchestration errors into stable application failures.
+ */
 final class MachineFailureFactory
 {
     public function machineNotFound(string $machineId): MachineOperationFailed
@@ -76,6 +79,7 @@ final class MachineFailureFactory
         Throwable $throwable,
         array $context = [],
     ): MachineOperationFailed {
+        // Handlers add use-case context here while preserving a stable public error contract.
         $context['machineId'] = $machineId;
 
         return $this->build(
@@ -87,6 +91,7 @@ final class MachineFailureFactory
 
     private function mapCode(Throwable $throwable): MachineFailureCode
     {
+        // Mapping stays explicit so adapters never need to know domain exception classes.
         return match (true) {
             $throwable instanceof ExactChangeNotAvailable => MachineFailureCode::ExactChangeUnavailable,
             $throwable instanceof InsufficientBalance => MachineFailureCode::InsufficientBalance,

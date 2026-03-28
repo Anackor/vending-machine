@@ -10,6 +10,9 @@ use VendingMachine\Application\Machine\Query\GetMachineStateQuery;
 use VendingMachine\Application\Machine\Repository\MachineRepository;
 use VendingMachine\Application\Machine\Result\GetMachineStateResult;
 
+/**
+ * Coordinates the read-only use case that returns the current machine snapshot.
+ */
 final readonly class GetMachineStateHandler
 {
     public function __construct(

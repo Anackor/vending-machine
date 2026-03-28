@@ -6,6 +6,9 @@ namespace VendingMachine\Application\Machine\Command;
 
 use InvalidArgumentException;
 
+/**
+ * Carries the input required to refund the current customer balance.
+ */
 final readonly class ReturnInsertedMoneyCommand
 {
     private string $machineId;

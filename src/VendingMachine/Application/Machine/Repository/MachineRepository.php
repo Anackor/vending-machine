@@ -6,8 +6,14 @@ namespace VendingMachine\Application\Machine\Repository;
 
 use VendingMachine\Domain\Machine\Machine;
 
+/**
+ * Application port for loading and saving the machine aggregate.
+ */
 interface MachineRepository
 {
+    /**
+     * Load one machine aggregate by its logical identifier.
+     */
     public function find(string $machineId): ?Machine;
 
     /**

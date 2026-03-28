@@ -6,6 +6,9 @@ namespace VendingMachine\Application\Machine\Result;
 
 use InvalidArgumentException;
 
+/**
+ * Flat application snapshot of the machine state exposed to adapters.
+ */
 final readonly class MachineSnapshot
 {
     /**

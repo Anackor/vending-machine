@@ -6,6 +6,9 @@ namespace VendingMachine\Domain\Machine;
 
 use InvalidArgumentException;
 
+/**
+ * Couples a product definition with its current machine stock quantity.
+ */
 final readonly class ProductStock
 {
     public function __construct(

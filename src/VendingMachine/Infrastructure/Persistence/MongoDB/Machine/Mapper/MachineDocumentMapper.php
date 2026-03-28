@@ -15,10 +15,14 @@ use VendingMachine\Domain\Machine\Selector;
 use VendingMachine\Infrastructure\Persistence\MongoDB\Machine\Document\MachineDocument;
 use VendingMachine\Infrastructure\Persistence\MongoDB\Machine\Document\ProductStockDocument;
 
+/**
+ * Maps the domain aggregate to the MongoDB document shape and back again.
+ */
 final class MachineDocumentMapper
 {
     public function fromDomain(string $machineId, Machine $machine): MachineDocument
     {
+        // Keep persistence DTOs free of domain behavior while preserving the aggregate shape.
         $productStocks = [];
 
         foreach ($machine->productStocks() as $productStock) {
@@ -42,6 +46,7 @@ final class MachineDocumentMapper
 
     public function toDomain(MachineDocument $document): Machine
     {
+        // Rebuild the aggregate from persistence primitives without leaking Mongo-specific types.
         $productStocks = [];
 
         foreach ($document->productStocks() as $productStock) {
@@ -123,6 +128,7 @@ final class MachineDocumentMapper
      */
     private function extractProductStocks(array $document): array
     {
+        // Products are stored as a list so selector order remains explicit and duplicate-safe.
         if (!array_key_exists('products', $document) || !is_array($document['products'])) {
             throw new InvalidArgumentException('Persisted machine document field "products" must be a list.');
         }

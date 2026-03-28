@@ -6,6 +6,9 @@ namespace VendingMachine\Domain\Machine;
 
 use InvalidArgumentException;
 
+/**
+ * Represents money as integer cents to avoid floating-point precision issues.
+ */
 final readonly class Money
 {
     private function __construct(

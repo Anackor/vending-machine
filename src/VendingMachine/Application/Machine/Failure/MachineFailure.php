@@ -6,6 +6,9 @@ namespace VendingMachine\Application\Machine\Failure;
 
 use InvalidArgumentException;
 
+/**
+ * Stable application-level failure payload exposed to HTTP and CLI adapters.
+ */
 final readonly class MachineFailure
 {
     /**

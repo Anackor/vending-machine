@@ -6,6 +6,9 @@ namespace VendingMachine\Infrastructure\Persistence\MongoDB\Machine\Document;
 
 use InvalidArgumentException;
 
+/**
+ * Persistence DTO for one product entry inside the machine MongoDB document.
+ */
 final readonly class ProductStockDocument
 {
     private string $selector;

@@ -17,6 +17,9 @@ use VendingMachine\Application\Machine\Handler\ReturnInsertedMoneyHandler;
 use VendingMachine\Application\Machine\Handler\SelectProductHandler;
 use VendingMachine\Application\Machine\Handler\ServiceMachineHandler;
 
+/**
+ * Thin Symfony controller that exposes the reviewer-facing HTTP API.
+ */
 #[AsController]
 #[Route('/api/machine', name: 'machine_')]
 final readonly class MachineController

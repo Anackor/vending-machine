@@ -11,6 +11,9 @@ use VendingMachine\Application\Machine\Factory\MachineSnapshotFactory;
 use VendingMachine\Application\Machine\Repository\MachineRepository;
 use VendingMachine\Application\Machine\Result\InsertCoinResult;
 
+/**
+ * Coordinates the insert-coin use case on top of the domain aggregate and repository port.
+ */
 final readonly class InsertCoinHandler
 {
     public function __construct(
@@ -22,6 +25,7 @@ final readonly class InsertCoinHandler
 
     public function handle(InsertCoinCommand $command): InsertCoinResult
     {
+        // Load, delegate the rule to the aggregate, and persist only the successful state transition.
         $machine = $this->machineRepository->find($command->machineId());
 
         if ($machine === null) {

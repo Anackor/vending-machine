@@ -12,6 +12,9 @@ use VendingMachine\Domain\Machine\Exception\PendingBalanceDuringService;
 use VendingMachine\Domain\Machine\Exception\ProductNotFound;
 use VendingMachine\Domain\Machine\Exception\ProductOutOfStock;
 
+/**
+ * Aggregate root that keeps stock, inserted balance, and available change consistent.
+ */
 final readonly class Machine
 {
     /**
@@ -114,6 +117,7 @@ final readonly class Machine
 
     public function purchase(Selector $selector): PurchaseResult
     {
+        // A successful purchase commits inserted coins, dispenses the product, and returns exact change.
         [$productStock, $committedAvailableChange, $dispensedChange] = $this->preparePurchase($selector);
 
         $updatedProductStocks = $this->productStocks;
@@ -134,6 +138,7 @@ final readonly class Machine
 
     public function refund(): RefundResult
     {
+        // Refund only clears the customer session; it does not mutate the machine-owned change pool.
         return new RefundResult(
             new self(
                 array_values($this->productStocks),
@@ -150,6 +155,7 @@ final readonly class Machine
      */
     public function service(array $stockCounts, array $availableChangeCounts): self
     {
+        // Service is intentionally blocked while a customer still has pending balance.
         if ($this->hasPendingBalance()) {
             throw new PendingBalanceDuringService('Machine service requires no pending customer balance.');
         }
@@ -210,6 +216,7 @@ final readonly class Machine
      */
     private function preparePurchase(Selector $selector): array
     {
+        // All purchase invariants are checked here before the aggregate state is actually committed.
         $productStock = $this->productStockFor($selector);
 
         if ($productStock === null) {

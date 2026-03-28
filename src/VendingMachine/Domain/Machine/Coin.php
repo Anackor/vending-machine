@@ -6,6 +6,9 @@ namespace VendingMachine\Domain\Machine;
 
 use InvalidArgumentException;
 
+/**
+ * Enumerates the only coin denominations accepted by the machine.
+ */
 enum Coin: int
 {
     case FiveCents = 5;
