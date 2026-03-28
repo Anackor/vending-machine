@@ -206,6 +206,33 @@ When `coins` is used, the adapter only accepts the exact challenge coin values:
 
 Values such as `0.249` are rejected instead of being rounded.
 
+## Implementation notes
+
+These short notes summarize the main technical decisions behind the solution:
+
+- Money is modeled as integer cents inside the application and domain layers to
+  avoid floating-point precision issues during balance checks and change
+  allocation.
+- The HTTP adapter accepts both `coins` and `coinCents`, but `coins` is the
+  preferred reviewer-facing field and is converted to integer cents immediately.
+- The machine aggregate is persisted as one MongoDB document, which keeps the
+  write model simple and hides storage details behind the repository port.
+- The controller layer stays intentionally thin: it only parses transport
+  input, delegates to application handlers, and serializes stable responses.
+
+## Lessons learned
+
+Some small implementation pitfalls and how they were handled:
+
+- Decimal input such as `0.249` looked close to `0.25`, but rounding it would
+  weaken the API contract. The adapter now rejects near matches instead of
+  guessing user intent.
+- A few controller branches turned out to be unreachable by design. Instead of
+  forcing artificial tests, the dead branches were removed so the code and the
+  coverage reflect the real behavior.
+- The project keeps adapters explicit on purpose: MongoDB types and HTTP
+  concerns stop in infrastructure and never leak into the core model.
+
 ## Reviewer validation guide
 
 The first reviewer-facing interface is a thin HTTP JSON layer served by the
