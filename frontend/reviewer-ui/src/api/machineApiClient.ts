@@ -2,9 +2,13 @@ import type {
   ApiErrorPayload,
   ApiExchange,
   ApiOperationResult,
+  CoinAmount,
+  CoinCountMap,
   GetMachineStateResponse,
   InsertCoinResponse,
   MachineClient,
+  MachineSnapshot,
+  ProductSnapshot,
   ReturnInsertedMoneyResponse,
   SelectProductResponse,
   ServiceMachinePayload,
@@ -86,26 +90,27 @@ export class MachineApiClient implements MachineClient {
     const response = await fetch(path, {
       method,
       headers: requestBody === undefined ? undefined : { 'Content-Type': 'application/json' },
-      body: requestBody === undefined ? undefined : JSON.stringify(requestBody),
+      body: requestBody === undefined ? undefined : JSON.stringify(this.toWireRequestBody(requestBody)),
     });
 
-    const responseBody = await this.responseBody(response);
+    const rawResponseBody = await this.responseBody(response);
+    const normalizedResponseBody = this.normalizeResponseBody(rawResponseBody);
     const exchange: ApiExchange = {
       label,
       method,
       path,
       requestBody: requestBody ?? null,
       status: response.status,
-      responseBody,
+      responseBody: normalizedResponseBody,
       occurredAt: new Date().toISOString(),
     };
 
     if (!response.ok) {
-      this.throwApiError(exchange, responseBody);
+      this.throwApiError(exchange, normalizedResponseBody);
     }
 
     return {
-      data: responseBody as T,
+      data: normalizedResponseBody as T,
       exchange,
     };
   }
@@ -147,5 +152,249 @@ export class MachineApiClient implements MachineClient {
     }
 
     return 'error' in responseBody;
+  }
+
+  private toWireRequestBody(requestBody: unknown): unknown {
+    return requestBody;
+  }
+
+  private normalizeResponseBody(responseBody: unknown): unknown {
+    if (this.isGetMachineStateResponse(responseBody)) {
+      const responseRecord = this.recordOfUnknown(responseBody);
+
+      return { machine: this.normalizeMachineSnapshot(this.recordOfUnknown(responseRecord.machine)) };
+    }
+
+    if (this.isInsertCoinResponse(responseBody)) {
+      const responseRecord = this.recordOfUnknown(responseBody);
+
+      return {
+        event: this.recordOfUnknown(responseRecord.event),
+        machine: this.normalizeMachineSnapshot(this.recordOfUnknown(responseRecord.machine)),
+      };
+    }
+
+    if (this.isSelectProductResponse(responseBody)) {
+      const responseRecord = this.recordOfUnknown(responseBody);
+      const event = this.recordOfUnknown(responseRecord.event);
+
+      return {
+        event: {
+          ...event,
+          dispensedChangeCounts: this.normalizeCoinCounts(this.recordOfNumbers(event.dispensedChangeCounts)),
+        },
+        machine: this.normalizeMachineSnapshot(this.recordOfUnknown(responseRecord.machine)),
+      };
+    }
+
+    if (this.isReturnInsertedMoneyResponse(responseBody)) {
+      const responseRecord = this.recordOfUnknown(responseBody);
+      const event = this.recordOfUnknown(responseRecord.event);
+
+      return {
+        event: {
+          ...event,
+          returnedCoinCounts: this.normalizeCoinCounts(this.recordOfNumbers(event.returnedCoinCounts)),
+        },
+        machine: this.normalizeMachineSnapshot(this.recordOfUnknown(responseRecord.machine)),
+      };
+    }
+
+    if (this.isServiceMachineResponse(responseBody)) {
+      const responseRecord = this.recordOfUnknown(responseBody);
+
+      return {
+        event: this.recordOfUnknown(responseRecord.event),
+        machine: this.normalizeMachineSnapshot(this.recordOfUnknown(responseRecord.machine)),
+      };
+    }
+
+    if (this.isApiErrorPayload(responseBody)) {
+      return {
+        error: {
+          code: responseBody.error.code,
+          message: this.normalizeErrorMessage(responseBody.error.code, responseBody.error.message),
+          context: this.normalizeObject(responseBody.error.context),
+        },
+      };
+    }
+
+    return responseBody;
+  }
+
+  private normalizeMachineSnapshot(rawMachine: Record<string, unknown>): MachineSnapshot {
+    return {
+      machineId: String(rawMachine.machineId),
+      insertedBalanceCoins: this.normalizedCoinAmount(
+        rawMachine.insertedBalanceCoins,
+        rawMachine.insertedBalanceCents,
+      ),
+      hasPendingBalance: Boolean(rawMachine.hasPendingBalance),
+      insertedCoins: this.normalizeCoinCounts(this.recordOfNumbers(rawMachine.insertedCoins)),
+      availableChangeCounts: this.normalizeCoinCounts(
+        this.recordOfNumbers(rawMachine.availableChangeCounts),
+      ),
+      products: Array.isArray(rawMachine.products)
+        ? rawMachine.products.map((product) => this.normalizeProductSnapshot(product))
+        : [],
+    };
+  }
+
+  private normalizeProductSnapshot(rawProduct: unknown): ProductSnapshot {
+    const product = this.recordOfUnknown(rawProduct);
+
+    return {
+      selector: String(product.selector),
+      name: String(product.name),
+      priceCoins: this.normalizedCoinAmount(product.priceCoins, product.priceCents),
+      quantity: Number(product.quantity),
+      available: Boolean(product.available),
+    };
+  }
+
+  private normalizeObject(value: Record<string, unknown>): Record<string, unknown> {
+    const normalized: Record<string, unknown> = {};
+
+    for (const [key, currentValue] of Object.entries(value)) {
+      if (this.isCoinCountContainerKey(key) && this.isRecord(currentValue)) {
+        normalized[key] = this.normalizeCoinCounts(this.recordOfNumbers(currentValue));
+        continue;
+      }
+
+      if (key === 'coinCents' && typeof currentValue === 'number') {
+        normalized.coins = this.centsToCoins(currentValue);
+        continue;
+      }
+
+      if (key.endsWith('Cents') && typeof currentValue === 'number') {
+        normalized[`${key.slice(0, -5)}Coins`] = this.centsToCoins(currentValue);
+        continue;
+      }
+
+      if (this.isRecord(currentValue)) {
+        normalized[key] = this.normalizeObject(currentValue);
+        continue;
+      }
+
+      normalized[key] = currentValue;
+    }
+
+    return normalized;
+  }
+
+  private normalizeCoinCounts(rawCounts: Record<string, number>): CoinCountMap {
+    if (this.coinCountsAlreadyUseCoins(rawCounts)) {
+      return Object.fromEntries(
+        Object.entries(rawCounts)
+          .map(([denomination, quantity]) => [
+            this.formatCoinLiteral(Number(denomination)),
+            quantity,
+          ] as const)
+          .sort(([left], [right]) => Number(left) - Number(right)),
+      );
+    }
+
+    const normalized = Object.entries(rawCounts)
+      .map(([denomination, quantity]) => [
+        this.coinKeyFromCents(Number(denomination)),
+        quantity,
+      ] as const)
+      .sort(([left], [right]) => Number(left) - Number(right));
+
+    return Object.fromEntries(normalized);
+  }
+
+  private normalizeErrorMessage(code: string, message: string): string {
+    switch (code) {
+      case 'exact_change_unavailable':
+      case 'insufficient_balance':
+      case 'unsupported_coin':
+        return message.replace(/"(\d+)"/g, (_match, cents) => {
+          return `"${this.formatCoinLiteral(this.centsToCoins(Number(cents)))}"`;
+        });
+      default:
+        return message;
+    }
+  }
+
+  private centsToCoins(cents: number): CoinAmount {
+    return Number((cents / 100).toFixed(2));
+  }
+
+  private formatCoinLiteral(coins: number): string {
+    return Number.isInteger(coins) ? coins.toFixed(0) : coins.toFixed(2);
+  }
+
+  private coinKeyFromCents(cents: number): string {
+    return this.formatCoinLiteral(this.centsToCoins(cents));
+  }
+
+  private normalizedCoinAmount(coins: unknown, cents: unknown): CoinAmount {
+    if (typeof coins === 'number') {
+      return Number(coins.toFixed(2));
+    }
+
+    return this.centsToCoins(Number(cents));
+  }
+
+  private isGetMachineStateResponse(value: unknown): value is Record<string, unknown> {
+    return this.isRecord(value) && 'machine' in value && !('event' in value);
+  }
+
+  private isInsertCoinResponse(value: unknown): value is Record<string, unknown> {
+    return this.hasEventType(value, 'coin_inserted');
+  }
+
+  private isSelectProductResponse(value: unknown): value is Record<string, unknown> {
+    return this.hasEventType(value, 'product_selected');
+  }
+
+  private isReturnInsertedMoneyResponse(value: unknown): value is Record<string, unknown> {
+    return this.hasEventType(value, 'money_returned');
+  }
+
+  private isServiceMachineResponse(value: unknown): value is Record<string, unknown> {
+    return this.hasEventType(value, 'machine_serviced');
+  }
+
+  private hasEventType(value: unknown, expectedType: string): value is Record<string, unknown> {
+    if (!this.isRecord(value) || !('event' in value) || !this.isRecord(value.event)) {
+      return false;
+    }
+
+    return value.event.type === expectedType;
+  }
+
+  private isCoinCountContainerKey(key: string): boolean {
+    return [
+      'insertedCoins',
+      'availableChangeCounts',
+      'returnedCoinCounts',
+      'dispensedChangeCounts',
+    ].includes(key);
+  }
+
+  private coinCountsAlreadyUseCoins(rawCounts: Record<string, number>): boolean {
+    return Object.keys(rawCounts).some((denomination) => {
+      return denomination.includes('.') || Number(denomination) <= 1;
+    });
+  }
+
+  private recordOfUnknown(value: unknown): Record<string, unknown> {
+    return this.isRecord(value) ? value : {};
+  }
+
+  private recordOfNumbers(value: unknown): Record<string, number> {
+    if (!this.isRecord(value)) {
+      return {};
+    }
+
+    return Object.fromEntries(
+      Object.entries(value).filter(([, currentValue]) => typeof currentValue === 'number'),
+    ) as Record<string, number>;
+  }
+
+  private isRecord(value: unknown): value is Record<string, unknown> {
+    return typeof value === 'object' && value !== null && !Array.isArray(value);
   }
 }

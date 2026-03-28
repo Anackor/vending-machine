@@ -5,7 +5,7 @@ This frontend is a small reviewer-facing companion for the vending machine API.
 ## Purpose
 
 - expose the current vending machine flows through a visual interface
-- keep the raw request and response payloads visible
+- keep the latest request and response payloads visible in a reviewer-friendly format
 - stay thin on top of the existing backend API
 
 ## Technology choices
@@ -24,3 +24,11 @@ This frontend is a small reviewer-facing companion for the vending machine API.
 
 The backend remains the single source of truth. The frontend only orchestrates
 calls, renders the current snapshot, and surfaces the latest HTTP exchange.
+
+## Money representation
+
+The backend persists money in integer cents internally.
+
+The HTTP API exposed to the reviewer UI uses `coins`, for example `0.25` and
+`1`, so the visual layer and the request/response inspector can stay readable
+without carrying cent-based transport details.

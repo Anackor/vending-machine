@@ -60,7 +60,7 @@ export class ReviewerApp {
         this.state.notice = {
           tone: 'info',
           title: 'Machine snapshot loaded',
-          detail: 'The latest persisted state is now visible in the dashboard.',
+          detail: 'The latest frontend-normalized machine state is now visible in the dashboard.',
         };
       },
       false,
@@ -76,7 +76,7 @@ export class ReviewerApp {
       this.state.notice = {
         tone: 'success',
         title: `Inserted ${formatCoins(coins)} coin`,
-        detail: 'The new machine snapshot and the raw API exchange are shown below.',
+        detail: 'The new machine snapshot and the normalized API exchange are shown below.',
       };
     });
   }
@@ -205,7 +205,7 @@ export class ReviewerApp {
 
   private template(): string {
     const machine = this.state.machine;
-    const balance = machine === null ? '€0.00' : formatCents(machine.insertedBalanceCents);
+    const balance = machine === null ? 'EUR 0.00' : formatCents(machine.insertedBalanceCoins);
     const products = machine === null ? [] : machine.products;
 
     return `
@@ -215,7 +215,7 @@ export class ReviewerApp {
             <p class="eyebrow">Reviewer UI</p>
             <h1>Vending Machine Console</h1>
             <p class="lede">
-              A visual companion for the real HTTP API. Every interaction keeps the raw request and response visible.
+              A visual companion for the real HTTP API. Every interaction keeps the normalized request and response visible.
             </p>
           </div>
           <div class="hero-metrics">
@@ -323,13 +323,13 @@ export class ReviewerApp {
       <div class="summary-grid">
         <article class="summary-card">
           <span>Inserted balance</span>
-          <strong>${formatCents(machine.insertedBalanceCents)}</strong>
+          <strong>${formatCents(machine.insertedBalanceCoins)}</strong>
           <small>${machine.hasPendingBalance ? 'Pending balance present' : 'No pending balance'}</small>
         </article>
         <article class="summary-card">
           <span>Inserted coins</span>
           <strong>${formatCounts(machine.insertedCoins)}</strong>
-          <small>Exact denominations tracked by the backend</small>
+          <small>Frontend-normalized coin denominations</small>
         </article>
         <article class="summary-card">
           <span>Available change</span>
@@ -350,7 +350,7 @@ export class ReviewerApp {
         <dl>
           <div>
             <dt>Price</dt>
-            <dd>${formatCents(machineProduct.priceCents)}</dd>
+            <dd>${formatCents(machineProduct.priceCoins)}</dd>
           </div>
           <div>
             <dt>Quantity</dt>
@@ -387,10 +387,10 @@ export class ReviewerApp {
           </fieldset>
           <fieldset>
             <legend>Available change</legend>
-            ${this.numberInput('5 cents', 'change-5', changeDefaults['5'] ?? 0)}
-            ${this.numberInput('10 cents', 'change-10', changeDefaults['10'] ?? 0)}
-            ${this.numberInput('25 cents', 'change-25', changeDefaults['25'] ?? 0)}
-            ${this.numberInput('1 euro', 'change-100', changeDefaults['100'] ?? 0)}
+            ${this.numberInput('0.05 coin', 'change-005', changeDefaults['0.05'] ?? 0)}
+            ${this.numberInput('0.10 coin', 'change-010', changeDefaults['0.10'] ?? 0)}
+            ${this.numberInput('0.25 coin', 'change-025', changeDefaults['0.25'] ?? 0)}
+            ${this.numberInput('1 coin', 'change-100', changeDefaults['1'] ?? 0)}
           </fieldset>
         </div>
         <button class="primary-button" type="submit" ${this.disabledAttr()}>
@@ -469,10 +469,10 @@ export class ReviewerApp {
         soda: this.requiredInteger(formData, 'product-soda'),
       },
       availableChangeCounts: {
-        5: this.requiredInteger(formData, 'change-5'),
-        10: this.requiredInteger(formData, 'change-10'),
-        25: this.requiredInteger(formData, 'change-25'),
-        100: this.requiredInteger(formData, 'change-100'),
+        '0.05': this.requiredInteger(formData, 'change-005'),
+        '0.10': this.requiredInteger(formData, 'change-010'),
+        '0.25': this.requiredInteger(formData, 'change-025'),
+        '1': this.requiredInteger(formData, 'change-100'),
       },
     };
   }

@@ -14,14 +14,14 @@ import { ReviewerApp } from './reviewerApp';
 
 const initialMachine = {
   machineId: 'default',
-  insertedBalanceCents: 0,
+  insertedBalanceCoins: 0,
   hasPendingBalance: false,
   insertedCoins: {},
-  availableChangeCounts: { 5: 20, 10: 20, 25: 20, 100: 10 },
+  availableChangeCounts: { '0.05': 20, '0.10': 20, '0.25': 20, '1': 10 },
   products: [
-    { selector: 'water', name: 'Water', priceCents: 65, quantity: 10, available: true },
-    { selector: 'juice', name: 'Juice', priceCents: 100, quantity: 8, available: true },
-    { selector: 'soda', name: 'Soda', priceCents: 150, quantity: 5, available: true },
+    { selector: 'water', name: 'Water', priceCoins: 0.65, quantity: 10, available: true },
+    { selector: 'juice', name: 'Juice', priceCoins: 1, quantity: 8, available: true },
+    { selector: 'soda', name: 'Soda', priceCoins: 1.5, quantity: 5, available: true },
   ],
 };
 
@@ -39,7 +39,7 @@ class FakeMachineClient implements MachineClient {
     return {
       data: {
         event: { type: 'coin_inserted', coins },
-        machine: { ...initialMachine, insertedBalanceCents: coins === 1 ? 100 : 25 },
+        machine: { ...initialMachine, insertedBalanceCoins: coins === 1 ? 1 : 0.25 },
       },
       exchange: this.exchange('POST', '/api/machine/insert-coin', { coins }, {
         event: { type: 'coin_inserted', coins },
@@ -50,43 +50,44 @@ class FakeMachineClient implements MachineClient {
   public async selectProduct(
     selector: string,
   ): Promise<ApiOperationResult<SelectProductResponse>> {
+    const machine = {
+      ...initialMachine,
+      insertedBalanceCoins: 0,
+      products: initialMachine.products.map((product) =>
+        product.selector === selector
+          ? { ...product, quantity: product.quantity - 1 }
+          : product,
+      ),
+    };
+    const event = {
+      type: 'product_selected' as const,
+      dispensedProduct: { name: 'Water', selector },
+      dispensedChangeCounts: { '0.10': 1, '0.25': 1 },
+    };
+
     return {
       data: {
-        event: {
-          type: 'product_selected',
-          dispensedProduct: { name: 'Water', selector },
-          dispensedChangeCounts: { 25: 1, 10: 1 },
-        },
-        machine: {
-          ...initialMachine,
-          insertedBalanceCents: 0,
-          products: initialMachine.products.map((product) =>
-            product.selector === selector
-              ? { ...product, quantity: product.quantity - 1 }
-              : product,
-          ),
-        },
+        event,
+        machine,
       },
-      exchange: this.exchange('POST', '/api/machine/select-product', { selector }, {
-        event: { type: 'product_selected' },
-      }),
+      exchange: this.exchange('POST', '/api/machine/select-product', { selector }, { event, machine }),
     };
   }
 
   public async returnInsertedMoney(): Promise<
     ApiOperationResult<ReturnInsertedMoneyResponse>
   > {
+    const event = {
+      type: 'money_returned' as const,
+      returnedCoinCounts: { '1': 1 },
+    };
+
     return {
       data: {
-        event: {
-          type: 'money_returned',
-          returnedCoinCounts: { 100: 1 },
-        },
+        event,
         machine: initialMachine,
       },
-      exchange: this.exchange('POST', '/api/machine/return-coin', null, {
-        event: { type: 'money_returned' },
-      }),
+      exchange: this.exchange('POST', '/api/machine/return-coin', null, { event, machine: initialMachine }),
     };
   }
 
@@ -95,20 +96,23 @@ class FakeMachineClient implements MachineClient {
   ): Promise<ApiOperationResult<ServiceMachineResponse>> {
     this.servicePayloads.push(payload);
 
+    const machine = {
+      ...initialMachine,
+      availableChangeCounts: payload.availableChangeCounts,
+      products: initialMachine.products.map((product) => ({
+        ...product,
+        quantity: payload.productQuantities[product.selector],
+      })),
+    };
+
     return {
       data: {
         event: { type: 'machine_serviced' },
-        machine: {
-          ...initialMachine,
-          availableChangeCounts: payload.availableChangeCounts,
-          products: initialMachine.products.map((product) => ({
-            ...product,
-            quantity: payload.productQuantities[product.selector],
-          })),
-        },
+        machine,
       },
       exchange: this.exchange('POST', '/api/machine/service', payload, {
         event: { type: 'machine_serviced' },
+        machine,
       }),
     };
   }
@@ -146,7 +150,7 @@ describe('ReviewerApp', () => {
 
     expect(root.textContent).toContain('Vending Machine Console');
     expect(root.textContent).toContain('Water');
-    expect(root.textContent).toContain('€0.00');
+    expect(root.textContent).toContain('EUR 0.00');
     expect(root.textContent).toContain('Latest API exchange');
   });
 
@@ -163,8 +167,9 @@ describe('ReviewerApp', () => {
     await flush();
 
     expect(root.textContent).toContain('Inserted 1 coin');
-    expect(root.textContent).toContain('€1.00');
+    expect(root.textContent).toContain('EUR 1.00');
     expect(root.textContent).toContain('/api/machine/insert-coin');
+    expect(root.textContent).toContain('"coins": 1');
   });
 
   it('runs a small reviewer flow across load, purchase, return, and service interactions', async () => {
@@ -180,7 +185,9 @@ describe('ReviewerApp', () => {
     await flush();
 
     expect(root.textContent).toContain('Water dispensed');
-    expect(root.textContent).toContain('Change: 10c × 1, 25c × 1.');
+    expect(root.textContent).toContain('Change: 0.10 x 1, 0.25 x 1.');
+    expect(root.textContent).toContain('"dispensedChangeCounts": {');
+    expect(root.textContent).toContain('"0.25": 1');
 
     root
       .querySelector<HTMLButtonElement>('[data-action="return-money"]')
@@ -188,6 +195,8 @@ describe('ReviewerApp', () => {
     await flush();
 
     expect(root.textContent).toContain('Money returned');
+    expect(root.textContent).toContain('"returnedCoinCounts": {');
+    expect(root.textContent).toContain('"1": 1');
 
     root
       .querySelector<HTMLButtonElement>('[data-action="reset-service"]')
@@ -195,7 +204,9 @@ describe('ReviewerApp', () => {
     await flush();
 
     expect(client.servicePayloads).toHaveLength(1);
-    expect(client.servicePayloads[0]?.productQuantities.water).toBe(10);
+    expect(client.servicePayloads[0]?.availableChangeCounts['0.25']).toBe(20);
     expect(root.textContent).toContain('Machine serviced');
+    expect(root.textContent).toContain('"availableChangeCounts": {');
+    expect(root.textContent).toContain('"0.05": 20');
   });
 });
