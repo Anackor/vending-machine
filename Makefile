@@ -2,13 +2,16 @@ DEFAULT_GOAL := help
 
 DOCKER_COMPOSE ?= docker compose
 APP_SERVICE ?= app
+FRONTEND_SERVICE ?= frontend
 
 APP_EXEC := $(DOCKER_COMPOSE) exec -T $(APP_SERVICE)
 APP_EXEC_INTERACTIVE := $(DOCKER_COMPOSE) exec $(APP_SERVICE)
+FRONTEND_EXEC := $(DOCKER_COMPOSE) exec -T $(FRONTEND_SERVICE)
+FRONTEND_EXEC_INTERACTIVE := $(DOCKER_COMPOSE) exec $(FRONTEND_SERVICE)
 COMPOSER := $(APP_EXEC) composer
 CONSOLE := $(APP_EXEC) php bin/console
 
-.PHONY: help bootstrap build up down restart status install setup shell composer console lint analyse quality review test test-unit test-integration coverage coverage-html phpstan deptrac rector rector-fix ecs ecs-fix mongodb-smoke
+.PHONY: help bootstrap build up down restart status install setup shell composer console lint analyse quality review test test-unit test-integration coverage coverage-html phpstan deptrac rector rector-fix ecs ecs-fix mongodb-smoke ui-install ui-shell ui-test ui-build
 
 # Show the available local workflow targets.
 help:
@@ -40,6 +43,10 @@ help:
 	@echo   ecs            Run ECS in check mode
 	@echo   ecs-fix        Run ECS and apply automatic fixes
 	@echo   mongodb-smoke  Run the MongoDB smoke command
+	@echo   ui-install     Install frontend dependencies inside the frontend container
+	@echo   ui-shell       Open a shell inside the frontend container
+	@echo   ui-test        Run the frontend test suite
+	@echo   ui-build       Run the frontend production build
 
 # Build the image, start the stack, install dependencies, and run setup checks.
 bootstrap: build up install setup
@@ -95,7 +102,7 @@ analyse:
 quality: lint analyse
 
 # Run the reviewer-facing validation baseline.
-review: quality coverage
+review: quality coverage ui-test ui-build
 
 # Run the full project safety-net suite.
 test:
@@ -144,3 +151,19 @@ ecs-fix:
 # Run the MongoDB smoke command directly.
 mongodb-smoke:
 	$(CONSOLE) app:mongodb:smoke
+
+# Install frontend dependencies inside the frontend container.
+ui-install:
+	$(FRONTEND_EXEC) npm install
+
+# Open an interactive shell inside the frontend container.
+ui-shell:
+	$(FRONTEND_EXEC_INTERACTIVE) sh
+
+# Run the frontend test suite.
+ui-test:
+	$(FRONTEND_EXEC) npm run test
+
+# Run the frontend production build.
+ui-build:
+	$(FRONTEND_EXEC) npm run build

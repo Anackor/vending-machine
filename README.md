@@ -1,6 +1,6 @@
 # vending-machine
 
-This repository is intended to host a PHP backend solution for a vending machine technical challenge.
+This repository is intended to host a PHP backend solution for a vending machine technical challenge, plus a small reviewer-facing frontend that helps exercise the API visually.
 
 ## Goal
 
@@ -8,13 +8,14 @@ Build a small but well-structured backend that models a vending machine, its inv
 
 ## Current scope
 
-The first delivery is backend-only and should focus on:
+The delivery remains backend-first and now also includes an optional reviewer UI:
 
 - correct vending machine behavior
 - clear domain modeling
 - automated tests
 - reproducible execution with Docker
 - concise documentation for reviewers
+- a visual reviewer path on top of the same API
 
 ## Recommended implementation direction
 
@@ -52,7 +53,9 @@ so the project also exposes a thin reviewer-facing HTTP JSON interface on top
 of the persisted application layer. Phase 5 is now complete as well, so the
 local safety net is explicit and pull requests run the agreed GitHub Actions
 quality baseline. Phase 6 is now complete as well, so the repository is ready
-for reviewer handoff with one documented Docker execution path.
+for reviewer handoff with one documented Docker execution path. Phase 7 is now
+complete as an optional follow-up, adding a small Dockerized reviewer UI inside
+the same repository.
 
 ## Local prerequisites
 
@@ -84,6 +87,12 @@ After `make bootstrap`, the reviewer-facing HTTP interface is available at:
 http://localhost:8000
 ```
 
+The reviewer UI is also available at:
+
+```text
+http://localhost:4173
+```
+
 No extra local database setup is required for reviewers. The bootstrap flow
 already creates the local environment and resets the default machine to the
 documented baseline.
@@ -109,6 +118,10 @@ Common commands:
 - `make coverage-html`
 - `make rector-fix`
 - `make ecs-fix`
+- `make ui-install`
+- `make ui-shell`
+- `make ui-test`
+- `make ui-build`
 
 ## Command mapping
 
@@ -128,6 +141,9 @@ It wraps the main containerized commands:
 - `make rector-fix` -> `docker compose exec -T app composer run analyse:rector:fix`
 - `make ecs-fix` -> `docker compose exec -T app composer run lint:ecs:fix`
 - `make console cmd="..."` -> `docker compose exec -T app php bin/console ...`
+- `make ui-install` -> `docker compose exec -T frontend npm install`
+- `make ui-test` -> `docker compose exec -T frontend npm run test`
+- `make ui-build` -> `docker compose exec -T frontend npm run build`
 
 ## Final delivery path
 
@@ -136,8 +152,9 @@ The development Docker workflow is also the delivery workflow for reviewers.
 The intended handoff path is:
 
 1. `make bootstrap`
-2. `make review`
-3. exercise the HTTP API on `http://localhost:8000`
+2. open the reviewer UI on `http://localhost:4173`
+3. `make review`
+4. optionally exercise the HTTP API on `http://localhost:8000`
 
 This keeps the delivery simple:
 
@@ -182,6 +199,8 @@ The current delivery covers the expected challenge behaviors:
 - persisted state: available items, available change, and inserted money
 - automated checks: unit tests, integration tests, static analysis, formatting,
   architecture checks, and pull-request CI
+- reviewer experience: raw HTTP API plus a small visual UI with request and
+  response inspection
 
 ## Author note
 
@@ -238,15 +257,10 @@ Some small implementation pitfalls and how they were handled:
 The first reviewer-facing interface is a thin HTTP JSON layer served by the
 `app` container on `localhost:8000`.
 
-Available endpoints:
+An optional visual reviewer UI is served by the `frontend` container on
+`localhost:4173`.
 
-- `GET /api/machine`
-- `POST /api/machine/insert-coin`
-- `POST /api/machine/select-product`
-- `POST /api/machine/return-coin`
-- `POST /api/machine/service`
-
-Recommended validation flow:
+Recommended reviewer path:
 
 1. Bootstrap the local environment:
 
@@ -260,13 +274,46 @@ make bootstrap
 make status
 ```
 
-3. Inspect the current machine state:
+3. Open the reviewer UI:
+
+```text
+http://localhost:4173
+```
+
+4. Use the visual console to:
+
+- inspect the current machine snapshot
+- insert coins
+- buy products
+- return inserted money
+- service the machine
+- inspect the latest raw request and response payloads
+
+5. Run the full delivery validation:
+
+```bash
+make review
+```
+
+6. Optionally compare the UI behavior with the raw HTTP API shown below.
+
+Available endpoints:
+
+- `GET /api/machine`
+- `POST /api/machine/insert-coin`
+- `POST /api/machine/select-product`
+- `POST /api/machine/return-coin`
+- `POST /api/machine/service`
+
+Raw API validation examples:
+
+1. Inspect the current machine state:
 
 ```bash
 curl http://localhost:8000/api/machine
 ```
 
-4. Insert a `1` coin:
+2. Insert a `1` coin:
 
 ```bash
 curl -X POST http://localhost:8000/api/machine/insert-coin \
@@ -274,7 +321,7 @@ curl -X POST http://localhost:8000/api/machine/insert-coin \
   -d '{"coins":1}'
 ```
 
-5. Buy a product, for example `water`:
+3. Buy a product, for example `water`:
 
 ```bash
 curl -X POST http://localhost:8000/api/machine/select-product \
@@ -282,13 +329,13 @@ curl -X POST http://localhost:8000/api/machine/select-product \
   -d '{"selector":"water"}'
 ```
 
-6. Return the currently inserted money:
+4. Return the currently inserted money:
 
 ```bash
 curl -X POST http://localhost:8000/api/machine/return-coin
 ```
 
-7. Reset the machine state with a service call when needed:
+5. Reset the machine state with a service call when needed:
 
 ```bash
 curl -X POST http://localhost:8000/api/machine/service \
@@ -300,12 +347,6 @@ curl -X POST http://localhost:8000/api/machine/service \
 ```
 
 The seeded default machine uses the selectors `water`, `juice`, and `soda`.
-
-To validate the automated checks as part of the review:
-
-```bash
-make review
-```
 
 ## Test suite split
 

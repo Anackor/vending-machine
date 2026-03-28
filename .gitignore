@@ -13,3 +13,7 @@
 /phpunit.xml
 /.phpunit.cache/
 ###< phpunit/phpunit ###
+
+/frontend/reviewer-ui/node_modules/
+/frontend/reviewer-ui/dist/
+/frontend/reviewer-ui/.vitest/

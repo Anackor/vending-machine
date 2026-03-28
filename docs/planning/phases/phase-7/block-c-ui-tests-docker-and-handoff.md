@@ -13,16 +13,16 @@ integration, and explicit handoff documentation.
 
 ## Tasks
 
-- [ ] P7-025: decide the minimum frontend test levels for this phase
-- [ ] P7-026: add tests for the frontend API client success and failure paths
-- [ ] P7-027: add tests for the main state rendering and interaction wiring
-- [ ] P7-028: add at least one smoke-like frontend flow that proves the reviewer path works end to end
-- [ ] P7-029: add the frontend service to `docker-compose.yml` with a stable local access port
-- [ ] P7-030: add `make` targets for the frontend reviewer workflow
-- [ ] P7-031: keep the backend bootstrap and review flow compatible with the new frontend service
-- [ ] P7-032: document how a reviewer should start, open, and use the frontend UI
-- [ ] P7-033: document the frontend technology choices and any deliberate constraints
-- [ ] P7-034: run the final phase gate and record any intentionally deferred frontend enhancements
+- [x] P7-025: decide the minimum frontend test levels for this phase
+- [x] P7-026: add tests for the frontend API client success and failure paths
+- [x] P7-027: add tests for the main state rendering and interaction wiring
+- [x] P7-028: add at least one smoke-like frontend flow that proves the reviewer path works end to end
+- [x] P7-029: add the frontend service to `docker-compose.yml` with a stable local access port
+- [x] P7-030: add `make` targets for the frontend reviewer workflow
+- [x] P7-031: keep the backend bootstrap and review flow compatible with the new frontend service
+- [x] P7-032: document how a reviewer should start, open, and use the frontend UI
+- [x] P7-033: document the frontend technology choices and any deliberate constraints
+- [x] P7-034: run the final phase gate and record any intentionally deferred frontend enhancements
 
 ## Test strategy note
 
@@ -34,6 +34,14 @@ The useful baseline for this phase is:
 - DOM or component-level interaction coverage
 - one reviewer-oriented smoke path
 
+That baseline is now implemented through:
+
+- `frontend/reviewer-ui/src/api/machineApiClient.test.ts`
+- `frontend/reviewer-ui/src/app/reviewerApp.test.ts`
+- `make ui-test`
+- `make ui-build`
+- the updated `make review` flow
+
 ## Output contract
 
 The block is expected to leave behind:
@@ -42,6 +50,15 @@ The block is expected to leave behind:
 - Docker and `make` commands that include the UI cleanly
 - reviewer documentation that covers both API and visual usage
 - a final validation snapshot for the optional frontend follow-up
+
+## Validation snapshot
+
+Validated in this block:
+
+- frontend unit and DOM tests: successful
+- frontend production build: successful
+- `make bootstrap`: successful with the `frontend` service included
+- `make review`: successful with backend and frontend checks together
 
 ## Exit condition
 

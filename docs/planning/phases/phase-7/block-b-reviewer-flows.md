@@ -13,19 +13,34 @@ comfortably while still seeing the real payloads behind each action.
 
 ## Tasks
 
-- [ ] P7-012: define the main screen sections for machine state, actions, and payload inspection
-- [ ] P7-013: render the current machine snapshot on initial load
-- [ ] P7-014: render the product list with name, selector, price, and remaining quantity
-- [ ] P7-015: render the inserted balance and available change in a reviewer-friendly way
-- [ ] P7-016: add the insert-coin UI using the preferred `coins` language from the HTTP contract
-- [ ] P7-017: add the select-product flow and reflect the updated machine snapshot after success
-- [ ] P7-018: add the return-inserted-money flow and show the returned denominations clearly
-- [ ] P7-019: add the service flow for restocking products and available change
-- [ ] P7-020: add loading and disabled states so repeated clicks do not create noisy requests
-- [ ] P7-021: add success and failure feedback that is friendly but still precise
-- [ ] P7-022: add a visual request and response inspector for the latest API interaction
-- [ ] P7-023: add an easy way to reload or reset the reviewer view after state-changing operations
-- [ ] P7-024: polish the UI so it feels more intentional than a raw Swagger page while staying simple to maintain
+- [x] P7-012: define the main screen sections for machine state, actions, and payload inspection
+- [x] P7-013: render the current machine snapshot on initial load
+- [x] P7-014: render the product list with name, selector, price, and remaining quantity
+- [x] P7-015: render the inserted balance and available change in a reviewer-friendly way
+- [x] P7-016: add the insert-coin UI using the preferred `coins` language from the HTTP contract
+- [x] P7-017: add the select-product flow and reflect the updated machine snapshot after success
+- [x] P7-018: add the return-inserted-money flow and show the returned denominations clearly
+- [x] P7-019: add the service flow for restocking products and available change
+- [x] P7-020: add loading and disabled states so repeated clicks do not create noisy requests
+- [x] P7-021: add success and failure feedback that is friendly but still precise
+- [x] P7-022: add a visual request and response inspector for the latest API interaction
+- [x] P7-023: add an easy way to reload or reset the reviewer view after state-changing operations
+- [x] P7-024: polish the UI so it feels more intentional than a raw Swagger page while staying simple to maintain
+
+## Implemented reviewer surface
+
+The reviewer UI now exposes:
+
+- a hero summary with machine id, inserted balance, and total stock
+- a machine snapshot panel for inserted coins and available change
+- product cards for `water`, `juice`, and `soda`
+- coin insertion actions using `0.05`, `0.10`, `0.25`, and `1`
+- a direct return-money action
+- a service panel with editable product and change counts
+- a raw latest request and response inspector
+
+The UI deliberately behaves like a more charming operator console, not like a
+generic generated API page.
 
 ## UX target
 
@@ -49,6 +64,12 @@ The block is expected to leave behind:
 - a readable state dashboard
 - clear interaction feedback
 - a raw payload panel that helps reviewers inspect the real API behavior
+
+Those outputs now live mainly in:
+
+- `frontend/reviewer-ui/src/app/reviewerApp.ts`
+- `frontend/reviewer-ui/src/styles.css`
+- `frontend/reviewer-ui/src/api/machineApiClient.ts`
 
 ## Exit condition
 
