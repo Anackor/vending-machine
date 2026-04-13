@@ -23,6 +23,8 @@ services:
     volumes:
       - ./:/app
       - composer-cache:/tmp/composer-cache
+    dns:
+      - 1.1.1.1
     ports:
       - "8000:8000"
     networks:
@@ -40,6 +42,8 @@ services:
     volumes:
       - ./:/workspace
       - frontend-node-modules:/workspace/frontend/reviewer-ui/node_modules
+    dns:
+      - 1.1.1.1
     ports:
       - "4173:4173"
     networks:
