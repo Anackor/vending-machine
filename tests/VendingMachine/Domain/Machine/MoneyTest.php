@@ -6,7 +6,7 @@ namespace Tests\VendingMachine\Domain\Machine;
 
 use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
-use VendingMachine\Domain\Machine\Money;
+use VendingMachine\Domain\Machine\ValueObject\Money;
 
 final class MoneyTest extends TestCase
 {

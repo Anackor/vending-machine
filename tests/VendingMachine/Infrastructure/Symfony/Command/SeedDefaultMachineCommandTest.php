@@ -9,9 +9,9 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Tester\CommandTester;
 use Tests\VendingMachine\Application\Machine\Double\InMemoryMachineRepository;
 use Tests\VendingMachine\Infrastructure\Persistence\MongoDB\Machine\Fixture\DefaultMachineFixture;
-use VendingMachine\Domain\Machine\Coin;
-use VendingMachine\Domain\Machine\MachineId;
-use VendingMachine\Domain\Machine\Selector;
+use VendingMachine\Domain\Machine\ValueObject\Coin;
+use VendingMachine\Domain\Machine\ValueObject\MachineId;
+use VendingMachine\Domain\Machine\ValueObject\Selector;
 use VendingMachine\Infrastructure\Symfony\Command\SeedDefaultMachineCommand;
 
 final class SeedDefaultMachineCommandTest extends TestCase

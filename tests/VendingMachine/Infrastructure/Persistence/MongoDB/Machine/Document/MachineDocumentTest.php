@@ -6,6 +6,8 @@ namespace Tests\VendingMachine\Infrastructure\Persistence\MongoDB\Machine\Docume
 
 use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
+use VendingMachine\Domain\Machine\ValueObject\AvailableChange;
+use VendingMachine\Domain\Machine\ValueObject\InsertedCoins;
 use VendingMachine\Infrastructure\Persistence\MongoDB\Machine\Document\MachineDocument;
 use VendingMachine\Infrastructure\Persistence\MongoDB\Machine\Document\ProductStockDocument;
 
@@ -25,6 +27,23 @@ final class MachineDocumentTest extends TestCase
 
         self::assertSame('default', $document->machineId());
         self::assertCount(2, $document->productStocks());
+        self::assertSame([5 => 1, 25 => 2], $document->availableChangeCounts());
+        self::assertSame([100 => 1], $document->insertedCoinCounts());
+    }
+
+    public function testItAcceptsCoinStateValueObjects(): void
+    {
+        $availableChange = AvailableChange::fromCounts([25 => 2, 5 => 1]);
+        $insertedCoins = InsertedCoins::fromCounts([100 => 1]);
+        $document = new MachineDocument(
+            'default',
+            [new ProductStockDocument('water', 65, 2, 'Water')],
+            $availableChange,
+            $insertedCoins,
+        );
+
+        self::assertSame($availableChange, $document->availableChange());
+        self::assertSame($insertedCoins, $document->insertedCoins());
         self::assertSame([5 => 1, 25 => 2], $document->availableChangeCounts());
         self::assertSame([100 => 1], $document->insertedCoinCounts());
     }
@@ -69,10 +88,7 @@ final class MachineDocumentTest extends TestCase
             );
             self::fail('The document should reject invalid coin denomination keys.');
         } catch (InvalidArgumentException $exception) {
-            self::assertSame(
-                'Persisted available change counts must use integer denomination keys.',
-                $exception->getMessage(),
-            );
+            self::assertSame('Coin denomination keys must be integer values.', $exception->getMessage());
         }
 
         try {
@@ -84,7 +100,7 @@ final class MachineDocumentTest extends TestCase
             );
             self::fail('The document should reject non-integer coin counts.');
         } catch (InvalidArgumentException $exception) {
-            self::assertSame('Persisted inserted coin counts must be integers.', $exception->getMessage());
+            self::assertSame('Coin counts must be integers.', $exception->getMessage());
         }
 
         try {
@@ -96,7 +112,7 @@ final class MachineDocumentTest extends TestCase
             );
             self::fail('The document should reject negative available change counts.');
         } catch (InvalidArgumentException $exception) {
-            self::assertSame('Persisted available change counts cannot be negative.', $exception->getMessage());
+            self::assertSame('Coin counts cannot be negative.', $exception->getMessage());
         }
 
         try {
@@ -108,10 +124,7 @@ final class MachineDocumentTest extends TestCase
             );
             self::fail('The document should reject invalid inserted coin denomination keys.');
         } catch (InvalidArgumentException $exception) {
-            self::assertSame(
-                'Persisted inserted coin counts must use integer denomination keys.',
-                $exception->getMessage(),
-            );
+            self::assertSame('Coin denomination keys must be integer values.', $exception->getMessage());
         }
     }
 }

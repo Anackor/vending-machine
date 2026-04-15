@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace VendingMachine\Application\Machine\Command;
 
-use VendingMachine\Domain\Machine\MachineId;
+use VendingMachine\Domain\Machine\ValueObject\MachineId;
 
 /**
  * Carries the input required to refund the current customer balance.

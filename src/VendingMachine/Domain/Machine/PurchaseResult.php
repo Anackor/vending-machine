@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace VendingMachine\Domain\Machine;
 
+use VendingMachine\Domain\Machine\ValueObject\CoinInventory;
+
 /**
  * Returns the updated machine, the dispensed product, and the exact change of a purchase.
  */

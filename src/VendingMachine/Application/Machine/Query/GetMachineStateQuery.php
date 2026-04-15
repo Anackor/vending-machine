@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace VendingMachine\Application\Machine\Query;
 
-use VendingMachine\Domain\Machine\MachineId;
+use VendingMachine\Domain\Machine\ValueObject\MachineId;
 
 /**
  * Requests the current machine snapshot without mutating state.

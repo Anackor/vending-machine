@@ -5,10 +5,10 @@ declare(strict_types=1);
 namespace VendingMachine\Application\Machine\Command;
 
 use InvalidArgumentException;
-use VendingMachine\Domain\Machine\AvailableChange;
-use VendingMachine\Domain\Machine\MachineId;
-use VendingMachine\Domain\Machine\Selector;
-use VendingMachine\Domain\Machine\StockQuantity;
+use VendingMachine\Domain\Machine\ValueObject\AvailableChange;
+use VendingMachine\Domain\Machine\ValueObject\MachineId;
+use VendingMachine\Domain\Machine\ValueObject\Selector;
+use VendingMachine\Domain\Machine\ValueObject\StockQuantity;
 
 /**
  * Carries the stock and change configuration used by the service operation.

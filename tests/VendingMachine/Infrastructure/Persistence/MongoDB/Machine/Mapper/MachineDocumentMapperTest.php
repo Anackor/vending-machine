@@ -7,7 +7,7 @@ namespace Tests\VendingMachine\Infrastructure\Persistence\MongoDB\Machine\Mapper
 use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
 use Tests\VendingMachine\Infrastructure\Persistence\MongoDB\Machine\Fixture\DefaultMachineFixture;
-use VendingMachine\Domain\Machine\MachineId;
+use VendingMachine\Domain\Machine\ValueObject\MachineId;
 use VendingMachine\Infrastructure\Persistence\MongoDB\Machine\Document\MachineDocument;
 use VendingMachine\Infrastructure\Persistence\MongoDB\Machine\Mapper\MachineDocumentMapper;
 
@@ -78,7 +78,7 @@ final class MachineDocumentMapperTest extends TestCase
         self::assertSame(100, $machine->insertedBalance()->cents());
         self::assertSame([5 => 1, 25 => 2], $machine->availableChange()->counts());
         self::assertSame([100 => 1], $machine->insertedCoins()->counts());
-        self::assertSame(2, $machine->productStockFor(\VendingMachine\Domain\Machine\Selector::fromString('water'))?->quantity());
+        self::assertSame(2, $machine->productStockFor(\VendingMachine\Domain\Machine\ValueObject\Selector::fromString('water'))?->quantity());
     }
 
     public function testItRejectsInvalidPersistedShapes(): void

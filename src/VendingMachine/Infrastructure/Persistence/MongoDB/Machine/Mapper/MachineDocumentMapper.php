@@ -5,13 +5,11 @@ declare(strict_types=1);
 namespace VendingMachine\Infrastructure\Persistence\MongoDB\Machine\Mapper;
 
 use InvalidArgumentException;
-use VendingMachine\Domain\Machine\AvailableChange;
-use VendingMachine\Domain\Machine\InsertedCoins;
 use VendingMachine\Domain\Machine\Machine;
-use VendingMachine\Domain\Machine\MachineId;
-use VendingMachine\Domain\Machine\Money;
 use VendingMachine\Domain\Machine\Product;
 use VendingMachine\Domain\Machine\ProductStock;
+use VendingMachine\Domain\Machine\ValueObject\MachineId;
+use VendingMachine\Domain\Machine\ValueObject\Money;
 use VendingMachine\Infrastructure\Persistence\MongoDB\Machine\Document\MachineDocument;
 use VendingMachine\Infrastructure\Persistence\MongoDB\Machine\Document\ProductStockDocument;
 
@@ -39,8 +37,8 @@ final class MachineDocumentMapper
         return new MachineDocument(
             $machineId->value(),
             $productStocks,
-            $machine->availableChange()->counts(),
-            $machine->insertedCoins()->counts(),
+            $machine->availableChange(),
+            $machine->insertedCoins(),
         );
     }
 
@@ -62,8 +60,8 @@ final class MachineDocumentMapper
 
         return Machine::initialize(
             $productStocks,
-            AvailableChange::fromCounts($document->availableChangeCounts()),
-            InsertedCoins::fromCounts($document->insertedCoinCounts()),
+            $document->availableChange(),
+            $document->insertedCoins(),
         );
     }
 
