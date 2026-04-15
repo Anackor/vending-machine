@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace VendingMachine\Domain\Machine;
+namespace VendingMachine\Domain\Machine\ValueObject;
 
 /**
  * Wraps the machine-owned coin inventory that can be used to return change.

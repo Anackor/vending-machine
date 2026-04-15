@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace VendingMachine\Infrastructure\Persistence\MongoDB\Machine\Document;
 
 use InvalidArgumentException;
-use VendingMachine\Domain\Machine\AvailableChange;
-use VendingMachine\Domain\Machine\InsertedCoins;
+use VendingMachine\Domain\Machine\ValueObject\AvailableChange;
+use VendingMachine\Domain\Machine\ValueObject\InsertedCoins;
 
 /**
  * Persistence DTO that stores one complete machine aggregate as a single MongoDB document.

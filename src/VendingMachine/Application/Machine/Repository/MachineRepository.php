@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace VendingMachine\Application\Machine\Repository;
 
 use VendingMachine\Domain\Machine\Machine;
-use VendingMachine\Domain\Machine\MachineId;
+use VendingMachine\Domain\Machine\ValueObject\MachineId;
 
 /**
  * Application port for loading and saving the machine aggregate.

@@ -16,8 +16,8 @@ use VendingMachine\Application\Machine\Result\ProductSnapshot;
 use VendingMachine\Application\Machine\Result\ReturnInsertedMoneyResult;
 use VendingMachine\Application\Machine\Result\SelectProductResult;
 use VendingMachine\Application\Machine\Result\ServiceMachineResult;
-use VendingMachine\Domain\Machine\ProductName;
-use VendingMachine\Domain\Machine\StockQuantity;
+use VendingMachine\Domain\Machine\ValueObject\ProductName;
+use VendingMachine\Domain\Machine\ValueObject\StockQuantity;
 
 final class ResultAndFailureContractTest extends TestCase
 {

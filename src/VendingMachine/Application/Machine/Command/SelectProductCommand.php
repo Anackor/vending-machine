@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace VendingMachine\Application\Machine\Command;
 
-use VendingMachine\Domain\Machine\MachineId;
-use VendingMachine\Domain\Machine\Selector;
+use VendingMachine\Domain\Machine\ValueObject\MachineId;
+use VendingMachine\Domain\Machine\ValueObject\Selector;
 
 /**
  * Carries the input required to select a product from the machine.

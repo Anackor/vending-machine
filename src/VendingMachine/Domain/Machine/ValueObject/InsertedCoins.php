@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace VendingMachine\Domain\Machine;
+namespace VendingMachine\Domain\Machine\ValueObject;
 
 /**
  * Wraps the coins inserted by the current customer session.

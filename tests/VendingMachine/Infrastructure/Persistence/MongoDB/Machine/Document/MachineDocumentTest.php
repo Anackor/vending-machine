@@ -6,8 +6,8 @@ namespace Tests\VendingMachine\Infrastructure\Persistence\MongoDB\Machine\Docume
 
 use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
-use VendingMachine\Domain\Machine\AvailableChange;
-use VendingMachine\Domain\Machine\InsertedCoins;
+use VendingMachine\Domain\Machine\ValueObject\AvailableChange;
+use VendingMachine\Domain\Machine\ValueObject\InsertedCoins;
 use VendingMachine\Infrastructure\Persistence\MongoDB\Machine\Document\MachineDocument;
 use VendingMachine\Infrastructure\Persistence\MongoDB\Machine\Document\ProductStockDocument;
 

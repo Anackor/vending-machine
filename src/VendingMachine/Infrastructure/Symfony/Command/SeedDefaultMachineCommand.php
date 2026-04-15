@@ -11,14 +11,14 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use VendingMachine\Application\Machine\Repository\MachineRepository;
-use VendingMachine\Domain\Machine\AvailableChange;
-use VendingMachine\Domain\Machine\InsertedCoins;
 use VendingMachine\Domain\Machine\Machine;
-use VendingMachine\Domain\Machine\MachineId;
-use VendingMachine\Domain\Machine\Money;
 use VendingMachine\Domain\Machine\Product;
 use VendingMachine\Domain\Machine\ProductStock;
-use VendingMachine\Domain\Machine\Selector;
+use VendingMachine\Domain\Machine\ValueObject\AvailableChange;
+use VendingMachine\Domain\Machine\ValueObject\InsertedCoins;
+use VendingMachine\Domain\Machine\ValueObject\MachineId;
+use VendingMachine\Domain\Machine\ValueObject\Money;
+use VendingMachine\Domain\Machine\ValueObject\Selector;
 
 /**
  * Seeds or resets the documented default machine used by reviewers and local setup.

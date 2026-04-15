@@ -15,7 +15,7 @@ use VendingMachine\Application\Machine\Handler\GetMachineStateHandler;
 use VendingMachine\Application\Machine\Handler\InsertCoinHandler;
 use VendingMachine\Application\Machine\Repository\MachineRepository;
 use VendingMachine\Domain\Machine\Machine;
-use VendingMachine\Domain\Machine\MachineId;
+use VendingMachine\Domain\Machine\ValueObject\MachineId;
 use VendingMachine\Infrastructure\Persistence\MongoDB\Machine\Mapper\MachineDocumentMapper;
 use VendingMachine\Infrastructure\Persistence\MongoDB\Machine\MongoDBMachineRepository;
 

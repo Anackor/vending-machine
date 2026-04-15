@@ -6,12 +6,12 @@ namespace Tests\VendingMachine\Domain\Machine;
 
 use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
-use VendingMachine\Domain\Machine\Money;
 use VendingMachine\Domain\Machine\Product;
-use VendingMachine\Domain\Machine\ProductName;
 use VendingMachine\Domain\Machine\ProductStock;
-use VendingMachine\Domain\Machine\Selector;
-use VendingMachine\Domain\Machine\StockQuantity;
+use VendingMachine\Domain\Machine\ValueObject\Money;
+use VendingMachine\Domain\Machine\ValueObject\ProductName;
+use VendingMachine\Domain\Machine\ValueObject\Selector;
+use VendingMachine\Domain\Machine\ValueObject\StockQuantity;
 
 final class ProductAndStockTest extends TestCase
 {
