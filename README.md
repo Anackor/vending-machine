@@ -27,12 +27,19 @@ The delivery remains backend-first and now also includes an optional reviewer UI
 
 ## Documentation map
 
-- `docs/challenges/backend/README.md`: backend challenge brief, extracted requirements, assumptions, and design guidance
 - `docs/planning/backend-implementation-plan.md`: implementation roadmap for the backend
 - `docs/architecture/http-api-boundary.md`: HTTP boundary design notes and SOLID/DDD/hexagonal trade-offs
 - `docs/planning/portfolio-backlog.md`: public portfolio polish backlog and documentation positioning
 - `docs/development/conventions.md`: project conventions, class placement rules, and tool responsibilities
 - `docs/development/ai-development-guide.md`: short development guide for future AI-assisted changes
+
+## Portfolio note
+
+Some classes include short `Tip:` docblocks. They are intentionally kept as
+learning signposts for reviewers who open files directly in GitHub; the full
+reasoning lives in `docs/architecture/http-api-boundary.md`. In a product team,
+this level of explanation would usually move to ADRs, onboarding docs, or PR
+discussion once the patterns are familiar.
 
 ## Delivery expectations
 

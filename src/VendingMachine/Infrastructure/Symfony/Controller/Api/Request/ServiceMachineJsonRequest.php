@@ -7,12 +7,8 @@ namespace VendingMachine\Infrastructure\Symfony\Controller\Api\Request;
 /**
  * Validated HTTP contract for servicing stock and change.
  *
- * The service endpoint has the richest input shape, so this passive DTO keeps
- * object validation and denomination-key normalization out of the controller. The
- * application command still owns use-case validation such as selector and
- * quantity normalization. A shared application DTO was considered, but the JSON
- * key format for available change is an adapter concern and should not become
- * part of the application boundary.
+ * Tip: JSON object shape is an adapter concern; service invariants stay in the
+ * use case and domain. See docs/architecture/http-api-boundary.md for details.
  */
 final readonly class ServiceMachineJsonRequest
 {

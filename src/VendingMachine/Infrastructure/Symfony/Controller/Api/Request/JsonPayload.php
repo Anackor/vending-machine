@@ -11,12 +11,8 @@ use VendingMachine\Infrastructure\Symfony\Controller\Api\Exception\InvalidMachin
 /**
  * Validated HTTP JSON object payload.
  *
- * This class represents the minimum shared contract for incoming JSON: the body
- * must be either empty or an object, never a list or scalar. Keeping this as a
- * small infrastructure value avoids repeating low-level JSON checks in every
- * endpoint. Symfony argument resolvers were considered, but an explicit helper
- * keeps the challenge code straightforward and converts parser failures into a
- * transport-specific exception before Application is called.
+ * Tip: raw JSON parsing is handled before Application is called. See
+ * docs/architecture/http-api-boundary.md for the trade-offs.
  */
 final readonly class JsonPayload
 {

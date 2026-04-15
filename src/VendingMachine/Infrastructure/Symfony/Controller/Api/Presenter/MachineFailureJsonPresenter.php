@@ -9,11 +9,8 @@ use VendingMachine\Application\Machine\Failure\MachineFailure;
 /**
  * Presents application failures without leaking cent-based internals to HTTP clients.
  *
- * Application failures are intentionally stable and transport-neutral, so this
- * presenter adapts their context to the reviewer-facing JSON
- * contract. Keeping this in infrastructure avoids teaching the application
- * layer about HTTP naming conventions. It deliberately avoids parsing failure
- * messages; amounts must arrive as structured context from Application.
+ * Tip: amounts are read from structured context, never parsed from messages.
+ * See docs/architecture/http-api-boundary.md for the trade-offs.
  */
 final readonly class MachineFailureJsonPresenter
 {

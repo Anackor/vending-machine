@@ -9,11 +9,8 @@ use VendingMachine\Infrastructure\Symfony\Controller\Api\Exception\InvalidMachin
 /**
  * Normalizes reviewer-facing coin literals into integer cents for application commands.
  *
- * The API accepts decimal coin literals for readability, while commands and
- * domain objects work with integer cents. This normalizer is infrastructure
- * code because it understands the HTTP contract, including compatibility with
- * legacy cent-based fields. Moving this into a domain value object was rejected
- * because decimal JSON formats are transport details, not vending machine rules.
+ * Tip: decimal JSON coin formats are transport details, not domain rules. See
+ * docs/architecture/http-api-boundary.md for the trade-offs.
  */
 final class CoinInputNormalizer
 {

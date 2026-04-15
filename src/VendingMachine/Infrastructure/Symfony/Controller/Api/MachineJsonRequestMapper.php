@@ -19,11 +19,8 @@ use VendingMachine\Infrastructure\Symfony\Controller\Api\Request\ServiceMachineJ
 /**
  * Maps the HTTP JSON contract into application commands and queries.
  *
- * This class exists because the controller should not know how transport
- * fields become application input, while the application layer should not
- * depend on Symfony requests or reviewer-facing JSON names. A generic factory
- * name was considered, but "mapper" describes the responsibility more clearly:
- * translating one boundary model into another without owning business rules.
+ * Tip: this keeps Symfony requests and JSON field names outside Application.
+ * See docs/architecture/http-api-boundary.md for the trade-offs.
  */
 final readonly class MachineJsonRequestMapper
 {
