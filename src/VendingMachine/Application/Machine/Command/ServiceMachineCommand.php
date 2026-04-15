@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace VendingMachine\Application\Machine\Command;
 
 use InvalidArgumentException;
+use VendingMachine\Domain\Machine\AvailableChange;
 use VendingMachine\Domain\Machine\MachineId;
 use VendingMachine\Domain\Machine\Selector;
 use VendingMachine\Domain\Machine\StockQuantity;
@@ -21,23 +22,20 @@ final readonly class ServiceMachineCommand
      */
     private array $productQuantities;
 
-    /**
-     * @var array<int, int>
-     */
-    private array $availableChangeCounts;
+    private AvailableChange $availableChange;
 
     /**
      * @param array<int|string, mixed> $productQuantities
-     * @param array<int|string, mixed> $availableChangeCounts
+     * @param AvailableChange|array<int|string, mixed> $availableChange
      */
     public function __construct(
         array $productQuantities,
-        array $availableChangeCounts,
+        AvailableChange|array $availableChange,
         MachineId|string $machineId = 'default',
     ) {
         $this->machineId = MachineId::from($machineId);
         $this->productQuantities = self::normalizeProductQuantities($productQuantities);
-        $this->availableChangeCounts = self::normalizeCoinCounts($availableChangeCounts);
+        $this->availableChange = AvailableChange::from($availableChange);
     }
 
     /**
@@ -45,7 +43,12 @@ final readonly class ServiceMachineCommand
      */
     public function availableChangeCounts(): array
     {
-        return $this->availableChangeCounts;
+        return $this->availableChange->counts();
+    }
+
+    public function availableChange(): AvailableChange
+    {
+        return $this->availableChange;
     }
 
     public function machineId(): MachineId
@@ -59,36 +62,6 @@ final readonly class ServiceMachineCommand
     public function productQuantities(): array
     {
         return $this->productQuantities;
-    }
-
-    /**
-     * @param array<int|string, mixed> $counts
-     *
-     * @return array<int, int>
-     */
-    private static function normalizeCoinCounts(array $counts): array
-    {
-        $normalized = [];
-
-        foreach ($counts as $denomination => $count) {
-            if (!is_int($count)) {
-                throw new InvalidArgumentException('Available change counts must be integers.');
-            }
-
-            if ($count < 0) {
-                throw new InvalidArgumentException('Available change counts cannot be negative.');
-            }
-
-            if (is_string($denomination) && !ctype_digit($denomination)) {
-                throw new InvalidArgumentException('Available change denomination keys must be integer values.');
-            }
-
-            $normalized[(int) $denomination] = $count;
-        }
-
-        ksort($normalized);
-
-        return $normalized;
     }
 
     /**

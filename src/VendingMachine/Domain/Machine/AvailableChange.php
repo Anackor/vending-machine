@@ -22,6 +22,16 @@ final readonly class AvailableChange
         return new self(CoinInventory::fromCounts($counts));
     }
 
+    /**
+     * @param self|array<int|string, mixed> $value
+     */
+    public static function from(self|array $value): self
+    {
+        return $value instanceof self
+            ? $value
+            : self::fromCounts($value);
+    }
+
     public static function empty(): self
     {
         return new self(CoinInventory::empty());

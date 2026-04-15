@@ -11,6 +11,7 @@ use VendingMachine\Application\Machine\Command\ReturnInsertedMoneyCommand;
 use VendingMachine\Application\Machine\Command\SelectProductCommand;
 use VendingMachine\Application\Machine\Command\ServiceMachineCommand;
 use VendingMachine\Application\Machine\Query\GetMachineStateQuery;
+use VendingMachine\Domain\Machine\AvailableChange;
 use VendingMachine\Domain\Machine\MachineId;
 use VendingMachine\Domain\Machine\Selector;
 use VendingMachine\Domain\Machine\StockQuantity;
@@ -97,6 +98,18 @@ final class CommandAndQueryContractTest extends TestCase
 
         self::assertSame($quantity, $command->productQuantities()['water']);
         self::assertSame(4, $command->productQuantities()['water']->value());
+    }
+
+    public function testItAcceptsAvailableChangeValueObjects(): void
+    {
+        $availableChange = AvailableChange::fromCounts(['25' => 2, 5 => 1]);
+        $command = new ServiceMachineCommand(
+            ['water' => 2],
+            $availableChange,
+        );
+
+        self::assertSame($availableChange, $command->availableChange());
+        self::assertSame([5 => 1, 25 => 2], $command->availableChangeCounts());
     }
 
     public function testItRejectsNonPositiveInsertCoinAmounts(): void
@@ -221,7 +234,7 @@ final class CommandAndQueryContractTest extends TestCase
     public function testItRejectsInvalidServiceChangeShapes(): void
     {
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Available change denomination keys must be integer values.');
+        $this->expectExceptionMessage('Coin denomination keys must be integer values.');
 
         new ServiceMachineCommand(
             ['water' => 2],
@@ -229,10 +242,21 @@ final class CommandAndQueryContractTest extends TestCase
         );
     }
 
+    public function testItRejectsUnsupportedServiceChangeDenominations(): void
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Unsupported coin denomination "50".');
+
+        new ServiceMachineCommand(
+            ['water' => 2],
+            [50 => 1],
+        );
+    }
+
     public function testItRejectsNonIntegerServiceChangeCounts(): void
     {
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Available change counts must be integers.');
+        $this->expectExceptionMessage('Coin counts must be integers.');
 
         new ServiceMachineCommand(
             ['water' => 2],
@@ -243,7 +267,7 @@ final class CommandAndQueryContractTest extends TestCase
     public function testItRejectsNegativeServiceChangeCounts(): void
     {
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Available change counts cannot be negative.');
+        $this->expectExceptionMessage('Coin counts cannot be negative.');
 
         new ServiceMachineCommand(
             ['water' => 2],
