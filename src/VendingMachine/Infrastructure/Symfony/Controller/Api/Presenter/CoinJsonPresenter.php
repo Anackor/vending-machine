@@ -6,6 +6,12 @@ namespace VendingMachine\Infrastructure\Symfony\Controller\Api\Presenter;
 
 /**
  * Presents integer cents as reviewer-facing coin literals.
+ *
+ * Money stays as integer cents in the core to avoid floating point drift, but
+ * the public HTTP contract is easier to review with coin values such as 0.25
+ * and 1. This presenter centralizes that translation. The alternative was to
+ * duplicate cents-to-coins formatting in every response method, which made the
+ * transport layer harder to audit and easier to drift over time.
  */
 final class CoinJsonPresenter
 {

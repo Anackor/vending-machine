@@ -10,6 +10,12 @@ use Symfony\Component\HttpFoundation\Request;
 
 /**
  * Validated HTTP JSON object payload.
+ *
+ * This class represents the minimum shared contract for incoming JSON: the body
+ * must be either empty or an object, never a list or scalar. Keeping this as a
+ * small infrastructure value avoids repeating low-level JSON checks in every
+ * endpoint. Symfony argument resolvers were considered, but an explicit helper
+ * keeps the challenge code straightforward and easy to follow in tests.
  */
 final readonly class JsonPayload
 {

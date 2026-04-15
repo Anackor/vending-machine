@@ -9,6 +9,12 @@ use VendingMachine\Application\Machine\Result\ProductSnapshot;
 
 /**
  * Presents an application machine snapshot as the stable HTTP JSON shape.
+ *
+ * The application snapshot is a read model for use cases, not a commitment to a
+ * particular JSON payload. This presenter keeps HTTP field names and coin
+ * rendering outside application code. Returning arrays directly from results
+ * was considered, but that would make Application aware of one adapter's
+ * serialization needs and weaken the layer boundary.
  */
 final readonly class MachineSnapshotJsonPresenter
 {

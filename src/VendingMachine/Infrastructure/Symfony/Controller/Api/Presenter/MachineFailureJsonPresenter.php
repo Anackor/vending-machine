@@ -9,6 +9,13 @@ use VendingMachine\Application\Machine\Failure\MachineFailureCode;
 
 /**
  * Presents application failures without leaking cent-based internals to HTTP clients.
+ *
+ * Application failures are intentionally stable and transport-neutral, so this
+ * presenter adapts their context and messages to the reviewer-facing JSON
+ * contract. Keeping this in infrastructure avoids teaching the application
+ * layer about HTTP naming conventions. A richer typed error view model would be
+ * another valid option, but this presenter keeps the current contract explicit
+ * while leaving that future refactor isolated.
  */
 final readonly class MachineFailureJsonPresenter
 {
