@@ -15,7 +15,7 @@ interface that a reviewer can execute without inspecting internal code paths.
 ## Inputs
 
 - `README.md`
-- `docs/challenges/backend/README.md`
+- `docs/README.md`
 - `docs/planning/phases/phase-2/README.md`
 - `docs/planning/phases/phase-3/README.md`
 

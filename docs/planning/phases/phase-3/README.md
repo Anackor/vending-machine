@@ -16,7 +16,7 @@ ports while preserving domain and application boundaries.
 ## Inputs
 
 - `README.md`
-- `docs/challenges/backend/README.md`
+- `docs/README.md`
 - `docs/planning/phases/phase-0/README.md`
 - `docs/planning/phases/phase-1/README.md`
 - `docs/planning/phases/phase-2/README.md`
