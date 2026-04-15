@@ -25,8 +25,8 @@ use VendingMachine\Application\Machine\Handler\ServiceMachineHandler;
 final readonly class MachineController
 {
     public function __construct(
-        private MachineJsonRequestFactory $requestFactory,
-        private MachineJsonResponseFactory $responseFactory,
+        private MachineJsonRequestMapper $requestMapper,
+        private MachineJsonResponder $responder,
     ) {
     }
 
@@ -34,11 +34,11 @@ final readonly class MachineController
     public function machineState(GetMachineStateHandler $handler): JsonResponse
     {
         try {
-            return $this->responseFactory->machineState(
-                $handler->handle($this->requestFactory->createGetMachineStateQuery()),
+            return $this->responder->machineState(
+                $handler->handle($this->requestMapper->createGetMachineStateQuery()),
             );
         } catch (MachineOperationFailed $exception) {
-            return $this->responseFactory->machineOperationFailed($exception);
+            return $this->responder->machineOperationFailed($exception);
         }
     }
 
@@ -46,16 +46,16 @@ final readonly class MachineController
     public function insertCoin(Request $request, InsertCoinHandler $handler): JsonResponse
     {
         try {
-            $command = $this->requestFactory->createInsertCoinCommand($request);
+            $command = $this->requestMapper->createInsertCoinCommand($request);
 
-            return $this->responseFactory->insertCoin(
+            return $this->responder->insertCoin(
                 $command,
                 $handler->handle($command),
             );
         } catch (MachineOperationFailed $exception) {
-            return $this->responseFactory->machineOperationFailed($exception);
+            return $this->responder->machineOperationFailed($exception);
         } catch (InvalidArgumentException | JsonException $exception) {
-            return $this->responseFactory->invalidRequest($exception);
+            return $this->responder->invalidRequest($exception);
         }
     }
 
@@ -63,11 +63,11 @@ final readonly class MachineController
     public function returnCoin(ReturnInsertedMoneyHandler $handler): JsonResponse
     {
         try {
-            return $this->responseFactory->returnInsertedMoney(
-                $handler->handle($this->requestFactory->createReturnInsertedMoneyCommand()),
+            return $this->responder->returnInsertedMoney(
+                $handler->handle($this->requestMapper->createReturnInsertedMoneyCommand()),
             );
         } catch (MachineOperationFailed $exception) {
-            return $this->responseFactory->machineOperationFailed($exception);
+            return $this->responder->machineOperationFailed($exception);
         }
     }
 
@@ -75,13 +75,13 @@ final readonly class MachineController
     public function selectProduct(Request $request, SelectProductHandler $handler): JsonResponse
     {
         try {
-            return $this->responseFactory->selectProduct(
-                $handler->handle($this->requestFactory->createSelectProductCommand($request)),
+            return $this->responder->selectProduct(
+                $handler->handle($this->requestMapper->createSelectProductCommand($request)),
             );
         } catch (MachineOperationFailed $exception) {
-            return $this->responseFactory->machineOperationFailed($exception);
+            return $this->responder->machineOperationFailed($exception);
         } catch (InvalidArgumentException | JsonException $exception) {
-            return $this->responseFactory->invalidRequest($exception);
+            return $this->responder->invalidRequest($exception);
         }
     }
 
@@ -89,13 +89,13 @@ final readonly class MachineController
     public function service(Request $request, ServiceMachineHandler $handler): JsonResponse
     {
         try {
-            return $this->responseFactory->serviceMachine(
-                $handler->handle($this->requestFactory->createServiceMachineCommand($request)),
+            return $this->responder->serviceMachine(
+                $handler->handle($this->requestMapper->createServiceMachineCommand($request)),
             );
         } catch (MachineOperationFailed $exception) {
-            return $this->responseFactory->machineOperationFailed($exception);
+            return $this->responder->machineOperationFailed($exception);
         } catch (InvalidArgumentException | JsonException $exception) {
-            return $this->responseFactory->invalidRequest($exception);
+            return $this->responder->invalidRequest($exception);
         }
     }
 }
