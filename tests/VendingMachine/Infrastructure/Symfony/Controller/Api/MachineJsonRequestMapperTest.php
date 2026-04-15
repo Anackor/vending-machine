@@ -4,33 +4,33 @@ declare(strict_types=1);
 
 namespace Tests\VendingMachine\Infrastructure\Symfony\Controller\Api;
 
-use InvalidArgumentException;
-use JsonException;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
-use VendingMachine\Infrastructure\Symfony\Controller\Api\MachineJsonRequestFactory;
+use VendingMachine\Infrastructure\Symfony\Controller\Api\Exception\InvalidMachineJsonRequest;
+use VendingMachine\Infrastructure\Symfony\Controller\Api\MachineJsonRequestMapper;
+use VendingMachine\Infrastructure\Symfony\Controller\Api\Request\CoinInputNormalizer;
 
-final class MachineJsonRequestFactoryTest extends TestCase
+final class MachineJsonRequestMapperTest extends TestCase
 {
-    private MachineJsonRequestFactory $requestFactory;
+    private MachineJsonRequestMapper $requestMapper;
 
     protected function setUp(): void
     {
         parent::setUp();
 
-        $this->requestFactory = new MachineJsonRequestFactory();
+        $this->requestMapper = new MachineJsonRequestMapper(new CoinInputNormalizer());
     }
 
     public function testItCreatesTheDefaultStateQuery(): void
     {
-        $query = $this->requestFactory->createGetMachineStateQuery();
+        $query = $this->requestMapper->createGetMachineStateQuery();
 
         self::assertSame('default', $query->machineId()->value());
     }
 
     public function testItCreatesAnInsertCoinCommandFromJson(): void
     {
-        $command = $this->requestFactory->createInsertCoinCommand(
+        $command = $this->requestMapper->createInsertCoinCommand(
             $this->jsonRequest(['coins' => 0.25]),
         );
 
@@ -40,7 +40,7 @@ final class MachineJsonRequestFactoryTest extends TestCase
 
     public function testItStillCreatesAnInsertCoinCommandFromCoinCentsJson(): void
     {
-        $command = $this->requestFactory->createInsertCoinCommand(
+        $command = $this->requestMapper->createInsertCoinCommand(
             $this->jsonRequest(['coinCents' => 25]),
         );
 
@@ -50,7 +50,7 @@ final class MachineJsonRequestFactoryTest extends TestCase
 
     public function testItAcceptsTheDocumentedDecimalCoinValues(): void
     {
-        $command = $this->requestFactory->createInsertCoinCommand(
+        $command = $this->requestMapper->createInsertCoinCommand(
             $this->jsonRequest(['coins' => 0.1]),
         );
 
@@ -59,7 +59,7 @@ final class MachineJsonRequestFactoryTest extends TestCase
 
     public function testItAcceptsTheSmallestDocumentedDecimalCoinValue(): void
     {
-        $command = $this->requestFactory->createInsertCoinCommand(
+        $command = $this->requestMapper->createInsertCoinCommand(
             $this->jsonRequest(['coins' => 0.05]),
         );
 
@@ -68,7 +68,7 @@ final class MachineJsonRequestFactoryTest extends TestCase
 
     public function testItAcceptsNumericStringCoins(): void
     {
-        $command = $this->requestFactory->createInsertCoinCommand(
+        $command = $this->requestMapper->createInsertCoinCommand(
             $this->jsonRequest(['coins' => ' 0.25 ']),
         );
 
@@ -77,7 +77,7 @@ final class MachineJsonRequestFactoryTest extends TestCase
 
     public function testItAcceptsWholeCoinNumericStringValues(): void
     {
-        $command = $this->requestFactory->createInsertCoinCommand(
+        $command = $this->requestMapper->createInsertCoinCommand(
             $this->jsonRequest(['coins' => '1.00']),
         );
 
@@ -86,10 +86,10 @@ final class MachineJsonRequestFactoryTest extends TestCase
 
     public function testItAcceptsOtherDocumentedNumericStringCoinValues(): void
     {
-        $nickelCommand = $this->requestFactory->createInsertCoinCommand(
+        $nickelCommand = $this->requestMapper->createInsertCoinCommand(
             $this->jsonRequest(['coins' => '0.05']),
         );
-        $dimeCommand = $this->requestFactory->createInsertCoinCommand(
+        $dimeCommand = $this->requestMapper->createInsertCoinCommand(
             $this->jsonRequest(['coins' => '0.10']),
         );
 
@@ -99,27 +99,27 @@ final class MachineJsonRequestFactoryTest extends TestCase
 
     public function testItRejectsUnsupportedFractionalCoinAmounts(): void
     {
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(InvalidMachineJsonRequest::class);
         $this->expectExceptionMessage('Field "coins" must be one of 0.05, 0.10, 0.25, or 1.');
 
-        $this->requestFactory->createInsertCoinCommand(
+        $this->requestMapper->createInsertCoinCommand(
             $this->jsonRequest(['coins' => 0.249]),
         );
     }
 
     public function testItRejectsUnsupportedNumericStringCoinAmounts(): void
     {
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(InvalidMachineJsonRequest::class);
         $this->expectExceptionMessage('Field "coins" must be one of 0.05, 0.10, 0.25, or 1.');
 
-        $this->requestFactory->createInsertCoinCommand(
+        $this->requestMapper->createInsertCoinCommand(
             $this->jsonRequest(['coins' => '0.249']),
         );
     }
 
     public function testItCreatesASelectProductCommandFromJson(): void
     {
-        $command = $this->requestFactory->createSelectProductCommand(
+        $command = $this->requestMapper->createSelectProductCommand(
             $this->jsonRequest(['selector' => 'water']),
         );
 
@@ -129,7 +129,7 @@ final class MachineJsonRequestFactoryTest extends TestCase
 
     public function testItCreatesAServiceMachineCommandFromCoinsJson(): void
     {
-        $command = $this->requestFactory->createServiceMachineCommand(
+        $command = $this->requestMapper->createServiceMachineCommand(
             $this->jsonRequest([
                 'productQuantities' => [
                     'water' => 6,
@@ -162,7 +162,7 @@ final class MachineJsonRequestFactoryTest extends TestCase
 
     public function testItStillCreatesAServiceMachineCommandFromCoinCentsJsonForCompatibility(): void
     {
-        $command = $this->requestFactory->createServiceMachineCommand(
+        $command = $this->requestMapper->createServiceMachineCommand(
             $this->jsonRequest([
                 'productQuantities' => [
                     'water' => 6,
@@ -183,7 +183,7 @@ final class MachineJsonRequestFactoryTest extends TestCase
 
     public function testItAcceptsOneDecimalCoinKeysForServiceChangeCounts(): void
     {
-        $command = $this->requestFactory->createServiceMachineCommand(
+        $command = $this->requestMapper->createServiceMachineCommand(
             $this->jsonRequest([
                 'productQuantities' => [
                     'water' => 6,
@@ -201,17 +201,17 @@ final class MachineJsonRequestFactoryTest extends TestCase
 
     public function testItCreatesTheDefaultReturnInsertedMoneyCommand(): void
     {
-        $command = $this->requestFactory->createReturnInsertedMoneyCommand();
+        $command = $this->requestMapper->createReturnInsertedMoneyCommand();
 
         self::assertSame('default', $command->machineId()->value());
     }
 
     public function testItRejectsInvalidJsonBodies(): void
     {
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(InvalidMachineJsonRequest::class);
         $this->expectExceptionMessage('Request body must be a JSON object.');
 
-        $this->requestFactory->createInsertCoinCommand(
+        $this->requestMapper->createInsertCoinCommand(
             Request::create(
                 '/api/machine/insert-coin',
                 'POST',
@@ -223,10 +223,10 @@ final class MachineJsonRequestFactoryTest extends TestCase
 
     public function testItRejectsMissingRequiredFields(): void
     {
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(InvalidMachineJsonRequest::class);
         $this->expectExceptionMessage('Field "coins" or "coinCents" is required.');
 
-        $this->requestFactory->createInsertCoinCommand(
+        $this->requestMapper->createInsertCoinCommand(
             Request::create(
                 '/api/machine',
                 'POST',
@@ -238,10 +238,10 @@ final class MachineJsonRequestFactoryTest extends TestCase
 
     public function testItRejectsMissingSelectorFields(): void
     {
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(InvalidMachineJsonRequest::class);
         $this->expectExceptionMessage('Field "selector" is required.');
 
-        $this->requestFactory->createSelectProductCommand(
+        $this->requestMapper->createSelectProductCommand(
             Request::create(
                 '/api/machine',
                 'POST',
@@ -253,10 +253,10 @@ final class MachineJsonRequestFactoryTest extends TestCase
 
     public function testItRejectsMissingServiceObjectFields(): void
     {
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(InvalidMachineJsonRequest::class);
         $this->expectExceptionMessage('Field "productQuantities" is required.');
 
-        $this->requestFactory->createServiceMachineCommand(
+        $this->requestMapper->createServiceMachineCommand(
             Request::create(
                 '/api/machine',
                 'POST',
@@ -268,10 +268,10 @@ final class MachineJsonRequestFactoryTest extends TestCase
 
     public function testItRejectsEmptyJsonBodiesForInsertCoin(): void
     {
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(InvalidMachineJsonRequest::class);
         $this->expectExceptionMessage('Field "coins" or "coinCents" is required.');
 
-        $this->requestFactory->createInsertCoinCommand(
+        $this->requestMapper->createInsertCoinCommand(
             Request::create(
                 '/api/machine',
                 'POST',
@@ -283,40 +283,40 @@ final class MachineJsonRequestFactoryTest extends TestCase
 
     public function testItRejectsNonNumericCoinsFields(): void
     {
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(InvalidMachineJsonRequest::class);
         $this->expectExceptionMessage('Field "coins" must be numeric.');
 
-        $this->requestFactory->createInsertCoinCommand(
+        $this->requestMapper->createInsertCoinCommand(
             $this->jsonRequest(['coins' => 'quarter']),
         );
     }
 
     public function testItRejectsNonScalarCoinsFields(): void
     {
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(InvalidMachineJsonRequest::class);
         $this->expectExceptionMessage('Field "coins" must be numeric.');
 
-        $this->requestFactory->createInsertCoinCommand(
+        $this->requestMapper->createInsertCoinCommand(
             $this->jsonRequest(['coins' => ['quarter']]),
         );
     }
 
     public function testItRejectsNonIntegerCoinCentsFields(): void
     {
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(InvalidMachineJsonRequest::class);
         $this->expectExceptionMessage('Field "coinCents" must be an integer.');
 
-        $this->requestFactory->createInsertCoinCommand(
+        $this->requestMapper->createInsertCoinCommand(
             $this->jsonRequest(['coinCents' => '25']),
         );
     }
 
     public function testItRejectsNonStringSelectors(): void
     {
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(InvalidMachineJsonRequest::class);
         $this->expectExceptionMessage('Field "selector" must be a string.');
 
-        $this->requestFactory->createSelectProductCommand(
+        $this->requestMapper->createSelectProductCommand(
             $this->jsonRequest(['selector' => 10]),
         );
     }
@@ -324,36 +324,36 @@ final class MachineJsonRequestFactoryTest extends TestCase
     public function testItRejectsNonObjectServiceFields(): void
     {
         try {
-            $this->requestFactory->createServiceMachineCommand(
+            $this->requestMapper->createServiceMachineCommand(
                 $this->jsonRequest([
                     'productQuantities' => [1, 2, 3],
                     'availableChangeCounts' => [],
                 ]),
             );
-            self::fail('The request factory should reject list-based product quantities.');
-        } catch (InvalidArgumentException $exception) {
+            self::fail('The request mapper should reject list-based product quantities.');
+        } catch (InvalidMachineJsonRequest $exception) {
             self::assertSame('Field "productQuantities" must be a JSON object.', $exception->getMessage());
         }
 
         try {
-            $this->requestFactory->createServiceMachineCommand(
+            $this->requestMapper->createServiceMachineCommand(
                 $this->jsonRequest([
                     'productQuantities' => ['water' => 1],
                     'availableChangeCounts' => [5, 10],
                 ]),
             );
-            self::fail('The request factory should reject list-based available change counts.');
-        } catch (InvalidArgumentException $exception) {
+            self::fail('The request mapper should reject list-based available change counts.');
+        } catch (InvalidMachineJsonRequest $exception) {
             self::assertSame('Field "availableChangeCounts" must be a JSON object.', $exception->getMessage());
         }
     }
 
     public function testItRejectsEmptyAvailableChangeDenominationKeys(): void
     {
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(InvalidMachineJsonRequest::class);
         $this->expectExceptionMessage('Available change denomination keys cannot be empty.');
 
-        $this->requestFactory->createServiceMachineCommand(
+        $this->requestMapper->createServiceMachineCommand(
             $this->jsonRequest([
                 'productQuantities' => ['water' => 1],
                 'availableChangeCounts' => ['' => 1],
@@ -363,10 +363,10 @@ final class MachineJsonRequestFactoryTest extends TestCase
 
     public function testItRejectsInexactDecimalAvailableChangeDenominationKeys(): void
     {
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(InvalidMachineJsonRequest::class);
         $this->expectExceptionMessage('Available change denomination keys must represent exact coin values.');
 
-        $this->requestFactory->createServiceMachineCommand(
+        $this->requestMapper->createServiceMachineCommand(
             $this->jsonRequest([
                 'productQuantities' => ['water' => 1],
                 'availableChangeCounts' => ['0.005' => 1],
@@ -376,10 +376,10 @@ final class MachineJsonRequestFactoryTest extends TestCase
 
     public function testItRejectsNonNumericAvailableChangeDenominationKeys(): void
     {
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(InvalidMachineJsonRequest::class);
         $this->expectExceptionMessage('Available change denomination keys must be numeric.');
 
-        $this->requestFactory->createServiceMachineCommand(
+        $this->requestMapper->createServiceMachineCommand(
             $this->jsonRequest([
                 'productQuantities' => ['water' => 1],
                 'availableChangeCounts' => ['quarter' => 1],
@@ -389,9 +389,10 @@ final class MachineJsonRequestFactoryTest extends TestCase
 
     public function testItRejectsMalformedJsonBodies(): void
     {
-        $this->expectException(JsonException::class);
+        $this->expectException(InvalidMachineJsonRequest::class);
+        $this->expectExceptionMessage('Request body must contain valid JSON.');
 
-        $this->requestFactory->createInsertCoinCommand(
+        $this->requestMapper->createInsertCoinCommand(
             Request::create(
                 '/api/machine',
                 'POST',

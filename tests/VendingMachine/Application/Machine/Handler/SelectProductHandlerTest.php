@@ -124,9 +124,11 @@ final class SelectProductHandlerTest extends AbstractMachineHandlerTestCase
             $this->assertMachineFailure(
                 $exception,
                 MachineFailureCode::InsufficientBalance,
-                'Inserted balance "25" is insufficient for product price "65".',
+                'Inserted balance is insufficient for product price.',
                 [
+                    'insertedBalanceCents' => 25,
                     'machineId' => 'default',
+                    'productPriceCents' => 65,
                     'selector' => 'water',
                 ],
             );
@@ -150,9 +152,12 @@ final class SelectProductHandlerTest extends AbstractMachineHandlerTestCase
             $this->assertMachineFailure(
                 $exception,
                 MachineFailureCode::ExactChangeUnavailable,
-                'Exact change "35" cannot be returned for selector "water".',
+                'Exact change cannot be returned.',
                 [
+                    'insertedBalanceCents' => 100,
                     'machineId' => 'default',
+                    'productPriceCents' => 65,
+                    'requiredChangeCents' => 35,
                     'selector' => 'water',
                 ],
             );

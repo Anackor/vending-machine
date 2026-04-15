@@ -17,8 +17,12 @@ use VendingMachine\Application\Machine\Handler\ReturnInsertedMoneyHandler;
 use VendingMachine\Application\Machine\Handler\SelectProductHandler;
 use VendingMachine\Application\Machine\Handler\ServiceMachineHandler;
 use VendingMachine\Infrastructure\Symfony\Controller\Api\MachineController;
-use VendingMachine\Infrastructure\Symfony\Controller\Api\MachineJsonRequestFactory;
-use VendingMachine\Infrastructure\Symfony\Controller\Api\MachineJsonResponseFactory;
+use VendingMachine\Infrastructure\Symfony\Controller\Api\MachineJsonRequestMapper;
+use VendingMachine\Infrastructure\Symfony\Controller\Api\MachineJsonResponder;
+use VendingMachine\Infrastructure\Symfony\Controller\Api\Presenter\CoinJsonPresenter;
+use VendingMachine\Infrastructure\Symfony\Controller\Api\Presenter\MachineFailureJsonPresenter;
+use VendingMachine\Infrastructure\Symfony\Controller\Api\Presenter\MachineSnapshotJsonPresenter;
+use VendingMachine\Infrastructure\Symfony\Controller\Api\Request\CoinInputNormalizer;
 
 final class MachineControllerDirectTest extends TestCase
 {
@@ -246,10 +250,16 @@ final class MachineControllerDirectTest extends TestCase
         $machineSnapshotFactory = new MachineSnapshotFactory();
         $machineFailureFactory = new MachineFailureFactory();
 
+        $coinPresenter = new CoinJsonPresenter();
+
         return [
             new MachineController(
-                new MachineJsonRequestFactory(),
-                new MachineJsonResponseFactory(),
+                new MachineJsonRequestMapper(new CoinInputNormalizer()),
+                new MachineJsonResponder(
+                    $coinPresenter,
+                    new MachineSnapshotJsonPresenter($coinPresenter),
+                    new MachineFailureJsonPresenter($coinPresenter),
+                ),
             ),
             new GetMachineStateHandler(
                 $machineRepository,

@@ -13,6 +13,8 @@ use VendingMachine\Domain\Machine\Exception\ExactChangeNotAvailable;
 use VendingMachine\Domain\Machine\Exception\InsufficientBalance;
 use VendingMachine\Domain\Machine\Exception\ProductNotFound;
 use VendingMachine\Domain\Machine\Exception\ProductOutOfStock;
+use VendingMachine\Domain\Machine\Machine;
+use VendingMachine\Domain\Machine\ProductStock;
 
 /**
  * Coordinates product selection, purchase rules, and the resulting state persistence.
@@ -35,13 +37,15 @@ final readonly class SelectProductHandler
             throw $this->machineFailureFactory->machineNotFound($command->machineId());
         }
 
+        $productStock = $machine->productStockFor($command->selector());
+
         try {
             $purchase = $machine->purchase($command->selector());
         } catch (ExactChangeNotAvailable | InsufficientBalance | ProductNotFound | ProductOutOfStock $exception) {
             throw $this->machineFailureFactory->fromDomainThrowable(
                 $command->machineId(),
                 $exception,
-                ['selector' => $command->selector()->value()],
+                $this->failureContext($command, $exception, $machine, $productStock),
             );
         }
 
@@ -54,5 +58,34 @@ final readonly class SelectProductHandler
             $purchase->change()->counts(),
             $this->machineSnapshotFactory->create($command->machineId(), $updatedMachine),
         );
+    }
+
+    /**
+     * @return array<string, int|string>
+     */
+    private function failureContext(
+        SelectProductCommand $command,
+        ExactChangeNotAvailable|InsufficientBalance|ProductNotFound|ProductOutOfStock $exception,
+        Machine $machine,
+        ?ProductStock $productStock,
+    ): array {
+        $context = ['selector' => $command->selector()->value()];
+
+        if ($productStock === null) {
+            return $context;
+        }
+
+        if ($exception instanceof InsufficientBalance || $exception instanceof ExactChangeNotAvailable) {
+            $context['insertedBalanceCents'] = $machine->insertedBalance()->cents();
+            $context['productPriceCents'] = $productStock->price()->cents();
+        }
+
+        if ($exception instanceof ExactChangeNotAvailable) {
+            $context['requiredChangeCents'] = $machine->insertedBalance()
+                ->subtract($productStock->price())
+                ->cents();
+        }
+
+        return $context;
     }
 }

@@ -43,7 +43,7 @@ final class MachineFailureFactoryTest extends TestCase
         $this->assertMachineFailure(
             $failure,
             MachineFailureCode::UnsupportedCoin,
-            'Unsupported coin denomination "50".',
+            'Unsupported coin denomination.',
             [
                 'coinCents' => 50,
                 'machineId' => 'default',
@@ -74,32 +74,40 @@ final class MachineFailureFactoryTest extends TestCase
             [
                 new ExactChangeNotAvailable('Exact change "35" cannot be returned for selector "water".'),
                 MachineFailureCode::ExactChangeUnavailable,
+                'Exact change cannot be returned.',
                 [
                     'machineId' => 'default',
+                    'requiredChangeCents' => 35,
                     'selector' => 'water',
                 ],
             ],
             [
                 new InsufficientBalance('Inserted balance "25" is insufficient for product price "65".'),
                 MachineFailureCode::InsufficientBalance,
+                'Inserted balance is insufficient for product price.',
                 [
+                    'insertedBalanceCents' => 25,
                     'machineId' => 'default',
+                    'productPriceCents' => 65,
                     'selector' => 'water',
                 ],
             ],
             [
                 new InvalidServiceConfiguration('Missing stock count for selector "juice".'),
                 MachineFailureCode::InvalidServiceConfiguration,
+                'Missing stock count for selector "juice".',
                 ['machineId' => 'default'],
             ],
             [
                 new PendingBalanceDuringService('Machine service requires no pending customer balance.'),
                 MachineFailureCode::PendingBalanceDuringService,
+                'Machine service requires no pending customer balance.',
                 ['machineId' => 'default'],
             ],
             [
                 new ProductNotFound('Unknown selector "chips".'),
                 MachineFailureCode::ProductNotFound,
+                'Unknown selector "chips".',
                 [
                     'machineId' => 'default',
                     'selector' => 'chips',
@@ -108,6 +116,7 @@ final class MachineFailureFactoryTest extends TestCase
             [
                 new ProductOutOfStock('Product "Water" is out of stock.'),
                 MachineFailureCode::ProductOutOfStock,
+                'Product "Water" is out of stock.',
                 [
                     'machineId' => 'default',
                     'selector' => 'water',
@@ -115,7 +124,7 @@ final class MachineFailureFactoryTest extends TestCase
             ],
         ];
 
-        foreach ($cases as [$throwable, $code, $context]) {
+        foreach ($cases as [$throwable, $code, $message, $context]) {
             $failure = $factory->fromDomainThrowable(
                 MachineId::default(),
                 $throwable,
@@ -125,7 +134,7 @@ final class MachineFailureFactoryTest extends TestCase
             $this->assertMachineFailure(
                 $failure,
                 $code,
-                $throwable->getMessage(),
+                $message,
                 $context,
             );
         }

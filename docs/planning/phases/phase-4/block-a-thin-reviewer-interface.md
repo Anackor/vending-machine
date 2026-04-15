@@ -80,8 +80,8 @@ handlers and contracts.
 The main infrastructure pieces are:
 
 - `Controller/Api/MachineController.php`
-- `Controller/Api/MachineJsonRequestFactory.php`
-- `Controller/Api/MachineJsonResponseFactory.php`
+- `Controller/Api/MachineJsonRequestMapper.php`
+- `Controller/Api/MachineJsonResponder.php`
 
 To keep the reviewer path usable from a clean environment, setup now also
 seeds the default machine if it does not exist yet through:
