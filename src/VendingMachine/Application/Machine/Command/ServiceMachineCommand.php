@@ -7,6 +7,7 @@ namespace VendingMachine\Application\Machine\Command;
 use InvalidArgumentException;
 use VendingMachine\Domain\Machine\MachineId;
 use VendingMachine\Domain\Machine\Selector;
+use VendingMachine\Domain\Machine\StockQuantity;
 
 /**
  * Carries the stock and change configuration used by the service operation.
@@ -16,7 +17,7 @@ final readonly class ServiceMachineCommand
     private MachineId $machineId;
 
     /**
-     * @var array<string, int>
+     * @var array<string, StockQuantity>
      */
     private array $productQuantities;
 
@@ -53,7 +54,7 @@ final readonly class ServiceMachineCommand
     }
 
     /**
-     * @return array<string, int>
+     * @return array<string, StockQuantity>
      */
     public function productQuantities(): array
     {
@@ -93,7 +94,7 @@ final readonly class ServiceMachineCommand
     /**
      * @param array<int|string, mixed> $productQuantities
      *
-     * @return array<string, int>
+     * @return array<string, StockQuantity>
      */
     private static function normalizeProductQuantities(array $productQuantities): array
     {
@@ -108,15 +109,11 @@ final readonly class ServiceMachineCommand
                 throw new InvalidArgumentException('Service product selectors must be strings.');
             }
 
-            if (!is_int($quantity)) {
+            if (!$quantity instanceof StockQuantity && !is_int($quantity)) {
                 throw new InvalidArgumentException('Service product quantities must be integers.');
             }
 
-            if ($quantity < 0) {
-                throw new InvalidArgumentException('Service product quantities cannot be negative.');
-            }
-
-            $normalized[Selector::fromString($selector)->value()] = $quantity;
+            $normalized[Selector::fromString($selector)->value()] = StockQuantity::from($quantity);
         }
 
         ksort($normalized);

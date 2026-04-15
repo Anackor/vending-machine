@@ -25,7 +25,7 @@ final class MachineSnapshotFactory
             $products[] = new ProductSnapshot(
                 $product->selector(),
                 $product->price()->cents(),
-                $productStock->quantity(),
+                $productStock->stockQuantity(),
                 $product->name(),
             );
         }

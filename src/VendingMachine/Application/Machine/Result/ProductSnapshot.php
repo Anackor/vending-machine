@@ -6,6 +6,7 @@ namespace VendingMachine\Application\Machine\Result;
 
 use InvalidArgumentException;
 use VendingMachine\Domain\Machine\Selector;
+use VendingMachine\Domain\Machine\StockQuantity;
 
 /**
  * Flat application snapshot of one product entry in the machine.
@@ -13,15 +14,17 @@ use VendingMachine\Domain\Machine\Selector;
 final readonly class ProductSnapshot
 {
     private string $name;
+    private StockQuantity $quantity;
     private Selector $selector;
 
     public function __construct(
         Selector|string $selector,
         private int $priceCents,
-        private int $quantity,
+        StockQuantity|int $quantity,
         string $name,
     ) {
         $this->selector = Selector::from($selector);
+        $this->quantity = StockQuantity::from($quantity);
         $this->name = trim($name);
 
         if ($this->name === '') {
@@ -31,15 +34,11 @@ final readonly class ProductSnapshot
         if ($this->priceCents <= 0) {
             throw new InvalidArgumentException('Product snapshot price must be greater than zero.');
         }
-
-        if ($this->quantity < 0) {
-            throw new InvalidArgumentException('Product snapshot quantity cannot be negative.');
-        }
     }
 
     public function isAvailable(): bool
     {
-        return $this->quantity > 0;
+        return $this->quantity->isAvailable();
     }
 
     public function name(): string
@@ -53,6 +52,11 @@ final readonly class ProductSnapshot
     }
 
     public function quantity(): int
+    {
+        return $this->quantity->value();
+    }
+
+    public function stockQuantity(): StockQuantity
     {
         return $this->quantity;
     }

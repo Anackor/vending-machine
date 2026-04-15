@@ -145,10 +145,15 @@ final class MachineJsonRequestFactoryTest extends TestCase
             ]),
         );
 
+        $productQuantities = $command->productQuantities();
+
         self::assertSame(
-            ['juice' => 7, 'soda' => 4, 'water' => 6],
-            $command->productQuantities(),
+            ['juice', 'soda', 'water'],
+            array_keys($productQuantities),
         );
+        self::assertSame(7, $productQuantities['juice']->value());
+        self::assertSame(4, $productQuantities['soda']->value());
+        self::assertSame(6, $productQuantities['water']->value());
         self::assertSame(
             [5 => 4, 10 => 5, 25 => 6, 100 => 2],
             $command->availableChangeCounts(),

@@ -16,6 +16,7 @@ use VendingMachine\Application\Machine\Result\ProductSnapshot;
 use VendingMachine\Application\Machine\Result\ReturnInsertedMoneyResult;
 use VendingMachine\Application\Machine\Result\SelectProductResult;
 use VendingMachine\Application\Machine\Result\ServiceMachineResult;
+use VendingMachine\Domain\Machine\StockQuantity;
 
 final class ResultAndFailureContractTest extends TestCase
 {
@@ -57,6 +58,15 @@ final class ResultAndFailureContractTest extends TestCase
         self::assertSame(65, $product->priceCents());
         self::assertSame(2, $product->quantity());
         self::assertTrue($product->isAvailable());
+    }
+
+    public function testItAcceptsStockQuantityValueObjectsInProductSnapshots(): void
+    {
+        $quantity = StockQuantity::fromInt(2);
+        $product = new ProductSnapshot('water', 65, $quantity, 'Water');
+
+        self::assertSame($quantity, $product->stockQuantity());
+        self::assertSame(2, $product->quantity());
     }
 
     public function testItBuildsTheUseCaseResultsAroundTheSharedSnapshot(): void
@@ -235,7 +245,7 @@ final class ResultAndFailureContractTest extends TestCase
     public function testItRejectsNegativeProductSnapshotQuantities(): void
     {
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Product snapshot quantity cannot be negative.');
+        $this->expectExceptionMessage('Stock quantity cannot be negative.');
 
         new ProductSnapshot('water', 65, -1, 'Water');
     }

@@ -6,6 +6,7 @@ namespace VendingMachine\Infrastructure\Persistence\MongoDB\Machine\Document;
 
 use InvalidArgumentException;
 use VendingMachine\Domain\Machine\Selector;
+use VendingMachine\Domain\Machine\StockQuantity;
 
 /**
  * Persistence DTO for one product entry inside the machine MongoDB document.
@@ -13,15 +14,17 @@ use VendingMachine\Domain\Machine\Selector;
 final readonly class ProductStockDocument
 {
     private Selector $selector;
+    private StockQuantity $quantity;
     private string $name;
 
     public function __construct(
         Selector|string $selector,
         private int $priceCents,
-        private int $quantity,
+        StockQuantity|int $quantity,
         string $name,
     ) {
         $selector = Selector::from($selector);
+        $quantity = StockQuantity::from($quantity);
         $name = trim($name);
 
         if ($name === '') {
@@ -32,11 +35,8 @@ final readonly class ProductStockDocument
             throw new InvalidArgumentException('Persisted product price must be greater than zero.');
         }
 
-        if ($this->quantity < 0) {
-            throw new InvalidArgumentException('Persisted product quantity cannot be negative.');
-        }
-
         $this->selector = $selector;
+        $this->quantity = $quantity;
         $this->name = $name;
     }
 
@@ -56,6 +56,11 @@ final readonly class ProductStockDocument
     }
 
     public function quantity(): int
+    {
+        return $this->quantity->value();
+    }
+
+    public function stockQuantity(): StockQuantity
     {
         return $this->quantity;
     }

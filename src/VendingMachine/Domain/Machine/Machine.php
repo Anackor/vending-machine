@@ -169,11 +169,11 @@ final readonly class Machine
 
             $quantity = $stockCounts[$selector];
 
-            if (!is_int($quantity)) {
+            if (!$quantity instanceof StockQuantity && !is_int($quantity)) {
                 throw new InvalidServiceConfiguration(sprintf('Stock count for selector "%s" must be an integer.', $selector));
             }
 
-            $updatedProductStocks[$selector] = $productStock->withQuantity($quantity);
+            $updatedProductStocks[$selector] = $productStock->withQuantity(StockQuantity::from($quantity));
         }
 
         foreach (array_keys($stockCounts) as $selector) {

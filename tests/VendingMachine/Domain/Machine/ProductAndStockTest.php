@@ -10,6 +10,7 @@ use VendingMachine\Domain\Machine\Money;
 use VendingMachine\Domain\Machine\Product;
 use VendingMachine\Domain\Machine\ProductStock;
 use VendingMachine\Domain\Machine\Selector;
+use VendingMachine\Domain\Machine\StockQuantity;
 
 final class ProductAndStockTest extends TestCase
 {
@@ -41,12 +42,24 @@ final class ProductAndStockTest extends TestCase
     public function testItRejectsNegativeStockQuantities(): void
     {
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Product stock quantity cannot be negative.');
+        $this->expectExceptionMessage('Stock quantity cannot be negative.');
 
         new ProductStock(
             new Product(Selector::fromString('water'), Money::fromCents(65), 'Water'),
             -1,
         );
+    }
+
+    public function testItAcceptsStockQuantityValueObjects(): void
+    {
+        $quantity = StockQuantity::fromInt(3);
+        $stock = new ProductStock(
+            new Product(Selector::fromString('water'), Money::fromCents(65), 'Water'),
+            $quantity,
+        );
+
+        self::assertSame($quantity, $stock->stockQuantity());
+        self::assertSame(3, $stock->quantity());
     }
 
     public function testItRejectsProductsWithEmptyNames(): void

@@ -13,6 +13,7 @@ use VendingMachine\Application\Machine\Command\ServiceMachineCommand;
 use VendingMachine\Application\Machine\Query\GetMachineStateQuery;
 use VendingMachine\Domain\Machine\MachineId;
 use VendingMachine\Domain\Machine\Selector;
+use VendingMachine\Domain\Machine\StockQuantity;
 
 final class CommandAndQueryContractTest extends TestCase
 {
@@ -51,7 +52,9 @@ final class CommandAndQueryContractTest extends TestCase
         );
 
         self::assertSame('default', $command->machineId()->value());
-        self::assertSame(['juice' => 3, 'water' => 2], $command->productQuantities());
+        self::assertSame(['juice', 'water'], array_keys($command->productQuantities()));
+        self::assertSame(3, $command->productQuantities()['juice']->value());
+        self::assertSame(2, $command->productQuantities()['water']->value());
         self::assertSame([5 => 1, 25 => 2], $command->availableChangeCounts());
     }
 
@@ -82,6 +85,18 @@ final class CommandAndQueryContractTest extends TestCase
 
         self::assertSame($selector, $command->selector());
         self::assertSame('water', $command->selector()->value());
+    }
+
+    public function testItAcceptsStockQuantityValueObjects(): void
+    {
+        $quantity = StockQuantity::fromInt(4);
+        $command = new ServiceMachineCommand(
+            ['water' => $quantity],
+            [25 => 1],
+        );
+
+        self::assertSame($quantity, $command->productQuantities()['water']);
+        self::assertSame(4, $command->productQuantities()['water']->value());
     }
 
     public function testItRejectsNonPositiveInsertCoinAmounts(): void
@@ -162,7 +177,7 @@ final class CommandAndQueryContractTest extends TestCase
     public function testItRejectsNegativeServiceProductQuantities(): void
     {
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Service product quantities cannot be negative.');
+        $this->expectExceptionMessage('Stock quantity cannot be negative.');
 
         new ServiceMachineCommand(
             ['water' => -1],
