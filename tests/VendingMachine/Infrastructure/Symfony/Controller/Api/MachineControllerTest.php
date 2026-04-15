@@ -15,6 +15,7 @@ use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Tests\VendingMachine\Infrastructure\Persistence\MongoDB\Machine\Fixture\DefaultMachineFixture;
 use VendingMachine\Application\Machine\Repository\MachineRepository;
 use VendingMachine\Domain\Machine\Machine;
+use VendingMachine\Domain\Machine\MachineId;
 use VendingMachine\Domain\Machine\Selector;
 use VendingMachine\Infrastructure\Persistence\MongoDB\Machine\Mapper\MachineDocumentMapper;
 use VendingMachine\Infrastructure\Persistence\MongoDB\Machine\MongoDBMachineRepository;
@@ -80,7 +81,7 @@ final class MachineControllerTest extends KernelTestCase
         $event = $this->eventPayload($payload);
         $machine = $this->machinePayload($payload);
         $insertedCoins = $this->objectPayload($machine, 'insertedCoins');
-        $reloadedMachine = $this->machineRepository->find('default');
+        $reloadedMachine = $this->machineRepository->find(MachineId::default());
 
         self::assertSame(Response::HTTP_OK, $response->getStatusCode());
         self::assertSame('coin_inserted', $event['type']);
@@ -119,7 +120,7 @@ final class MachineControllerTest extends KernelTestCase
         $dispensedProduct = $this->objectPayload($event, 'dispensedProduct');
         $dispensedChangeCounts = $this->objectPayload($event, 'dispensedChangeCounts');
         $machine = $this->machinePayload($payload);
-        $reloadedMachine = $this->machineRepository->find('default');
+        $reloadedMachine = $this->machineRepository->find(MachineId::default());
 
         self::assertSame(Response::HTTP_OK, $response->getStatusCode());
         self::assertSame('product_selected', $event['type']);
@@ -269,7 +270,7 @@ final class MachineControllerTest extends KernelTestCase
 
     private function seedDefaultMachine(?Machine $machine = null): void
     {
-        $this->machineRepository->save('default', $machine ?? DefaultMachineFixture::machine());
+        $this->machineRepository->save(MachineId::default(), $machine ?? DefaultMachineFixture::machine());
     }
 
     private function clearMachineCollection(): void

@@ -8,6 +8,7 @@ use InvalidArgumentException;
 use VendingMachine\Domain\Machine\AvailableChange;
 use VendingMachine\Domain\Machine\InsertedCoins;
 use VendingMachine\Domain\Machine\Machine;
+use VendingMachine\Domain\Machine\MachineId;
 use VendingMachine\Domain\Machine\Money;
 use VendingMachine\Domain\Machine\Product;
 use VendingMachine\Domain\Machine\ProductStock;
@@ -20,7 +21,7 @@ use VendingMachine\Infrastructure\Persistence\MongoDB\Machine\Document\ProductSt
  */
 final class MachineDocumentMapper
 {
-    public function fromDomain(string $machineId, Machine $machine): MachineDocument
+    public function fromDomain(MachineId $machineId, Machine $machine): MachineDocument
     {
         // Keep persistence DTOs free of domain behavior while preserving the aggregate shape.
         $productStocks = [];
@@ -37,7 +38,7 @@ final class MachineDocumentMapper
         }
 
         return new MachineDocument(
-            $machineId,
+            $machineId->value(),
             $productStocks,
             $machine->availableChange()->counts(),
             $machine->insertedCoins()->counts(),

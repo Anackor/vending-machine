@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace VendingMachine\Application\Machine\Result;
 
 use InvalidArgumentException;
+use VendingMachine\Domain\Machine\MachineId;
 
 /**
  * Flat application snapshot of the machine state exposed to adapters.
@@ -21,7 +22,7 @@ final readonly class MachineSnapshot
      */
     private array $insertedCoins;
 
-    private string $machineId;
+    private MachineId $machineId;
 
     /**
      * @var array<string, ProductSnapshot>
@@ -34,13 +35,13 @@ final readonly class MachineSnapshot
      * @param list<ProductSnapshot> $products
      */
     public function __construct(
-        string $machineId,
+        MachineId|string $machineId,
         private int $insertedBalanceCents,
         array $insertedCoins,
         array $availableChangeCounts,
         array $products,
     ) {
-        $this->machineId = self::normalizeMachineId($machineId);
+        $this->machineId = MachineId::from($machineId);
 
         if ($this->insertedBalanceCents < 0) {
             throw new InvalidArgumentException('Inserted balance cents cannot be negative.');
@@ -77,7 +78,7 @@ final readonly class MachineSnapshot
         return $this->insertedCoins;
     }
 
-    public function machineId(): string
+    public function machineId(): MachineId
     {
         return $this->machineId;
     }
@@ -151,16 +152,5 @@ final readonly class MachineSnapshot
         ksort($indexed);
 
         return $indexed;
-    }
-
-    private static function normalizeMachineId(string $machineId): string
-    {
-        $normalized = strtolower(trim($machineId));
-
-        if ($normalized === '') {
-            throw new InvalidArgumentException('Machine id cannot be empty.');
-        }
-
-        return $normalized;
     }
 }

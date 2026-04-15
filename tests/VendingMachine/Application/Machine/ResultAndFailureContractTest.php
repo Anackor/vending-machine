@@ -37,7 +37,7 @@ final class ResultAndFailureContractTest extends TestCase
 
         self::assertNotNull($water);
         self::assertNotNull($juice);
-        self::assertSame('default', $snapshot->machineId());
+        self::assertSame('default', $snapshot->machineId()->value());
         self::assertSame(25, $snapshot->insertedBalanceCents());
         self::assertSame([25 => 1], $snapshot->insertedCoins());
         self::assertSame([5 => 2], $snapshot->availableChangeCounts());

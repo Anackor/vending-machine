@@ -5,13 +5,14 @@ declare(strict_types=1);
 namespace VendingMachine\Application\Machine\Command;
 
 use InvalidArgumentException;
+use VendingMachine\Domain\Machine\MachineId;
 
 /**
  * Carries the stock and change configuration used by the service operation.
  */
 final readonly class ServiceMachineCommand
 {
-    private string $machineId;
+    private MachineId $machineId;
 
     /**
      * @var array<string, int>
@@ -30,9 +31,9 @@ final readonly class ServiceMachineCommand
     public function __construct(
         array $productQuantities,
         array $availableChangeCounts,
-        string $machineId = 'default',
+        MachineId|string $machineId = 'default',
     ) {
-        $this->machineId = self::normalizeMachineId($machineId);
+        $this->machineId = MachineId::from($machineId);
         $this->productQuantities = self::normalizeProductQuantities($productQuantities);
         $this->availableChangeCounts = self::normalizeCoinCounts($availableChangeCounts);
     }
@@ -45,7 +46,7 @@ final readonly class ServiceMachineCommand
         return $this->availableChangeCounts;
     }
 
-    public function machineId(): string
+    public function machineId(): MachineId
     {
         return $this->machineId;
     }
@@ -56,17 +57,6 @@ final readonly class ServiceMachineCommand
     public function productQuantities(): array
     {
         return $this->productQuantities;
-    }
-
-    private static function normalizeMachineId(string $machineId): string
-    {
-        $normalized = strtolower(trim($machineId));
-
-        if ($normalized === '') {
-            throw new InvalidArgumentException('Machine id cannot be empty.');
-        }
-
-        return $normalized;
     }
 
     /**

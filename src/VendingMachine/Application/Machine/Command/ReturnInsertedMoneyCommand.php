@@ -4,34 +4,23 @@ declare(strict_types=1);
 
 namespace VendingMachine\Application\Machine\Command;
 
-use InvalidArgumentException;
+use VendingMachine\Domain\Machine\MachineId;
 
 /**
  * Carries the input required to refund the current customer balance.
  */
 final readonly class ReturnInsertedMoneyCommand
 {
-    private string $machineId;
+    private MachineId $machineId;
 
     public function __construct(
-        string $machineId = 'default',
+        MachineId|string $machineId = 'default',
     ) {
-        $this->machineId = self::normalizeMachineId($machineId);
+        $this->machineId = MachineId::from($machineId);
     }
 
-    public function machineId(): string
+    public function machineId(): MachineId
     {
         return $this->machineId;
-    }
-
-    private static function normalizeMachineId(string $machineId): string
-    {
-        $normalized = strtolower(trim($machineId));
-
-        if ($normalized === '') {
-            throw new InvalidArgumentException('Machine id cannot be empty.');
-        }
-
-        return $normalized;
     }
 }

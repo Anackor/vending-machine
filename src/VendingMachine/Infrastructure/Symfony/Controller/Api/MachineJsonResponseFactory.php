@@ -123,7 +123,7 @@ final class MachineJsonResponseFactory
     private function machine(MachineSnapshot $snapshot): array
     {
         return [
-            'machineId' => $snapshot->machineId(),
+            'machineId' => $snapshot->machineId()->value(),
             'insertedBalanceCoins' => $this->coins($snapshot->insertedBalanceCents()),
             'hasPendingBalance' => $snapshot->hasPendingBalance(),
             'insertedCoins' => $this->coinCounts($snapshot->insertedCoins()),

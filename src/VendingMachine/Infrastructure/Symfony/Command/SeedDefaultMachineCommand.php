@@ -14,6 +14,7 @@ use VendingMachine\Application\Machine\Repository\MachineRepository;
 use VendingMachine\Domain\Machine\AvailableChange;
 use VendingMachine\Domain\Machine\InsertedCoins;
 use VendingMachine\Domain\Machine\Machine;
+use VendingMachine\Domain\Machine\MachineId;
 use VendingMachine\Domain\Machine\Money;
 use VendingMachine\Domain\Machine\Product;
 use VendingMachine\Domain\Machine\ProductStock;
@@ -50,13 +51,15 @@ final class SeedDefaultMachineCommand extends Command
         $io = new SymfonyStyle($input, $output);
         $reset = $input->getOption('reset');
 
-        if (!$reset && $this->machineRepository->find('default') !== null) {
+        $machineId = MachineId::default();
+
+        if (!$reset && $this->machineRepository->find($machineId) !== null) {
             $io->success('Default machine already exists. No changes were required.');
 
             return Command::SUCCESS;
         }
 
-        $this->machineRepository->save('default', $this->defaultMachine());
+        $this->machineRepository->save($machineId, $this->defaultMachine());
         $io->success(
             $reset
                 ? 'Default machine reset to the documented reviewer baseline.'

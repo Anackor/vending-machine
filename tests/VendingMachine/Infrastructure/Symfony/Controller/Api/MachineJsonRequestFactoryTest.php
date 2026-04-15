@@ -25,7 +25,7 @@ final class MachineJsonRequestFactoryTest extends TestCase
     {
         $query = $this->requestFactory->createGetMachineStateQuery();
 
-        self::assertSame('default', $query->machineId());
+        self::assertSame('default', $query->machineId()->value());
     }
 
     public function testItCreatesAnInsertCoinCommandFromJson(): void
@@ -35,7 +35,7 @@ final class MachineJsonRequestFactoryTest extends TestCase
         );
 
         self::assertSame(25, $command->coinCents());
-        self::assertSame('default', $command->machineId());
+        self::assertSame('default', $command->machineId()->value());
     }
 
     public function testItStillCreatesAnInsertCoinCommandFromCoinCentsJson(): void
@@ -45,7 +45,7 @@ final class MachineJsonRequestFactoryTest extends TestCase
         );
 
         self::assertSame(25, $command->coinCents());
-        self::assertSame('default', $command->machineId());
+        self::assertSame('default', $command->machineId()->value());
     }
 
     public function testItAcceptsTheDocumentedDecimalCoinValues(): void
@@ -124,7 +124,7 @@ final class MachineJsonRequestFactoryTest extends TestCase
         );
 
         self::assertSame('water', $command->selector());
-        self::assertSame('default', $command->machineId());
+        self::assertSame('default', $command->machineId()->value());
     }
 
     public function testItCreatesAServiceMachineCommandFromCoinsJson(): void
@@ -198,7 +198,7 @@ final class MachineJsonRequestFactoryTest extends TestCase
     {
         $command = $this->requestFactory->createReturnInsertedMoneyCommand();
 
-        self::assertSame('default', $command->machineId());
+        self::assertSame('default', $command->machineId()->value());
     }
 
     public function testItRejectsInvalidJsonBodies(): void

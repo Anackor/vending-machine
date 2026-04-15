@@ -7,6 +7,7 @@ namespace Tests\VendingMachine\Infrastructure\Persistence\MongoDB\Machine\Mapper
 use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
 use Tests\VendingMachine\Infrastructure\Persistence\MongoDB\Machine\Fixture\DefaultMachineFixture;
+use VendingMachine\Domain\Machine\MachineId;
 use VendingMachine\Infrastructure\Persistence\MongoDB\Machine\Document\MachineDocument;
 use VendingMachine\Infrastructure\Persistence\MongoDB\Machine\Mapper\MachineDocumentMapper;
 
@@ -16,7 +17,7 @@ final class MachineDocumentMapperTest extends TestCase
     {
         $mapper = new MachineDocumentMapper();
         $document = $mapper->fromDomain(
-            'default',
+            MachineId::default(),
             DefaultMachineFixture::machine(
                 ['water' => 2, 'juice' => 3, 'soda' => 4],
                 [25 => 2, 5 => 1],
@@ -40,7 +41,7 @@ final class MachineDocumentMapperTest extends TestCase
         $document = new MachineDocument(
             'default',
             $mapper->fromDomain(
-                'default',
+                MachineId::default(),
                 DefaultMachineFixture::machine(
                     ['water' => 2, 'juice' => 3, 'soda' => 4],
                     [25 => 2, 5 => 1],

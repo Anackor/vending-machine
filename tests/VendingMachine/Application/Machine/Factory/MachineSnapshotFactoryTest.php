@@ -9,6 +9,7 @@ use VendingMachine\Application\Machine\Factory\MachineSnapshotFactory;
 use VendingMachine\Domain\Machine\AvailableChange;
 use VendingMachine\Domain\Machine\InsertedCoins;
 use VendingMachine\Domain\Machine\Machine;
+use VendingMachine\Domain\Machine\MachineId;
 use VendingMachine\Domain\Machine\Money;
 use VendingMachine\Domain\Machine\Product;
 use VendingMachine\Domain\Machine\ProductStock;
@@ -19,12 +20,12 @@ final class MachineSnapshotFactoryTest extends TestCase
     public function testItBuildsAStableApplicationSnapshotFromTheMachineAggregate(): void
     {
         $factory = new MachineSnapshotFactory();
-        $snapshot = $factory->create(' DEFAULT ', $this->machine());
+        $snapshot = $factory->create(MachineId::fromString(' DEFAULT '), $this->machine());
         $water = $snapshot->productSnapshotFor('water');
         $juice = $snapshot->productSnapshotFor('juice');
         $soda = $snapshot->productSnapshotFor('soda');
 
-        self::assertSame('default', $snapshot->machineId());
+        self::assertSame('default', $snapshot->machineId()->value());
         self::assertSame(110, $snapshot->insertedBalanceCents());
         self::assertSame([10 => 1, 100 => 1], $snapshot->insertedCoins());
         self::assertSame([5 => 4, 25 => 2], $snapshot->availableChangeCounts());
