@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace VendingMachine\Application\Machine\Command;
 
 use InvalidArgumentException;
-use VendingMachine\Domain\Machine\MachineId;
+use VendingMachine\Domain\Machine\ValueObject\MachineId;
 
 /**
  * Carries the input required to insert one supported coin into a machine.

@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace VendingMachine\Application\Machine\Result;
 
 use InvalidArgumentException;
-use VendingMachine\Domain\Machine\ProductName;
-use VendingMachine\Domain\Machine\Selector;
+use VendingMachine\Domain\Machine\ValueObject\ProductName;
+use VendingMachine\Domain\Machine\ValueObject\Selector;
 
 /**
  * Wraps the dispensed product, change, and resulting machine snapshot of a purchase.

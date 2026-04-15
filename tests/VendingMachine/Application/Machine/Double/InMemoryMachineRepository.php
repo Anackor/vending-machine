@@ -6,7 +6,7 @@ namespace Tests\VendingMachine\Application\Machine\Double;
 
 use VendingMachine\Application\Machine\Repository\MachineRepository;
 use VendingMachine\Domain\Machine\Machine;
-use VendingMachine\Domain\Machine\MachineId;
+use VendingMachine\Domain\Machine\ValueObject\MachineId;
 
 final class InMemoryMachineRepository implements MachineRepository
 {

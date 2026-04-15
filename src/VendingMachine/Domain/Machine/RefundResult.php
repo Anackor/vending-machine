@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace VendingMachine\Domain\Machine;
 
+use VendingMachine\Domain\Machine\ValueObject\InsertedCoins;
+
 /**
  * Returns the updated machine and the coins handed back to the customer.
  */

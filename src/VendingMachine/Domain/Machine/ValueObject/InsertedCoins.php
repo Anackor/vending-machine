@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace VendingMachine\Domain\Machine;
+namespace VendingMachine\Domain\Machine\ValueObject;
 
 /**
- * Wraps the machine-owned coin inventory that can be used to return change.
+ * Wraps the coins inserted by the current customer session.
  */
-final readonly class AvailableChange
+final readonly class InsertedCoins
 {
     public function __construct(
         private CoinInventory $coins,
@@ -50,19 +50,14 @@ final readonly class AvailableChange
         return $this->coins->countFor($coin);
     }
 
-    public function addInsertedCoins(InsertedCoins $insertedCoins): self
+    public function addCoin(Coin $coin): self
     {
-        return new self($this->coins->add($insertedCoins->toCoinInventory()));
+        return new self($this->coins->addCoin($coin));
     }
 
-    public function remove(CoinInventory $coins): self
+    public function clear(): self
     {
-        return new self($this->coins->subtract($coins));
-    }
-
-    public function allocateChange(Money $amount): ?CoinInventory
-    {
-        return $this->coins->allocateForAmount($amount);
+        return self::empty();
     }
 
     public function toCoinInventory(): CoinInventory

@@ -31,6 +31,11 @@ It owns:
 normalization for machine keys so application and persistence code do not repeat
 the same string rules.
 
+## Value objects
+
+Machine-specific value objects live in `ValueObject/` so they remain easy to find
+without turning them into shared cross-context utilities.
+
 ## Behavioral rules
 
 - refund returns the exact inserted coin multiset

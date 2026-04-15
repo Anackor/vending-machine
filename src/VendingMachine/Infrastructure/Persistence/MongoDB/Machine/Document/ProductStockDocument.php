@@ -5,9 +5,9 @@ declare(strict_types=1);
 namespace VendingMachine\Infrastructure\Persistence\MongoDB\Machine\Document;
 
 use InvalidArgumentException;
-use VendingMachine\Domain\Machine\ProductName;
-use VendingMachine\Domain\Machine\Selector;
-use VendingMachine\Domain\Machine\StockQuantity;
+use VendingMachine\Domain\Machine\ValueObject\ProductName;
+use VendingMachine\Domain\Machine\ValueObject\Selector;
+use VendingMachine\Domain\Machine\ValueObject\StockQuantity;
 
 /**
  * Persistence DTO for one product entry inside the machine MongoDB document.

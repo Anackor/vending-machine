@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace Tests\VendingMachine\Infrastructure\Persistence\MongoDB\Machine\Integration;
 
 use Tests\VendingMachine\Infrastructure\Persistence\MongoDB\Machine\Fixture\DefaultMachineFixture;
-use VendingMachine\Domain\Machine\MachineId;
-use VendingMachine\Domain\Machine\Selector;
+use VendingMachine\Domain\Machine\ValueObject\MachineId;
+use VendingMachine\Domain\Machine\ValueObject\Selector;
 
 final class MongoDBMachineRepositoryTest extends MongoDBIntegrationTestCase
 {

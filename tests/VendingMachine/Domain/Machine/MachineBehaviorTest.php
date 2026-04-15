@@ -6,19 +6,19 @@ namespace Tests\VendingMachine\Domain\Machine;
 
 use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
-use VendingMachine\Domain\Machine\AvailableChange;
 use VendingMachine\Domain\Machine\Exception\ExactChangeNotAvailable;
 use VendingMachine\Domain\Machine\Exception\InsufficientBalance;
 use VendingMachine\Domain\Machine\Exception\InvalidServiceConfiguration;
 use VendingMachine\Domain\Machine\Exception\PendingBalanceDuringService;
 use VendingMachine\Domain\Machine\Exception\ProductNotFound;
 use VendingMachine\Domain\Machine\Exception\ProductOutOfStock;
-use VendingMachine\Domain\Machine\InsertedCoins;
 use VendingMachine\Domain\Machine\Machine;
-use VendingMachine\Domain\Machine\Money;
 use VendingMachine\Domain\Machine\Product;
 use VendingMachine\Domain\Machine\ProductStock;
-use VendingMachine\Domain\Machine\Selector;
+use VendingMachine\Domain\Machine\ValueObject\AvailableChange;
+use VendingMachine\Domain\Machine\ValueObject\InsertedCoins;
+use VendingMachine\Domain\Machine\ValueObject\Money;
+use VendingMachine\Domain\Machine\ValueObject\Selector;
 
 final class MachineBehaviorTest extends TestCase
 {

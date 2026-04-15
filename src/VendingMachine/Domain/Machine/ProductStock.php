@@ -4,6 +4,10 @@ declare(strict_types=1);
 
 namespace VendingMachine\Domain\Machine;
 
+use VendingMachine\Domain\Machine\ValueObject\Money;
+use VendingMachine\Domain\Machine\ValueObject\Selector;
+use VendingMachine\Domain\Machine\ValueObject\StockQuantity;
+
 /**
  * Couples a product definition with its current machine stock quantity.
  */
