@@ -29,6 +29,7 @@ The delivery remains backend-first and now also includes an optional reviewer UI
 
 - `docs/challenges/backend/README.md`: backend challenge brief, extracted requirements, assumptions, and design guidance
 - `docs/planning/backend-implementation-plan.md`: implementation roadmap for the backend
+- `docs/planning/portfolio-backlog.md`: public portfolio polish backlog and documentation positioning
 - `docs/development/conventions.md`: project conventions, class placement rules, and tool responsibilities
 - `docs/development/ai-development-guide.md`: short development guide for future AI-assisted changes
 
