@@ -7,12 +7,8 @@ namespace VendingMachine\Infrastructure\Symfony\Controller\Api\Request;
 /**
  * Validated HTTP contract for inserting one coin.
  *
- * This DTO captures the normalized request shape after JSON parsing and before
- * creating the application command. It keeps transport validation close to
- * Symfony without making the command accept raw HTTP payloads. Using Symfony
- * forms or validation attributes would also work, but for this small API an
- * explicit passive DTO is easier to read and keeps framework configuration out
- * of the use case path.
+ * Tip: this passive DTO documents adapter input before it becomes a command.
+ * See docs/architecture/http-api-boundary.md for the trade-offs.
  */
 final readonly class InsertCoinJsonRequest
 {

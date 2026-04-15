@@ -22,11 +22,8 @@ use VendingMachine\Infrastructure\Symfony\Controller\Api\Presenter\MachineSnapsh
 /**
  * Converts presented API payloads into Symfony JSON responses.
  *
- * This adapter is kept separate from presenters so HTTP status codes and
- * Symfony's JsonResponse remain infrastructure concerns. Another option was to
- * keep one response factory that both formats arrays and builds responses, but
- * splitting responder from presenters keeps serialization decisions reusable
- * and makes the controller depend on a single response boundary service.
+ * Tip: presenters shape arrays, this responder owns Symfony and HTTP status
+ * codes. See docs/architecture/http-api-boundary.md for the trade-offs.
  */
 final readonly class MachineJsonResponder
 {

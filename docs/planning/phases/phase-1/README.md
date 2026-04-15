@@ -16,7 +16,7 @@ independently from Symfony and persistence concerns.
 ## Inputs
 
 - `README.md`
-- `docs/challenges/backend/README.md`
+- `docs/README.md`
 - `docs/planning/phases/phase-0/README.md`
 
 ## Canonical structure

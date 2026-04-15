@@ -8,7 +8,7 @@ will rely on before implementing the first core classes.
 ## Depends on
 
 - `docs/planning/phases/phase-1/README.md`
-- `docs/challenges/backend/README.md`
+- `docs/README.md`
 - `docs/planning/phases/phase-0/block-d-architecture-and-namespace.md`
 - `docs/planning/phases/phase-0/block-e-ddd-naming.md`
 

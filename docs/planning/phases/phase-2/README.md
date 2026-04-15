@@ -17,7 +17,7 @@ directly to domain internals.
 ## Inputs
 
 - `README.md`
-- `docs/challenges/backend/README.md`
+- `docs/README.md`
 - `docs/planning/phases/phase-1/README.md`
 
 ## Canonical structure

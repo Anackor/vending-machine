@@ -16,7 +16,7 @@ quality baseline for local work and pull requests.
 ## Inputs
 
 - `README.md`
-- `docs/challenges/backend/README.md`
+- `docs/README.md`
 - `docs/planning/phases/phase-1/README.md`
 - `docs/planning/phases/phase-3/README.md`
 - `docs/planning/phases/phase-4/README.md`

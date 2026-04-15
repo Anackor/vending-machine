@@ -63,7 +63,7 @@ Deliver a production-minded backend foundation for the vending machine challenge
 Before executing any phase, the minimum common context should be:
 
 - the root `README.md`
-- `docs/challenges/backend/README.md`
+- `docs/README.md`
 - the target phase document
 
 For Phase 0 specifically:

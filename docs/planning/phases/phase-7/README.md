@@ -16,7 +16,7 @@ vending machine API can be exercised visually through a pleasant local UI.
 ## Inputs
 
 - `README.md`
-- `docs/challenges/backend/README.md`
+- `docs/README.md`
 - `docs/planning/phases/phase-4/README.md`
 - `docs/planning/phases/phase-5/README.md`
 - `docs/planning/phases/phase-6-packaging-and-delivery.md`
@@ -44,8 +44,8 @@ Use the block files for task-level execution and block-local decisions:
 
 This phase is intentionally not a second full challenge inside the repository.
 
-The `docs/challenges/frontend/README.md` brief is useful as inspiration for UI
-quality, test coverage, and reviewer empathy, but the goal here is simpler:
+The `frontend/reviewer-ui/README.md` file captures the implemented UI scope,
+technology choices, and reviewer intent. The goal stays intentionally simple:
 build a small visual client for the existing vending machine API.
 
 The implementation should therefore stay pragmatic:
@@ -90,10 +90,9 @@ Load Phase 5 only when:
 - frontend tests, coverage, or CI parity decisions must align with the current
   project safety-net approach
 
-Load `docs/challenges/frontend/README.md` only when:
+Load `frontend/reviewer-ui/README.md` when:
 
-- visual quality, UX expectations, or frontend testing goals need extra
-  inspiration
+- visual quality, UX expectations, or frontend testing goals need to stay aligned
 
 ## Block index
 

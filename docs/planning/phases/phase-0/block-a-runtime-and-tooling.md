@@ -8,7 +8,7 @@ Freeze the runtime, image, extension, and local-tooling decisions that every oth
 
 - `docs/planning/phases/phase-0/README.md`
 - `README.md`
-- `docs/challenges/backend/README.md`
+- `docs/README.md`
 
 ## Tasks
 

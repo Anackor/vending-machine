@@ -19,7 +19,7 @@ Create the engineering foundation that allows backend development to start immed
 ## Inputs
 
 - `README.md`
-- `docs/challenges/backend/README.md`
+- `docs/README.md`
 
 ## Canonical structure
 

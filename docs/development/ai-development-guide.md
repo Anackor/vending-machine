@@ -10,7 +10,7 @@ project structure and working agreements.
 For most backend implementation work, load:
 
 - `README.md`
-- `docs/challenges/backend/README.md`
+- `docs/README.md`
 - the active phase document
 - `docs/development/conventions.md`
 - `src/VendingMachine/README.md`

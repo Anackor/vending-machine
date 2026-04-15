@@ -9,7 +9,7 @@ Load only the documents needed for the phase you are executing.
 For every phase, always load:
 
 - `README.md`
-- `docs/challenges/backend/README.md`
+- `docs/README.md`
 - the current phase document
 
 Load previous phase documents only if:
