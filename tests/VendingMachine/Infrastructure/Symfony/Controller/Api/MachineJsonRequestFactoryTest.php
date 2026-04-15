@@ -123,7 +123,7 @@ final class MachineJsonRequestFactoryTest extends TestCase
             $this->jsonRequest(['selector' => 'water']),
         );
 
-        self::assertSame('water', $command->selector());
+        self::assertSame('water', $command->selector()->value());
         self::assertSame('default', $command->machineId()->value());
     }
 

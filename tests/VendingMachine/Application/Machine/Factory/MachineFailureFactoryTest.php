@@ -51,25 +51,6 @@ final class MachineFailureFactoryTest extends TestCase
         );
     }
 
-    public function testItBuildsTheInvalidProductSelectionFailure(): void
-    {
-        $failure = new MachineFailureFactory()->invalidProductSelection(
-            MachineId::default(),
-            'water!',
-            new InvalidArgumentException('Selector "water!" is invalid.'),
-        );
-
-        $this->assertMachineFailure(
-            $failure,
-            MachineFailureCode::ProductNotFound,
-            'Selector "water!" is invalid.',
-            [
-                'machineId' => 'default',
-                'selector' => 'water!',
-            ],
-        );
-    }
-
     public function testItBuildsTheInvalidServiceConfigurationFailure(): void
     {
         $failure = new MachineFailureFactory()->invalidServiceConfiguration(

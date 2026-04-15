@@ -6,6 +6,7 @@ namespace VendingMachine\Application\Machine\Command;
 
 use InvalidArgumentException;
 use VendingMachine\Domain\Machine\MachineId;
+use VendingMachine\Domain\Machine\Selector;
 
 /**
  * Carries the stock and change configuration used by the service operation.
@@ -107,12 +108,6 @@ final readonly class ServiceMachineCommand
                 throw new InvalidArgumentException('Service product selectors must be strings.');
             }
 
-            $normalizedSelector = strtolower(trim($selector));
-
-            if ($normalizedSelector === '') {
-                throw new InvalidArgumentException('Service product selectors cannot be empty.');
-            }
-
             if (!is_int($quantity)) {
                 throw new InvalidArgumentException('Service product quantities must be integers.');
             }
@@ -121,7 +116,7 @@ final readonly class ServiceMachineCommand
                 throw new InvalidArgumentException('Service product quantities cannot be negative.');
             }
 
-            $normalized[$normalizedSelector] = $quantity;
+            $normalized[Selector::fromString($selector)->value()] = $quantity;
         }
 
         ksort($normalized);

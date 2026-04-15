@@ -31,6 +31,13 @@ final readonly class Selector implements \Stringable
         return new self($normalized);
     }
 
+    public static function from(self|string $value): self
+    {
+        return $value instanceof self
+            ? $value
+            : self::fromString($value);
+    }
+
     public function value(): string
     {
         return $this->value;

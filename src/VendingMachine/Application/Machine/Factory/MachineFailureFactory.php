@@ -46,21 +46,6 @@ final class MachineFailureFactory
         );
     }
 
-    public function invalidProductSelection(
-        MachineId $machineId,
-        string $selector,
-        InvalidArgumentException $exception,
-    ): MachineOperationFailed {
-        return $this->build(
-            MachineFailureCode::ProductNotFound,
-            $exception->getMessage(),
-            [
-                'machineId' => $machineId->value(),
-                'selector' => $selector,
-            ],
-        );
-    }
-
     public function invalidServiceConfiguration(
         MachineId $machineId,
         InvalidArgumentException $exception,

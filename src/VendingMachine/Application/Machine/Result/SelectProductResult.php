@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace VendingMachine\Application\Machine\Result;
 
 use InvalidArgumentException;
+use VendingMachine\Domain\Machine\Selector;
 
 /**
  * Wraps the dispensed product, change, and resulting machine snapshot of a purchase.
@@ -17,18 +18,18 @@ final readonly class SelectProductResult
     private array $dispensedChangeCounts;
 
     private string $dispensedProductName;
-    private string $dispensedProductSelector;
+    private Selector $dispensedProductSelector;
 
     /**
      * @param array<int|string, mixed> $dispensedChangeCounts
      */
     public function __construct(
-        string $dispensedProductSelector,
+        Selector|string $dispensedProductSelector,
         string $dispensedProductName,
         array $dispensedChangeCounts,
         private MachineSnapshot $machineSnapshot,
     ) {
-        $this->dispensedProductSelector = self::normalizeSelector($dispensedProductSelector);
+        $this->dispensedProductSelector = Selector::from($dispensedProductSelector);
         $this->dispensedProductName = trim($dispensedProductName);
 
         if ($this->dispensedProductName === '') {
@@ -51,7 +52,7 @@ final readonly class SelectProductResult
         return $this->dispensedProductName;
     }
 
-    public function dispensedProductSelector(): string
+    public function dispensedProductSelector(): Selector
     {
         return $this->dispensedProductSelector;
     }
@@ -87,17 +88,6 @@ final readonly class SelectProductResult
         }
 
         ksort($normalized);
-
-        return $normalized;
-    }
-
-    private static function normalizeSelector(string $selector): string
-    {
-        $normalized = strtolower(trim($selector));
-
-        if ($normalized === '') {
-            throw new InvalidArgumentException('Dispensed product selector cannot be empty.');
-        }
 
         return $normalized;
     }

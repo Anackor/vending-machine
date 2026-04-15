@@ -26,7 +26,7 @@ final class SelectProductHandlerTest extends AbstractMachineHandlerTestCase
 
         self::assertNotNull($savedMachine);
         self::assertNotNull($water);
-        self::assertSame('water', $result->dispensedProductSelector());
+        self::assertSame('water', $result->dispensedProductSelector()->value());
         self::assertSame('Water', $result->dispensedProductName());
         self::assertSame([], $result->dispensedChangeCounts());
         self::assertSame(0, $result->machineSnapshot()->insertedBalanceCents());
@@ -76,32 +76,6 @@ final class SelectProductHandlerTest extends AbstractMachineHandlerTestCase
                 [
                     'machineId' => 'default',
                     'selector' => 'chips',
-                ],
-            );
-            self::assertSame(0, $repository->saveCount());
-        }
-    }
-
-    public function testItTranslatesInvalidSelectorsIntoApplicationFailures(): void
-    {
-        $repository = $this->repository($this->machine([], [], [25 => 1]));
-        $handler = new SelectProductHandler(
-            $repository,
-            $this->machineSnapshotFactory(),
-            $this->machineFailureFactory(),
-        );
-
-        try {
-            $handler->handle(new SelectProductCommand('water!'));
-            self::fail('The handler should have rejected the invalid selector.');
-        } catch (MachineOperationFailed $exception) {
-            $this->assertMachineFailure(
-                $exception,
-                MachineFailureCode::ProductNotFound,
-                'Selector "water!" is invalid.',
-                [
-                    'machineId' => 'default',
-                    'selector' => 'water!',
                 ],
             );
             self::assertSame(0, $repository->saveCount());

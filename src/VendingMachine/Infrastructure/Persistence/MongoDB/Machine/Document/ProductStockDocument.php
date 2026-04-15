@@ -5,27 +5,24 @@ declare(strict_types=1);
 namespace VendingMachine\Infrastructure\Persistence\MongoDB\Machine\Document;
 
 use InvalidArgumentException;
+use VendingMachine\Domain\Machine\Selector;
 
 /**
  * Persistence DTO for one product entry inside the machine MongoDB document.
  */
 final readonly class ProductStockDocument
 {
-    private string $selector;
+    private Selector $selector;
     private string $name;
 
     public function __construct(
-        string $selector,
+        Selector|string $selector,
         private int $priceCents,
         private int $quantity,
         string $name,
     ) {
-        $selector = trim($selector);
+        $selector = Selector::from($selector);
         $name = trim($name);
-
-        if ($selector === '') {
-            throw new InvalidArgumentException('Persisted product selector cannot be empty.');
-        }
 
         if ($name === '') {
             throw new InvalidArgumentException('Persisted product name cannot be empty.');
@@ -43,7 +40,7 @@ final readonly class ProductStockDocument
         $this->name = $name;
     }
 
-    public function selector(): string
+    public function selector(): Selector
     {
         return $this->selector;
     }

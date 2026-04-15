@@ -12,6 +12,7 @@ use VendingMachine\Application\Machine\Command\SelectProductCommand;
 use VendingMachine\Application\Machine\Command\ServiceMachineCommand;
 use VendingMachine\Application\Machine\Query\GetMachineStateQuery;
 use VendingMachine\Domain\Machine\MachineId;
+use VendingMachine\Domain\Machine\Selector;
 
 final class CommandAndQueryContractTest extends TestCase
 {
@@ -29,7 +30,7 @@ final class CommandAndQueryContractTest extends TestCase
         $returnInsertedMoney = new ReturnInsertedMoneyCommand(' DEFAULT ');
         $getMachineState = new GetMachineStateQuery(' DEFAULT ');
 
-        self::assertSame('water', $selectProduct->selector());
+        self::assertSame('water', $selectProduct->selector()->value());
         self::assertSame('default', $selectProduct->machineId()->value());
         self::assertSame('default', $returnInsertedMoney->machineId()->value());
         self::assertSame('default', $getMachineState->machineId()->value());
@@ -74,6 +75,15 @@ final class CommandAndQueryContractTest extends TestCase
         self::assertSame('lobby-01', $command->machineId()->value());
     }
 
+    public function testItAcceptsASelectorValueObject(): void
+    {
+        $selector = Selector::fromString(' WATER ');
+        $command = new SelectProductCommand($selector);
+
+        self::assertSame($selector, $command->selector());
+        self::assertSame('water', $command->selector()->value());
+    }
+
     public function testItRejectsNonPositiveInsertCoinAmounts(): void
     {
         $this->expectException(InvalidArgumentException::class);
@@ -101,9 +111,17 @@ final class CommandAndQueryContractTest extends TestCase
     public function testItRejectsEmptyProductSelectors(): void
     {
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Product selector cannot be empty.');
+        $this->expectExceptionMessage('Selector cannot be empty.');
 
         new SelectProductCommand('   ');
+    }
+
+    public function testItRejectsInvalidProductSelectors(): void
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Selector "water!" is invalid.');
+
+        new SelectProductCommand('water!');
     }
 
     public function testItRejectsEmptyMachineIdsForSelectProductCommands(): void
@@ -155,10 +173,21 @@ final class CommandAndQueryContractTest extends TestCase
     public function testItRejectsEmptyServiceProductSelectors(): void
     {
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Service product selectors cannot be empty.');
+        $this->expectExceptionMessage('Selector cannot be empty.');
 
         new ServiceMachineCommand(
             ['   ' => 1],
+            [25 => 1],
+        );
+    }
+
+    public function testItRejectsInvalidServiceProductSelectors(): void
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Selector "water!" is invalid.');
+
+        new ServiceMachineCommand(
+            ['water!' => 1],
             [25 => 1],
         );
     }

@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace VendingMachine\Application\Machine\Handler;
 
-use InvalidArgumentException;
 use VendingMachine\Application\Machine\Command\SelectProductCommand;
 use VendingMachine\Application\Machine\Factory\MachineFailureFactory;
 use VendingMachine\Application\Machine\Factory\MachineSnapshotFactory;
@@ -14,7 +13,6 @@ use VendingMachine\Domain\Machine\Exception\ExactChangeNotAvailable;
 use VendingMachine\Domain\Machine\Exception\InsufficientBalance;
 use VendingMachine\Domain\Machine\Exception\ProductNotFound;
 use VendingMachine\Domain\Machine\Exception\ProductOutOfStock;
-use VendingMachine\Domain\Machine\Selector;
 
 /**
  * Coordinates product selection, purchase rules, and the resulting state persistence.
@@ -38,18 +36,12 @@ final readonly class SelectProductHandler
         }
 
         try {
-            $purchase = $machine->purchase(Selector::fromString($command->selector()));
-        } catch (InvalidArgumentException $exception) {
-            throw $this->machineFailureFactory->invalidProductSelection(
-                $command->machineId(),
-                $command->selector(),
-                $exception,
-            );
+            $purchase = $machine->purchase($command->selector());
         } catch (ExactChangeNotAvailable | InsufficientBalance | ProductNotFound | ProductOutOfStock $exception) {
             throw $this->machineFailureFactory->fromDomainThrowable(
                 $command->machineId(),
                 $exception,
-                ['selector' => $command->selector()],
+                ['selector' => $command->selector()->value()],
             );
         }
 
@@ -57,7 +49,7 @@ final readonly class SelectProductHandler
         $this->machineRepository->save($command->machineId(), $updatedMachine);
 
         return new SelectProductResult(
-            $purchase->product()->selector()->value(),
+            $purchase->product()->selector(),
             $purchase->product()->name(),
             $purchase->change()->counts(),
             $this->machineSnapshotFactory->create($command->machineId(), $updatedMachine),

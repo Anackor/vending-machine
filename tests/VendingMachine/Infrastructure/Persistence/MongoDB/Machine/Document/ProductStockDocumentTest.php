@@ -14,7 +14,7 @@ final class ProductStockDocumentTest extends TestCase
     {
         $document = new ProductStockDocument('water', 65, 3, 'Water');
 
-        self::assertSame('water', $document->selector());
+        self::assertSame('water', $document->selector()->value());
         self::assertSame('Water', $document->name());
         self::assertSame(65, $document->priceCents());
         self::assertSame(3, $document->quantity());
@@ -26,7 +26,7 @@ final class ProductStockDocumentTest extends TestCase
             new ProductStockDocument('   ', 65, 1, 'Water');
             self::fail('The document should reject empty selectors.');
         } catch (InvalidArgumentException $exception) {
-            self::assertSame('Persisted product selector cannot be empty.', $exception->getMessage());
+            self::assertSame('Selector cannot be empty.', $exception->getMessage());
         }
 
         try {

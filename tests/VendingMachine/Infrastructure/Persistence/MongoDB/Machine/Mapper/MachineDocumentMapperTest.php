@@ -29,7 +29,7 @@ final class MachineDocumentMapperTest extends TestCase
         self::assertSame([5 => 1, 25 => 2], $document->availableChangeCounts());
         self::assertSame([100 => 1], $document->insertedCoinCounts());
         self::assertCount(3, $document->productStocks());
-        self::assertSame('water', $document->productStocks()[0]->selector());
+        self::assertSame('water', $document->productStocks()[0]->selector()->value());
         self::assertSame('Water', $document->productStocks()[0]->name());
         self::assertSame(65, $document->productStocks()[0]->priceCents());
         self::assertSame(2, $document->productStocks()[0]->quantity());

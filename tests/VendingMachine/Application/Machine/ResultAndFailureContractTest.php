@@ -43,7 +43,7 @@ final class ResultAndFailureContractTest extends TestCase
         self::assertSame([5 => 2], $snapshot->availableChangeCounts());
         self::assertTrue($snapshot->hasPendingBalance());
         self::assertCount(2, $snapshot->products());
-        self::assertSame('water', $water->selector());
+        self::assertSame('water', $water->selector()->value());
         self::assertTrue($water->isAvailable());
         self::assertFalse($juice->isAvailable());
     }
@@ -52,7 +52,7 @@ final class ResultAndFailureContractTest extends TestCase
     {
         $product = new ProductSnapshot(' WATER ', 65, 2, ' Water ');
 
-        self::assertSame('water', $product->selector());
+        self::assertSame('water', $product->selector()->value());
         self::assertSame('Water', $product->name());
         self::assertSame(65, $product->priceCents());
         self::assertSame(2, $product->quantity());
@@ -70,7 +70,7 @@ final class ResultAndFailureContractTest extends TestCase
         $getMachineState = new GetMachineStateResult($snapshot);
 
         self::assertSame($snapshot, $insertCoin->machineSnapshot());
-        self::assertSame('water', $selectProduct->dispensedProductSelector());
+        self::assertSame('water', $selectProduct->dispensedProductSelector()->value());
         self::assertSame('Water', $selectProduct->dispensedProductName());
         self::assertSame([10 => 1], $selectProduct->dispensedChangeCounts());
         self::assertSame($snapshot, $selectProduct->machineSnapshot());
@@ -243,7 +243,7 @@ final class ResultAndFailureContractTest extends TestCase
     public function testItRejectsEmptyProductSnapshotSelectors(): void
     {
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Product snapshot selector cannot be empty.');
+        $this->expectExceptionMessage('Selector cannot be empty.');
 
         new ProductSnapshot('   ', 65, 1, 'Water');
     }
@@ -288,7 +288,7 @@ final class ResultAndFailureContractTest extends TestCase
             new SelectProductResult('   ', 'Water', [25 => 1], $snapshot);
             self::fail('The result should have rejected the empty selector.');
         } catch (InvalidArgumentException $exception) {
-            self::assertSame('Dispensed product selector cannot be empty.', $exception->getMessage());
+            self::assertSame('Selector cannot be empty.', $exception->getMessage());
         }
 
         try {

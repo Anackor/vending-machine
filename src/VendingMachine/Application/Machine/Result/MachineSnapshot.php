@@ -6,6 +6,7 @@ namespace VendingMachine\Application\Machine\Result;
 
 use InvalidArgumentException;
 use VendingMachine\Domain\Machine\MachineId;
+use VendingMachine\Domain\Machine\Selector;
 
 /**
  * Flat application snapshot of the machine state exposed to adapters.
@@ -83,9 +84,9 @@ final readonly class MachineSnapshot
         return $this->machineId;
     }
 
-    public function productSnapshotFor(string $selector): ?ProductSnapshot
+    public function productSnapshotFor(Selector|string $selector): ?ProductSnapshot
     {
-        return $this->productsBySelector[strtolower(trim($selector))] ?? null;
+        return $this->productsBySelector[Selector::from($selector)->value()] ?? null;
     }
 
     /**
@@ -140,7 +141,7 @@ final readonly class MachineSnapshot
         $indexed = [];
 
         foreach ($products as $product) {
-            $selector = $product->selector();
+            $selector = $product->selector()->value();
 
             if (isset($indexed[$selector])) {
                 throw new InvalidArgumentException(sprintf('Duplicate product snapshot selector "%s" detected.', $selector));

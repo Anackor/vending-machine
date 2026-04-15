@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace VendingMachine\Application\Machine\Result;
 
 use InvalidArgumentException;
+use VendingMachine\Domain\Machine\Selector;
 
 /**
  * Flat application snapshot of one product entry in the machine.
@@ -12,15 +13,15 @@ use InvalidArgumentException;
 final readonly class ProductSnapshot
 {
     private string $name;
-    private string $selector;
+    private Selector $selector;
 
     public function __construct(
-        string $selector,
+        Selector|string $selector,
         private int $priceCents,
         private int $quantity,
         string $name,
     ) {
-        $this->selector = self::normalizeSelector($selector);
+        $this->selector = Selector::from($selector);
         $this->name = trim($name);
 
         if ($this->name === '') {
@@ -56,19 +57,8 @@ final readonly class ProductSnapshot
         return $this->quantity;
     }
 
-    public function selector(): string
+    public function selector(): Selector
     {
         return $this->selector;
-    }
-
-    private static function normalizeSelector(string $selector): string
-    {
-        $normalized = strtolower(trim($selector));
-
-        if ($normalized === '') {
-            throw new InvalidArgumentException('Product snapshot selector cannot be empty.');
-        }
-
-        return $normalized;
     }
 }

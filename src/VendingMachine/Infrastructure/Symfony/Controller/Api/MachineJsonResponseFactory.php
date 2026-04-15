@@ -108,7 +108,7 @@ final class MachineJsonResponseFactory
                     'type' => 'product_selected',
                     'dispensedProduct' => [
                         'name' => $result->dispensedProductName(),
-                        'selector' => $result->dispensedProductSelector(),
+                        'selector' => $result->dispensedProductSelector()->value(),
                     ],
                     'dispensedChangeCounts' => $this->coinCounts($result->dispensedChangeCounts()),
                 ],
@@ -130,7 +130,7 @@ final class MachineJsonResponseFactory
             'availableChangeCounts' => $this->coinCounts($snapshot->availableChangeCounts()),
             'products' => array_map(
                 fn (ProductSnapshot $product): array => [
-                    'selector' => $product->selector(),
+                    'selector' => $product->selector()->value(),
                     'name' => $product->name(),
                     'priceCoins' => $this->coins($product->priceCents()),
                     'quantity' => $product->quantity(),
