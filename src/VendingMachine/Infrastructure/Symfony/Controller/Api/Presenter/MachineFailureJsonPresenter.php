@@ -5,17 +5,15 @@ declare(strict_types=1);
 namespace VendingMachine\Infrastructure\Symfony\Controller\Api\Presenter;
 
 use VendingMachine\Application\Machine\Failure\MachineFailure;
-use VendingMachine\Application\Machine\Failure\MachineFailureCode;
 
 /**
  * Presents application failures without leaking cent-based internals to HTTP clients.
  *
  * Application failures are intentionally stable and transport-neutral, so this
- * presenter adapts their context and messages to the reviewer-facing JSON
+ * presenter adapts their context to the reviewer-facing JSON
  * contract. Keeping this in infrastructure avoids teaching the application
- * layer about HTTP naming conventions. A richer typed error view model would be
- * another valid option, but this presenter keeps the current contract explicit
- * while leaving that future refactor isolated.
+ * layer about HTTP naming conventions. It deliberately avoids parsing failure
+ * messages; amounts must arrive as structured context from Application.
  */
 final readonly class MachineFailureJsonPresenter
 {
@@ -32,7 +30,7 @@ final readonly class MachineFailureJsonPresenter
         return [
             'error' => [
                 'code' => $failure->code()->value,
-                'message' => $this->message($failure->code(), $failure->message()),
+                'message' => $failure->message(),
                 'context' => $this->context($failure->context()),
             ],
         ];
@@ -62,20 +60,5 @@ final readonly class MachineFailureJsonPresenter
         }
 
         return $normalized;
-    }
-
-    private function message(MachineFailureCode $code, string $message): string
-    {
-        return match ($code) {
-            MachineFailureCode::ExactChangeUnavailable,
-            MachineFailureCode::InsufficientBalance,
-            MachineFailureCode::InvalidServiceConfiguration,
-            MachineFailureCode::UnsupportedCoin => preg_replace_callback(
-                '/"(\d+)"/',
-                fn (array $matches): string => sprintf('"%s"', $this->coinPresenter->coinKey((int) $matches[1])),
-                $message,
-            ) ?? $message,
-            default => $message,
-        };
     }
 }

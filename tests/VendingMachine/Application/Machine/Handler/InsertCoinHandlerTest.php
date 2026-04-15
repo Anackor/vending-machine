@@ -47,7 +47,7 @@ final class InsertCoinHandlerTest extends AbstractMachineHandlerTestCase
             $this->assertMachineFailure(
                 $exception,
                 MachineFailureCode::UnsupportedCoin,
-                'Unsupported coin denomination "50".',
+                'Unsupported coin denomination.',
                 [
                     'coinCents' => 50,
                     'machineId' => 'default',

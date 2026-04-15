@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace VendingMachine\Infrastructure\Symfony\Controller\Api;
 
-use JsonException;
 use Symfony\Component\HttpFoundation\Request;
 use VendingMachine\Application\Machine\Command\InsertCoinCommand;
 use VendingMachine\Application\Machine\Command\ReturnInsertedMoneyCommand;
@@ -38,14 +37,11 @@ final readonly class MachineJsonRequestMapper
         return new GetMachineStateQuery();
     }
 
-    /**
-     * @throws JsonException
-     */
     public function createInsertCoinCommand(Request $request): InsertCoinCommand
     {
-        $insertCoinRequest = InsertCoinJsonRequest::fromPayload(
-            JsonPayload::fromRequest($request),
-            $this->coinInputNormalizer,
+        $payload = JsonPayload::fromRequest($request);
+        $insertCoinRequest = new InsertCoinJsonRequest(
+            $this->coinInputNormalizer->coinCentsFromInsertPayload($payload),
         );
 
         return new InsertCoinCommand($insertCoinRequest->coinCents());
@@ -56,14 +52,12 @@ final readonly class MachineJsonRequestMapper
         return new ReturnInsertedMoneyCommand();
     }
 
-    /**
-     * @throws JsonException
-     */
     public function createServiceMachineCommand(Request $request): ServiceMachineCommand
     {
-        $serviceMachineRequest = ServiceMachineJsonRequest::fromPayload(
-            JsonPayload::fromRequest($request),
-            $this->coinInputNormalizer,
+        $payload = JsonPayload::fromRequest($request);
+        $serviceMachineRequest = new ServiceMachineJsonRequest(
+            $payload->requiredObject('productQuantities'),
+            $this->coinInputNormalizer->coinCountKeysToCents($payload->requiredObject('availableChangeCounts')),
         );
 
         return new ServiceMachineCommand(
@@ -72,12 +66,11 @@ final readonly class MachineJsonRequestMapper
         );
     }
 
-    /**
-     * @throws JsonException
-     */
     public function createSelectProductCommand(Request $request): SelectProductCommand
     {
-        $selectProductRequest = SelectProductJsonRequest::fromPayload(JsonPayload::fromRequest($request));
+        $selectProductRequest = new SelectProductJsonRequest(
+            JsonPayload::fromRequest($request)->requiredString('selector'),
+        );
 
         return new SelectProductCommand($selectProductRequest->selector());
     }

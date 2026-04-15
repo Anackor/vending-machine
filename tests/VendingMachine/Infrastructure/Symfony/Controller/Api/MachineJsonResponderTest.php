@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Tests\VendingMachine\Infrastructure\Symfony\Controller\Api;
 
-use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
 use VendingMachine\Application\Machine\Command\InsertCoinCommand;
 use VendingMachine\Application\Machine\Exception\MachineOperationFailed;
@@ -15,6 +14,7 @@ use VendingMachine\Application\Machine\Result\InsertCoinResult;
 use VendingMachine\Application\Machine\Result\ReturnInsertedMoneyResult;
 use VendingMachine\Application\Machine\Result\SelectProductResult;
 use VendingMachine\Application\Machine\Result\ServiceMachineResult;
+use VendingMachine\Infrastructure\Symfony\Controller\Api\Exception\InvalidMachineJsonRequest;
 use VendingMachine\Infrastructure\Symfony\Controller\Api\MachineJsonResponder;
 use VendingMachine\Infrastructure\Symfony\Controller\Api\Presenter\CoinJsonPresenter;
 use VendingMachine\Infrastructure\Symfony\Controller\Api\Presenter\MachineFailureJsonPresenter;
@@ -138,11 +138,11 @@ final class MachineJsonResponderTest extends TestCase
             new MachineOperationFailed(
                 new MachineFailure(
                     MachineFailureCode::ExactChangeUnavailable,
-                    'Exact change "150" cannot be returned for selector "soda".',
+                    'Exact change cannot be returned.',
                     [
                         'machineId' => 'default',
-                        'coinCents' => 150,
-                        'requiredBalanceCents' => 150,
+                        'requiredChangeCents' => 150,
+                        'selector' => 'soda',
                     ],
                 ),
             ),
@@ -153,16 +153,16 @@ final class MachineJsonResponderTest extends TestCase
 
         self::assertSame(409, $response->getStatusCode());
         self::assertSame('exact_change_unavailable', $error['code']);
-        self::assertSame('Exact change "1.50" cannot be returned for selector "soda".', $error['message']);
-        self::assertSame(1.5, $this->numberValue($context, 'coins'));
-        self::assertSame(1.5, $this->numberValue($context, 'requiredBalanceCoins'));
-        self::assertArrayNotHasKey('coinCents', $context);
+        self::assertSame('Exact change cannot be returned.', $error['message']);
+        self::assertSame(1.5, $this->numberValue($context, 'requiredChangeCoins'));
+        self::assertSame('soda', $context['selector']);
+        self::assertArrayNotHasKey('requiredChangeCents', $context);
     }
 
     public function testItBuildsInvalidRequestResponses(): void
     {
         $response = $this->responder->invalidRequest(
-            new InvalidArgumentException('Field "coins" must be numeric.'),
+            new InvalidMachineJsonRequest('Field "coins" must be numeric.'),
         );
         $payload = $this->payload($response->getContent());
         $error = $this->objectPayload($payload, 'error');

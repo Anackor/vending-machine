@@ -188,7 +188,7 @@ final class MachineControllerTest extends KernelTestCase
     }
 
     #[Test]
-    public function itReturnsConflictMessagesInCoinsThroughTheHttpInterface(): void
+    public function itReturnsConflictContextInCoinsThroughTheHttpInterface(): void
     {
         $this->seedDefaultMachine(DefaultMachineFixture::machine(
             availableChangeCounts: [],
@@ -198,10 +198,13 @@ final class MachineControllerTest extends KernelTestCase
         $response = $this->request('POST', '/api/machine/select-product', ['selector' => 'soda']);
         $payload = $this->payload($response);
         $error = $this->errorPayload($payload);
+        $context = $this->objectPayload($error, 'context');
 
         self::assertSame(Response::HTTP_CONFLICT, $response->getStatusCode());
         self::assertSame('exact_change_unavailable', $error['code']);
-        self::assertSame('Exact change "1.50" cannot be returned for selector "soda".', $error['message']);
+        self::assertSame('Exact change cannot be returned.', $error['message']);
+        self::assertSame(1.5, $this->numberValue($context, 'requiredChangeCoins'));
+        self::assertSame('soda', $context['selector']);
     }
 
     #[Test]

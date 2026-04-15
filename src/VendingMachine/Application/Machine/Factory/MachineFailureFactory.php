@@ -38,7 +38,7 @@ final class MachineFailureFactory
     ): MachineOperationFailed {
         return $this->build(
             MachineFailureCode::UnsupportedCoin,
-            $exception->getMessage(),
+            'Unsupported coin denomination.',
             [
                 'coinCents' => $coinCents,
                 'machineId' => $machineId->value(),
@@ -67,10 +67,11 @@ final class MachineFailureFactory
     ): MachineOperationFailed {
         // Handlers add use-case context here while preserving a stable public error contract.
         $context['machineId'] = $machineId->value();
+        $code = $this->mapCode($throwable);
 
         return $this->build(
-            $this->mapCode($throwable),
-            $throwable->getMessage(),
+            $code,
+            $this->messageFor($code, $throwable),
             $context,
         );
     }
@@ -89,6 +90,15 @@ final class MachineFailureFactory
                 'Unsupported domain failure "%s" for application failure mapping.',
                 $throwable::class,
             )),
+        };
+    }
+
+    private function messageFor(MachineFailureCode $code, Throwable $throwable): string
+    {
+        return match ($code) {
+            MachineFailureCode::ExactChangeUnavailable => 'Exact change cannot be returned.',
+            MachineFailureCode::InsufficientBalance => 'Inserted balance is insufficient for product price.',
+            default => $throwable->getMessage(),
         };
     }
 

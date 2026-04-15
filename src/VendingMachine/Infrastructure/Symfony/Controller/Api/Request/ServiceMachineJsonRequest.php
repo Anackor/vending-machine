@@ -7,8 +7,8 @@ namespace VendingMachine\Infrastructure\Symfony\Controller\Api\Request;
 /**
  * Validated HTTP contract for servicing stock and change.
  *
- * The service endpoint has the richest input shape, so this DTO keeps object
- * validation and denomination-key normalization out of the controller. The
+ * The service endpoint has the richest input shape, so this passive DTO keeps
+ * object validation and denomination-key normalization out of the controller. The
  * application command still owns use-case validation such as selector and
  * quantity normalization. A shared application DTO was considered, but the JSON
  * key format for available change is an adapter concern and should not become
@@ -20,18 +20,10 @@ final readonly class ServiceMachineJsonRequest
      * @param array<array-key, mixed> $productQuantities
      * @param array<int, mixed> $availableChangeCounts
      */
-    private function __construct(
+    public function __construct(
         private array $productQuantities,
         private array $availableChangeCounts,
     ) {
-    }
-
-    public static function fromPayload(JsonPayload $payload, CoinInputNormalizer $coinInputNormalizer): self
-    {
-        return new self(
-            $payload->requiredObject('productQuantities'),
-            $coinInputNormalizer->coinCountKeysToCents($payload->requiredObject('availableChangeCounts')),
-        );
     }
 
     /**

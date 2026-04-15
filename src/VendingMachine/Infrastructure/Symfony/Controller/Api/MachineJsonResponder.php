@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace VendingMachine\Infrastructure\Symfony\Controller\Api;
 
-use InvalidArgumentException;
-use JsonException;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 use VendingMachine\Application\Machine\Command\InsertCoinCommand;
@@ -16,6 +14,7 @@ use VendingMachine\Application\Machine\Result\InsertCoinResult;
 use VendingMachine\Application\Machine\Result\ReturnInsertedMoneyResult;
 use VendingMachine\Application\Machine\Result\SelectProductResult;
 use VendingMachine\Application\Machine\Result\ServiceMachineResult;
+use VendingMachine\Infrastructure\Symfony\Controller\Api\Exception\InvalidMachineJsonRequest;
 use VendingMachine\Infrastructure\Symfony\Controller\Api\Presenter\CoinJsonPresenter;
 use VendingMachine\Infrastructure\Symfony\Controller\Api\Presenter\MachineFailureJsonPresenter;
 use VendingMachine\Infrastructure\Symfony\Controller\Api\Presenter\MachineSnapshotJsonPresenter;
@@ -38,7 +37,7 @@ final readonly class MachineJsonResponder
     ) {
     }
 
-    public function invalidRequest(InvalidArgumentException|JsonException $exception): JsonResponse
+    public function invalidRequest(InvalidMachineJsonRequest $exception): JsonResponse
     {
         return new JsonResponse(
             [

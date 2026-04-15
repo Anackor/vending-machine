@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace VendingMachine\Infrastructure\Symfony\Controller\Api;
 
-use InvalidArgumentException;
-use JsonException;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Attribute\AsController;
@@ -16,6 +14,7 @@ use VendingMachine\Application\Machine\Handler\InsertCoinHandler;
 use VendingMachine\Application\Machine\Handler\ReturnInsertedMoneyHandler;
 use VendingMachine\Application\Machine\Handler\SelectProductHandler;
 use VendingMachine\Application\Machine\Handler\ServiceMachineHandler;
+use VendingMachine\Infrastructure\Symfony\Controller\Api\Exception\InvalidMachineJsonRequest;
 
 /**
  * Thin Symfony controller that exposes the reviewer-facing HTTP API.
@@ -54,7 +53,7 @@ final readonly class MachineController
             );
         } catch (MachineOperationFailed $exception) {
             return $this->responder->machineOperationFailed($exception);
-        } catch (InvalidArgumentException | JsonException $exception) {
+        } catch (InvalidMachineJsonRequest $exception) {
             return $this->responder->invalidRequest($exception);
         }
     }
@@ -80,7 +79,7 @@ final readonly class MachineController
             );
         } catch (MachineOperationFailed $exception) {
             return $this->responder->machineOperationFailed($exception);
-        } catch (InvalidArgumentException | JsonException $exception) {
+        } catch (InvalidMachineJsonRequest $exception) {
             return $this->responder->invalidRequest($exception);
         }
     }
@@ -94,7 +93,7 @@ final readonly class MachineController
             );
         } catch (MachineOperationFailed $exception) {
             return $this->responder->machineOperationFailed($exception);
-        } catch (InvalidArgumentException | JsonException $exception) {
+        } catch (InvalidMachineJsonRequest $exception) {
             return $this->responder->invalidRequest($exception);
         }
     }
