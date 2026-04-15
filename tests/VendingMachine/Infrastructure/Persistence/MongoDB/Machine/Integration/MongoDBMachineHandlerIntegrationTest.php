@@ -8,6 +8,7 @@ use VendingMachine\Application\Machine\Command\InsertCoinCommand;
 use VendingMachine\Application\Machine\Handler\GetMachineStateHandler;
 use VendingMachine\Application\Machine\Handler\InsertCoinHandler;
 use VendingMachine\Application\Machine\Query\GetMachineStateQuery;
+use VendingMachine\Domain\Machine\MachineId;
 use VendingMachine\Domain\Machine\Selector;
 
 final class MongoDBMachineHandlerIntegrationTest extends MongoDBIntegrationTestCase
@@ -21,7 +22,7 @@ final class MongoDBMachineHandlerIntegrationTest extends MongoDBIntegrationTestC
 
         $insertResult = $this->insertCoinHandler->handle(new InsertCoinCommand(25));
         $stateResult = $this->getMachineStateHandler->handle(new GetMachineStateQuery());
-        $reloadedMachine = $this->machineRepository->find('default');
+        $reloadedMachine = $this->machineRepository->find(MachineId::default());
 
         self::assertSame(25, $insertResult->machineSnapshot()->insertedBalanceCents());
         self::assertSame([25 => 1], $insertResult->machineSnapshot()->insertedCoins());

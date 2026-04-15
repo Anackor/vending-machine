@@ -25,7 +25,7 @@ final class MachineJsonRequestFactoryTest extends TestCase
     {
         $query = $this->requestFactory->createGetMachineStateQuery();
 
-        self::assertSame('default', $query->machineId());
+        self::assertSame('default', $query->machineId()->value());
     }
 
     public function testItCreatesAnInsertCoinCommandFromJson(): void
@@ -35,7 +35,7 @@ final class MachineJsonRequestFactoryTest extends TestCase
         );
 
         self::assertSame(25, $command->coinCents());
-        self::assertSame('default', $command->machineId());
+        self::assertSame('default', $command->machineId()->value());
     }
 
     public function testItStillCreatesAnInsertCoinCommandFromCoinCentsJson(): void
@@ -45,7 +45,7 @@ final class MachineJsonRequestFactoryTest extends TestCase
         );
 
         self::assertSame(25, $command->coinCents());
-        self::assertSame('default', $command->machineId());
+        self::assertSame('default', $command->machineId()->value());
     }
 
     public function testItAcceptsTheDocumentedDecimalCoinValues(): void
@@ -123,8 +123,8 @@ final class MachineJsonRequestFactoryTest extends TestCase
             $this->jsonRequest(['selector' => 'water']),
         );
 
-        self::assertSame('water', $command->selector());
-        self::assertSame('default', $command->machineId());
+        self::assertSame('water', $command->selector()->value());
+        self::assertSame('default', $command->machineId()->value());
     }
 
     public function testItCreatesAServiceMachineCommandFromCoinsJson(): void
@@ -145,10 +145,15 @@ final class MachineJsonRequestFactoryTest extends TestCase
             ]),
         );
 
+        $productQuantities = $command->productQuantities();
+
         self::assertSame(
-            ['juice' => 7, 'soda' => 4, 'water' => 6],
-            $command->productQuantities(),
+            ['juice', 'soda', 'water'],
+            array_keys($productQuantities),
         );
+        self::assertSame(7, $productQuantities['juice']->value());
+        self::assertSame(4, $productQuantities['soda']->value());
+        self::assertSame(6, $productQuantities['water']->value());
         self::assertSame(
             [5 => 4, 10 => 5, 25 => 6, 100 => 2],
             $command->availableChangeCounts(),
@@ -198,7 +203,7 @@ final class MachineJsonRequestFactoryTest extends TestCase
     {
         $command = $this->requestFactory->createReturnInsertedMoneyCommand();
 
-        self::assertSame('default', $command->machineId());
+        self::assertSame('default', $command->machineId()->value());
     }
 
     public function testItRejectsInvalidJsonBodies(): void

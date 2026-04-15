@@ -7,6 +7,7 @@ namespace Tests\VendingMachine\Domain\Machine;
 use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
 use VendingMachine\Domain\Machine\Coin;
+use VendingMachine\Domain\Machine\MachineId;
 use VendingMachine\Domain\Machine\Selector;
 
 final class CoinAndSelectorTest extends TestCase
@@ -59,5 +60,33 @@ final class CoinAndSelectorTest extends TestCase
         self::assertTrue($selector->equals($sameSelector));
         self::assertFalse($selector->equals($differentSelector));
         self::assertSame('water', (string) $selector);
+    }
+
+    public function testItNormalizesMachineIds(): void
+    {
+        $machineId = MachineId::fromString('  LOBBY-01 ');
+
+        self::assertSame('lobby-01', $machineId->value());
+        self::assertSame('default', MachineId::default()->value());
+    }
+
+    public function testItRejectsEmptyMachineIds(): void
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Machine id cannot be empty.');
+
+        MachineId::fromString('   ');
+    }
+
+    public function testItComparesAndStringifiesMachineIds(): void
+    {
+        $machineId = MachineId::fromString('default');
+        $sameMachineId = MachineId::fromString(' DEFAULT ');
+        $differentMachineId = MachineId::fromString('lobby');
+
+        self::assertTrue($machineId->equals($sameMachineId));
+        self::assertFalse($machineId->equals($differentMachineId));
+        self::assertSame('default', (string) $machineId);
+        self::assertSame($machineId, MachineId::from($machineId));
     }
 }

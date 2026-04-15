@@ -16,12 +16,13 @@ use VendingMachine\Domain\Machine\Exception\InvalidServiceConfiguration;
 use VendingMachine\Domain\Machine\Exception\PendingBalanceDuringService;
 use VendingMachine\Domain\Machine\Exception\ProductNotFound;
 use VendingMachine\Domain\Machine\Exception\ProductOutOfStock;
+use VendingMachine\Domain\Machine\MachineId;
 
 final class MachineFailureFactoryTest extends TestCase
 {
     public function testItBuildsTheMissingMachineFailure(): void
     {
-        $failure = new MachineFailureFactory()->machineNotFound('default');
+        $failure = new MachineFailureFactory()->machineNotFound(MachineId::default());
 
         $this->assertMachineFailure(
             $failure,
@@ -34,7 +35,7 @@ final class MachineFailureFactoryTest extends TestCase
     public function testItBuildsTheUnsupportedCoinFailure(): void
     {
         $failure = new MachineFailureFactory()->unsupportedCoin(
-            'default',
+            MachineId::default(),
             50,
             new InvalidArgumentException('Unsupported coin denomination "50".'),
         );
@@ -50,29 +51,10 @@ final class MachineFailureFactoryTest extends TestCase
         );
     }
 
-    public function testItBuildsTheInvalidProductSelectionFailure(): void
-    {
-        $failure = new MachineFailureFactory()->invalidProductSelection(
-            'default',
-            'water!',
-            new InvalidArgumentException('Selector "water!" is invalid.'),
-        );
-
-        $this->assertMachineFailure(
-            $failure,
-            MachineFailureCode::ProductNotFound,
-            'Selector "water!" is invalid.',
-            [
-                'machineId' => 'default',
-                'selector' => 'water!',
-            ],
-        );
-    }
-
     public function testItBuildsTheInvalidServiceConfigurationFailure(): void
     {
         $failure = new MachineFailureFactory()->invalidServiceConfiguration(
-            'default',
+            MachineId::default(),
             new InvalidArgumentException('Missing stock count for selector "juice".'),
         );
 
@@ -135,7 +117,7 @@ final class MachineFailureFactoryTest extends TestCase
 
         foreach ($cases as [$throwable, $code, $context]) {
             $failure = $factory->fromDomainThrowable(
-                'default',
+                MachineId::default(),
                 $throwable,
                 array_diff_key($context, ['machineId' => true]),
             );
@@ -157,7 +139,7 @@ final class MachineFailureFactoryTest extends TestCase
         );
 
         new MachineFailureFactory()->fromDomainThrowable(
-            'default',
+            MachineId::default(),
             new RuntimeException('Unexpected failure.'),
         );
     }

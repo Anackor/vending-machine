@@ -5,36 +5,37 @@ declare(strict_types=1);
 namespace VendingMachine\Application\Machine\Command;
 
 use InvalidArgumentException;
+use VendingMachine\Domain\Machine\AvailableChange;
+use VendingMachine\Domain\Machine\MachineId;
+use VendingMachine\Domain\Machine\Selector;
+use VendingMachine\Domain\Machine\StockQuantity;
 
 /**
  * Carries the stock and change configuration used by the service operation.
  */
 final readonly class ServiceMachineCommand
 {
-    private string $machineId;
+    private MachineId $machineId;
 
     /**
-     * @var array<string, int>
+     * @var array<string, StockQuantity>
      */
     private array $productQuantities;
 
-    /**
-     * @var array<int, int>
-     */
-    private array $availableChangeCounts;
+    private AvailableChange $availableChange;
 
     /**
      * @param array<int|string, mixed> $productQuantities
-     * @param array<int|string, mixed> $availableChangeCounts
+     * @param AvailableChange|array<int|string, mixed> $availableChange
      */
     public function __construct(
         array $productQuantities,
-        array $availableChangeCounts,
-        string $machineId = 'default',
+        AvailableChange|array $availableChange,
+        MachineId|string $machineId = 'default',
     ) {
-        $this->machineId = self::normalizeMachineId($machineId);
+        $this->machineId = MachineId::from($machineId);
         $this->productQuantities = self::normalizeProductQuantities($productQuantities);
-        $this->availableChangeCounts = self::normalizeCoinCounts($availableChangeCounts);
+        $this->availableChange = AvailableChange::from($availableChange);
     }
 
     /**
@@ -42,67 +43,31 @@ final readonly class ServiceMachineCommand
      */
     public function availableChangeCounts(): array
     {
-        return $this->availableChangeCounts;
+        return $this->availableChange->counts();
     }
 
-    public function machineId(): string
+    public function availableChange(): AvailableChange
+    {
+        return $this->availableChange;
+    }
+
+    public function machineId(): MachineId
     {
         return $this->machineId;
     }
 
     /**
-     * @return array<string, int>
+     * @return array<string, StockQuantity>
      */
     public function productQuantities(): array
     {
         return $this->productQuantities;
     }
 
-    private static function normalizeMachineId(string $machineId): string
-    {
-        $normalized = strtolower(trim($machineId));
-
-        if ($normalized === '') {
-            throw new InvalidArgumentException('Machine id cannot be empty.');
-        }
-
-        return $normalized;
-    }
-
-    /**
-     * @param array<int|string, mixed> $counts
-     *
-     * @return array<int, int>
-     */
-    private static function normalizeCoinCounts(array $counts): array
-    {
-        $normalized = [];
-
-        foreach ($counts as $denomination => $count) {
-            if (!is_int($count)) {
-                throw new InvalidArgumentException('Available change counts must be integers.');
-            }
-
-            if ($count < 0) {
-                throw new InvalidArgumentException('Available change counts cannot be negative.');
-            }
-
-            if (is_string($denomination) && !ctype_digit($denomination)) {
-                throw new InvalidArgumentException('Available change denomination keys must be integer values.');
-            }
-
-            $normalized[(int) $denomination] = $count;
-        }
-
-        ksort($normalized);
-
-        return $normalized;
-    }
-
     /**
      * @param array<int|string, mixed> $productQuantities
      *
-     * @return array<string, int>
+     * @return array<string, StockQuantity>
      */
     private static function normalizeProductQuantities(array $productQuantities): array
     {
@@ -117,21 +82,11 @@ final readonly class ServiceMachineCommand
                 throw new InvalidArgumentException('Service product selectors must be strings.');
             }
 
-            $normalizedSelector = strtolower(trim($selector));
-
-            if ($normalizedSelector === '') {
-                throw new InvalidArgumentException('Service product selectors cannot be empty.');
-            }
-
-            if (!is_int($quantity)) {
+            if (!$quantity instanceof StockQuantity && !is_int($quantity)) {
                 throw new InvalidArgumentException('Service product quantities must be integers.');
             }
 
-            if ($quantity < 0) {
-                throw new InvalidArgumentException('Service product quantities cannot be negative.');
-            }
-
-            $normalized[$normalizedSelector] = $quantity;
+            $normalized[Selector::fromString($selector)->value()] = StockQuantity::from($quantity);
         }
 
         ksort($normalized);

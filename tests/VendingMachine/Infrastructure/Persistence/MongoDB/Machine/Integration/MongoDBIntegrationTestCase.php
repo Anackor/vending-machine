@@ -15,6 +15,7 @@ use VendingMachine\Application\Machine\Handler\GetMachineStateHandler;
 use VendingMachine\Application\Machine\Handler\InsertCoinHandler;
 use VendingMachine\Application\Machine\Repository\MachineRepository;
 use VendingMachine\Domain\Machine\Machine;
+use VendingMachine\Domain\Machine\MachineId;
 use VendingMachine\Infrastructure\Persistence\MongoDB\Machine\Mapper\MachineDocumentMapper;
 use VendingMachine\Infrastructure\Persistence\MongoDB\Machine\MongoDBMachineRepository;
 
@@ -76,7 +77,7 @@ abstract class MongoDBIntegrationTestCase extends TestCase
 
     protected function seedDefaultMachine(?Machine $machine = null): void
     {
-        $this->machineRepository->save('default', $machine ?? DefaultMachineFixture::machine());
+        $this->machineRepository->save(MachineId::default(), $machine ?? DefaultMachineFixture::machine());
     }
 
     protected function machineCollection(): Collection

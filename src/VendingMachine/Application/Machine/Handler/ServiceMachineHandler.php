@@ -36,7 +36,7 @@ final readonly class ServiceMachineHandler
         try {
             $updatedMachine = $machine->service(
                 $command->productQuantities(),
-                $command->availableChangeCounts(),
+                $command->availableChange(),
             );
         } catch (InvalidArgumentException $exception) {
             throw $this->machineFailureFactory->invalidServiceConfiguration(

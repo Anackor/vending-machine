@@ -7,13 +7,14 @@ namespace VendingMachine\Application\Machine\Factory;
 use VendingMachine\Application\Machine\Result\MachineSnapshot;
 use VendingMachine\Application\Machine\Result\ProductSnapshot;
 use VendingMachine\Domain\Machine\Machine;
+use VendingMachine\Domain\Machine\MachineId;
 
 /**
  * Builds transport-friendly snapshots from the machine aggregate.
  */
 final class MachineSnapshotFactory
 {
-    public function create(string $machineId, Machine $machine): MachineSnapshot
+    public function create(MachineId $machineId, Machine $machine): MachineSnapshot
     {
         // The snapshot is intentionally flat so adapters can serialize it without extra domain knowledge.
         $products = [];
@@ -22,10 +23,10 @@ final class MachineSnapshotFactory
             $product = $productStock->product();
 
             $products[] = new ProductSnapshot(
-                $product->selector()->value(),
+                $product->selector(),
                 $product->price()->cents(),
-                $productStock->quantity(),
-                $product->name(),
+                $productStock->stockQuantity(),
+                $product->productName(),
             );
         }
 

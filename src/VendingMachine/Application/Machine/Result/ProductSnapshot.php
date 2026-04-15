@@ -5,43 +5,45 @@ declare(strict_types=1);
 namespace VendingMachine\Application\Machine\Result;
 
 use InvalidArgumentException;
+use VendingMachine\Domain\Machine\ProductName;
+use VendingMachine\Domain\Machine\Selector;
+use VendingMachine\Domain\Machine\StockQuantity;
 
 /**
  * Flat application snapshot of one product entry in the machine.
  */
 final readonly class ProductSnapshot
 {
-    private string $name;
-    private string $selector;
+    private ProductName $name;
+    private StockQuantity $quantity;
+    private Selector $selector;
 
     public function __construct(
-        string $selector,
+        Selector|string $selector,
         private int $priceCents,
-        private int $quantity,
-        string $name,
+        StockQuantity|int $quantity,
+        ProductName|string $name,
     ) {
-        $this->selector = self::normalizeSelector($selector);
-        $this->name = trim($name);
-
-        if ($this->name === '') {
-            throw new InvalidArgumentException('Product snapshot name cannot be empty.');
-        }
+        $this->selector = Selector::from($selector);
+        $this->quantity = StockQuantity::from($quantity);
+        $this->name = ProductName::from($name);
 
         if ($this->priceCents <= 0) {
             throw new InvalidArgumentException('Product snapshot price must be greater than zero.');
-        }
-
-        if ($this->quantity < 0) {
-            throw new InvalidArgumentException('Product snapshot quantity cannot be negative.');
         }
     }
 
     public function isAvailable(): bool
     {
-        return $this->quantity > 0;
+        return $this->quantity->isAvailable();
     }
 
     public function name(): string
+    {
+        return $this->name->value();
+    }
+
+    public function productName(): ProductName
     {
         return $this->name;
     }
@@ -53,22 +55,16 @@ final readonly class ProductSnapshot
 
     public function quantity(): int
     {
+        return $this->quantity->value();
+    }
+
+    public function stockQuantity(): StockQuantity
+    {
         return $this->quantity;
     }
 
-    public function selector(): string
+    public function selector(): Selector
     {
         return $this->selector;
-    }
-
-    private static function normalizeSelector(string $selector): string
-    {
-        $normalized = strtolower(trim($selector));
-
-        if ($normalized === '') {
-            throw new InvalidArgumentException('Product snapshot selector cannot be empty.');
-        }
-
-        return $normalized;
     }
 }

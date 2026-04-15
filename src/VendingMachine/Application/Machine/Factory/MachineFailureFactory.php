@@ -15,23 +15,24 @@ use VendingMachine\Domain\Machine\Exception\InvalidServiceConfiguration;
 use VendingMachine\Domain\Machine\Exception\PendingBalanceDuringService;
 use VendingMachine\Domain\Machine\Exception\ProductNotFound;
 use VendingMachine\Domain\Machine\Exception\ProductOutOfStock;
+use VendingMachine\Domain\Machine\MachineId;
 
 /**
  * Translates domain and orchestration errors into stable application failures.
  */
 final class MachineFailureFactory
 {
-    public function machineNotFound(string $machineId): MachineOperationFailed
+    public function machineNotFound(MachineId $machineId): MachineOperationFailed
     {
         return $this->build(
             MachineFailureCode::MachineNotFound,
             sprintf('Machine "%s" was not found.', $machineId),
-            ['machineId' => $machineId],
+            ['machineId' => $machineId->value()],
         );
     }
 
     public function unsupportedCoin(
-        string $machineId,
+        MachineId $machineId,
         int $coinCents,
         InvalidArgumentException $exception,
     ): MachineOperationFailed {
@@ -40,34 +41,19 @@ final class MachineFailureFactory
             $exception->getMessage(),
             [
                 'coinCents' => $coinCents,
-                'machineId' => $machineId,
-            ],
-        );
-    }
-
-    public function invalidProductSelection(
-        string $machineId,
-        string $selector,
-        InvalidArgumentException $exception,
-    ): MachineOperationFailed {
-        return $this->build(
-            MachineFailureCode::ProductNotFound,
-            $exception->getMessage(),
-            [
-                'machineId' => $machineId,
-                'selector' => $selector,
+                'machineId' => $machineId->value(),
             ],
         );
     }
 
     public function invalidServiceConfiguration(
-        string $machineId,
+        MachineId $machineId,
         InvalidArgumentException $exception,
     ): MachineOperationFailed {
         return $this->build(
             MachineFailureCode::InvalidServiceConfiguration,
             $exception->getMessage(),
-            ['machineId' => $machineId],
+            ['machineId' => $machineId->value()],
         );
     }
 
@@ -75,12 +61,12 @@ final class MachineFailureFactory
      * @param array<string, bool|float|int|string> $context
      */
     public function fromDomainThrowable(
-        string $machineId,
+        MachineId $machineId,
         Throwable $throwable,
         array $context = [],
     ): MachineOperationFailed {
         // Handlers add use-case context here while preserving a stable public error contract.
-        $context['machineId'] = $machineId;
+        $context['machineId'] = $machineId->value();
 
         return $this->build(
             $this->mapCode($throwable),

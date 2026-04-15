@@ -31,13 +31,13 @@ Handlers are not responsible for:
 
 ## Machine identity direction
 
-Phase 2 keeps the machine as a single logical instance for the challenge.
+The reviewer-facing baseline still starts from one logical machine named
+`default`, but the application boundary now carries that key as a `MachineId`
+value object.
 
-The application layer will use one fixed machine identifier, `default`, when a
-repository contract needs an explicit key.
-
-This keeps persistence practical without forcing a `MachineId` concept into the
-domain before the model asks for it.
+Commands, queries, snapshots, factories, and the repository port should use
+`MachineId` instead of repeating string normalization. HTTP and MongoDB adapters
+convert it back to a string at their own serialization/persistence boundary.
 
 ## Naming baseline
 
@@ -68,9 +68,8 @@ Phase 2 Block B now freezes the first application-facing contract set:
 - `Result/ProductSnapshot.php`
 - one `Result` class per use case
 
-These contracts normalize external string identifiers and expose primitive
-values only, so adapters can depend on stable inputs and outputs without
-carrying domain entities across the application boundary.
+These contracts normalize external string identifiers through `MachineId` and
+continue exposing primitive transport payloads from adapters.
 
 ## Failure boundary
 

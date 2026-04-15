@@ -5,19 +5,20 @@ declare(strict_types=1);
 namespace Tests\VendingMachine\Infrastructure\Persistence\MongoDB\Machine\Integration;
 
 use Tests\VendingMachine\Infrastructure\Persistence\MongoDB\Machine\Fixture\DefaultMachineFixture;
+use VendingMachine\Domain\Machine\MachineId;
 use VendingMachine\Domain\Machine\Selector;
 
 final class MongoDBMachineRepositoryTest extends MongoDBIntegrationTestCase
 {
     public function testItReturnsNullWhenTheMachineDocumentDoesNotExist(): void
     {
-        self::assertNull($this->machineRepository->find('default'));
+        self::assertNull($this->machineRepository->find(MachineId::default()));
     }
 
     public function testItSavesAndReloadsTheDefaultMachineAggregate(): void
     {
         $this->machineRepository->save(
-            'default',
+            MachineId::default(),
             DefaultMachineFixture::machine(
                 ['water' => 2, 'juice' => 3, 'soda' => 4],
                 [25 => 2, 5 => 1],
@@ -25,7 +26,7 @@ final class MongoDBMachineRepositoryTest extends MongoDBIntegrationTestCase
             ),
         );
 
-        $reloadedMachine = $this->machineRepository->find('default');
+        $reloadedMachine = $this->machineRepository->find(MachineId::default());
         $persistedDocument = $this->machineCollection()->findOne(
             ['_id' => 'default'],
             ['typeMap' => ['root' => 'array', 'document' => 'array', 'array' => 'array']],
@@ -51,7 +52,7 @@ final class MongoDBMachineRepositoryTest extends MongoDBIntegrationTestCase
         );
 
         $this->machineRepository->save(
-            'default',
+            MachineId::default(),
             DefaultMachineFixture::machine(
                 ['water' => 7, 'juice' => 6, 'soda' => 5],
                 [100 => 1],
@@ -59,7 +60,7 @@ final class MongoDBMachineRepositoryTest extends MongoDBIntegrationTestCase
             ),
         );
 
-        $reloadedMachine = $this->machineRepository->find('default');
+        $reloadedMachine = $this->machineRepository->find(MachineId::default());
         $documents = $this->machineCollection()->find(
             [],
             ['typeMap' => ['root' => 'array', 'document' => 'array', 'array' => 'array']],
@@ -82,7 +83,7 @@ final class MongoDBMachineRepositoryTest extends MongoDBIntegrationTestCase
             ),
         );
 
-        $machine = $this->machineRepository->find('default');
+        $machine = $this->machineRepository->find(MachineId::default());
 
         self::assertNotNull($machine);
         self::assertTrue($machine->canPurchase(Selector::fromString('water')));

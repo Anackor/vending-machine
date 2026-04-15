@@ -7,9 +7,9 @@ namespace VendingMachine\Domain\Machine;
 use InvalidArgumentException;
 
 /**
- * Normalizes the canonical selector used to address products across the system.
+ * Represents the display name of a vendable product.
  */
-final readonly class Selector implements \Stringable
+final readonly class ProductName implements \Stringable
 {
     private function __construct(
         private string $value,
@@ -18,14 +18,10 @@ final readonly class Selector implements \Stringable
 
     public static function fromString(string $value): self
     {
-        $normalized = strtolower(trim($value));
+        $normalized = trim($value);
 
         if ($normalized === '') {
-            throw new InvalidArgumentException('Selector cannot be empty.');
-        }
-
-        if (preg_match('/^[a-z][a-z0-9-]*$/', $normalized) !== 1) {
-            throw new InvalidArgumentException(sprintf('Selector "%s" is invalid.', $value));
+            throw new InvalidArgumentException('Product name cannot be empty.');
         }
 
         return new self($normalized);

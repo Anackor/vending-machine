@@ -6,6 +6,8 @@ namespace Tests\VendingMachine\Infrastructure\Persistence\MongoDB\Machine\Docume
 
 use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
+use VendingMachine\Domain\Machine\ProductName;
+use VendingMachine\Domain\Machine\StockQuantity;
 use VendingMachine\Infrastructure\Persistence\MongoDB\Machine\Document\ProductStockDocument;
 
 final class ProductStockDocumentTest extends TestCase
@@ -14,9 +16,22 @@ final class ProductStockDocumentTest extends TestCase
     {
         $document = new ProductStockDocument('water', 65, 3, 'Water');
 
-        self::assertSame('water', $document->selector());
+        self::assertSame('water', $document->selector()->value());
         self::assertSame('Water', $document->name());
+        self::assertSame('Water', $document->productName()->value());
         self::assertSame(65, $document->priceCents());
+        self::assertSame(3, $document->quantity());
+    }
+
+    public function testItAcceptsValueObjects(): void
+    {
+        $name = ProductName::fromString(' Water ');
+        $quantity = StockQuantity::fromInt(3);
+        $document = new ProductStockDocument('water', 65, $quantity, $name);
+
+        self::assertSame($name, $document->productName());
+        self::assertSame($quantity, $document->stockQuantity());
+        self::assertSame('Water', $document->name());
         self::assertSame(3, $document->quantity());
     }
 
@@ -26,7 +41,7 @@ final class ProductStockDocumentTest extends TestCase
             new ProductStockDocument('   ', 65, 1, 'Water');
             self::fail('The document should reject empty selectors.');
         } catch (InvalidArgumentException $exception) {
-            self::assertSame('Persisted product selector cannot be empty.', $exception->getMessage());
+            self::assertSame('Selector cannot be empty.', $exception->getMessage());
         }
 
         try {
@@ -40,14 +55,14 @@ final class ProductStockDocumentTest extends TestCase
             new ProductStockDocument('water', 65, -1, 'Water');
             self::fail('The document should reject negative quantities.');
         } catch (InvalidArgumentException $exception) {
-            self::assertSame('Persisted product quantity cannot be negative.', $exception->getMessage());
+            self::assertSame('Stock quantity cannot be negative.', $exception->getMessage());
         }
 
         try {
             new ProductStockDocument('water', 65, 1, '   ');
             self::fail('The document should reject empty names.');
         } catch (InvalidArgumentException $exception) {
-            self::assertSame('Persisted product name cannot be empty.', $exception->getMessage());
+            self::assertSame('Product name cannot be empty.', $exception->getMessage());
         }
     }
 }

@@ -52,14 +52,16 @@ final readonly class MachineDocument
         $selectors = [];
 
         foreach ($productStocks as $productStock) {
-            if (isset($selectors[$productStock->selector()])) {
+            $selector = $productStock->selector()->value();
+
+            if (isset($selectors[$selector])) {
                 throw new InvalidArgumentException(sprintf(
                     'Duplicate persisted product selector "%s" detected.',
-                    $productStock->selector(),
+                    $selector,
                 ));
             }
 
-            $selectors[$productStock->selector()] = true;
+            $selectors[$selector] = true;
         }
 
         $this->machineId = $machineId;

@@ -127,36 +127,4 @@ final class ServiceMachineHandlerTest extends AbstractMachineHandlerTestCase
             self::assertSame(0, $repository->saveCount());
         }
     }
-
-    public function testItTranslatesUnsupportedServiceChangeDenominationsIntoApplicationFailures(): void
-    {
-        $repository = $this->repository($this->machine());
-        $handler = new ServiceMachineHandler(
-            $repository,
-            $this->machineSnapshotFactory(),
-            $this->machineFailureFactory(),
-        );
-
-        try {
-            $handler->handle(
-                new ServiceMachineCommand(
-                    [
-                        'water' => 2,
-                        'juice' => 3,
-                        'soda' => 4,
-                    ],
-                    [50 => 1],
-                ),
-            );
-            self::fail('The handler should have rejected the unsupported change denomination.');
-        } catch (MachineOperationFailed $exception) {
-            $this->assertMachineFailure(
-                $exception,
-                MachineFailureCode::InvalidServiceConfiguration,
-                'Unsupported coin denomination "50".',
-                ['machineId' => 'default'],
-            );
-            self::assertSame(0, $repository->saveCount());
-        }
-    }
 }

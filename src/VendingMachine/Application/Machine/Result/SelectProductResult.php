@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace VendingMachine\Application\Machine\Result;
 
 use InvalidArgumentException;
+use VendingMachine\Domain\Machine\ProductName;
+use VendingMachine\Domain\Machine\Selector;
 
 /**
  * Wraps the dispensed product, change, and resulting machine snapshot of a purchase.
@@ -16,24 +18,20 @@ final readonly class SelectProductResult
      */
     private array $dispensedChangeCounts;
 
-    private string $dispensedProductName;
-    private string $dispensedProductSelector;
+    private ProductName $dispensedProductName;
+    private Selector $dispensedProductSelector;
 
     /**
      * @param array<int|string, mixed> $dispensedChangeCounts
      */
     public function __construct(
-        string $dispensedProductSelector,
-        string $dispensedProductName,
+        Selector|string $dispensedProductSelector,
+        ProductName|string $dispensedProductName,
         array $dispensedChangeCounts,
         private MachineSnapshot $machineSnapshot,
     ) {
-        $this->dispensedProductSelector = self::normalizeSelector($dispensedProductSelector);
-        $this->dispensedProductName = trim($dispensedProductName);
-
-        if ($this->dispensedProductName === '') {
-            throw new InvalidArgumentException('Dispensed product name cannot be empty.');
-        }
+        $this->dispensedProductSelector = Selector::from($dispensedProductSelector);
+        $this->dispensedProductName = ProductName::from($dispensedProductName);
 
         $this->dispensedChangeCounts = self::normalizeCoinCounts($dispensedChangeCounts);
     }
@@ -48,10 +46,10 @@ final readonly class SelectProductResult
 
     public function dispensedProductName(): string
     {
-        return $this->dispensedProductName;
+        return $this->dispensedProductName->value();
     }
 
-    public function dispensedProductSelector(): string
+    public function dispensedProductSelector(): Selector
     {
         return $this->dispensedProductSelector;
     }
@@ -87,17 +85,6 @@ final readonly class SelectProductResult
         }
 
         ksort($normalized);
-
-        return $normalized;
-    }
-
-    private static function normalizeSelector(string $selector): string
-    {
-        $normalized = strtolower(trim($selector));
-
-        if ($normalized === '') {
-            throw new InvalidArgumentException('Dispensed product selector cannot be empty.');
-        }
 
         return $normalized;
     }

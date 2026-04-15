@@ -5,50 +5,49 @@ declare(strict_types=1);
 namespace VendingMachine\Infrastructure\Persistence\MongoDB\Machine\Document;
 
 use InvalidArgumentException;
+use VendingMachine\Domain\Machine\ProductName;
+use VendingMachine\Domain\Machine\Selector;
+use VendingMachine\Domain\Machine\StockQuantity;
 
 /**
  * Persistence DTO for one product entry inside the machine MongoDB document.
  */
 final readonly class ProductStockDocument
 {
-    private string $selector;
-    private string $name;
+    private Selector $selector;
+    private StockQuantity $quantity;
+    private ProductName $name;
 
     public function __construct(
-        string $selector,
+        Selector|string $selector,
         private int $priceCents,
-        private int $quantity,
-        string $name,
+        StockQuantity|int $quantity,
+        ProductName|string $name,
     ) {
-        $selector = trim($selector);
-        $name = trim($name);
-
-        if ($selector === '') {
-            throw new InvalidArgumentException('Persisted product selector cannot be empty.');
-        }
-
-        if ($name === '') {
-            throw new InvalidArgumentException('Persisted product name cannot be empty.');
-        }
+        $selector = Selector::from($selector);
+        $quantity = StockQuantity::from($quantity);
+        $name = ProductName::from($name);
 
         if ($this->priceCents <= 0) {
             throw new InvalidArgumentException('Persisted product price must be greater than zero.');
         }
 
-        if ($this->quantity < 0) {
-            throw new InvalidArgumentException('Persisted product quantity cannot be negative.');
-        }
-
         $this->selector = $selector;
+        $this->quantity = $quantity;
         $this->name = $name;
     }
 
-    public function selector(): string
+    public function selector(): Selector
     {
         return $this->selector;
     }
 
     public function name(): string
+    {
+        return $this->name->value();
+    }
+
+    public function productName(): ProductName
     {
         return $this->name;
     }
@@ -59,6 +58,11 @@ final readonly class ProductStockDocument
     }
 
     public function quantity(): int
+    {
+        return $this->quantity->value();
+    }
+
+    public function stockQuantity(): StockQuantity
     {
         return $this->quantity;
     }

@@ -6,6 +6,7 @@ namespace Tests\VendingMachine\Application\Machine\Double;
 
 use VendingMachine\Application\Machine\Repository\MachineRepository;
 use VendingMachine\Domain\Machine\Machine;
+use VendingMachine\Domain\Machine\MachineId;
 
 final class InMemoryMachineRepository implements MachineRepository
 {
@@ -17,21 +18,23 @@ final class InMemoryMachineRepository implements MachineRepository
     ) {
     }
 
-    public function find(string $machineId): ?Machine
+    public function find(MachineId $machineId): ?Machine
     {
-        return $this->machines[$machineId] ?? null;
+        return $this->machines[$machineId->value()] ?? null;
     }
 
-    public function save(string $machineId, Machine $machine): void
+    public function save(MachineId $machineId, Machine $machine): void
     {
         ++$this->saveCount;
-        $this->lastSavedMachineId = $machineId;
-        $this->machines[$machineId] = $machine;
+        $this->lastSavedMachineId = $machineId->value();
+        $this->machines[$machineId->value()] = $machine;
     }
 
-    public function machine(string $machineId): ?Machine
+    public function machine(MachineId|string $machineId): ?Machine
     {
-        return $this->machines[$machineId] ?? null;
+        $key = $machineId instanceof MachineId ? $machineId->value() : $machineId;
+
+        return $this->machines[$key] ?? null;
     }
 
     public function lastSavedMachineId(): ?string

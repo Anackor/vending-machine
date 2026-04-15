@@ -10,6 +10,7 @@ use Symfony\Component\Console\Tester\CommandTester;
 use Tests\VendingMachine\Application\Machine\Double\InMemoryMachineRepository;
 use Tests\VendingMachine\Infrastructure\Persistence\MongoDB\Machine\Fixture\DefaultMachineFixture;
 use VendingMachine\Domain\Machine\Coin;
+use VendingMachine\Domain\Machine\MachineId;
 use VendingMachine\Domain\Machine\Selector;
 use VendingMachine\Infrastructure\Symfony\Command\SeedDefaultMachineCommand;
 
@@ -22,7 +23,7 @@ final class SeedDefaultMachineCommandTest extends TestCase
         $tester = new CommandTester($command);
 
         $exitCode = $tester->execute([]);
-        $seededMachine = $repository->find('default');
+        $seededMachine = $repository->find(MachineId::default());
 
         self::assertSame(Command::SUCCESS, $exitCode);
         self::assertStringContainsString('Default machine seeded', $tester->getDisplay());
@@ -45,7 +46,7 @@ final class SeedDefaultMachineCommandTest extends TestCase
         $tester = new CommandTester($command);
 
         $exitCode = $tester->execute([]);
-        $persistedMachine = $repository->find('default');
+        $persistedMachine = $repository->find(MachineId::default());
 
         self::assertSame(Command::SUCCESS, $exitCode);
         self::assertStringContainsString('already exists', $tester->getDisplay());
@@ -78,7 +79,7 @@ final class SeedDefaultMachineCommandTest extends TestCase
         $tester = new CommandTester($command);
 
         $exitCode = $tester->execute(['--reset' => true]);
-        $persistedMachine = $repository->find('default');
+        $persistedMachine = $repository->find(MachineId::default());
 
         self::assertSame(Command::SUCCESS, $exitCode);
         self::assertStringContainsString('reset to the documented reviewer baseline', $tester->getDisplay());

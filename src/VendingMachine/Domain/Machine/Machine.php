@@ -151,9 +151,9 @@ final readonly class Machine
 
     /**
      * @param array<string, mixed> $stockCounts
-     * @param array<int|string, mixed> $availableChangeCounts
+     * @param AvailableChange|array<int|string, mixed> $availableChange
      */
-    public function service(array $stockCounts, array $availableChangeCounts): self
+    public function service(array $stockCounts, AvailableChange|array $availableChange): self
     {
         // Service is intentionally blocked while a customer still has pending balance.
         if ($this->hasPendingBalance()) {
@@ -169,11 +169,11 @@ final readonly class Machine
 
             $quantity = $stockCounts[$selector];
 
-            if (!is_int($quantity)) {
+            if (!$quantity instanceof StockQuantity && !is_int($quantity)) {
                 throw new InvalidServiceConfiguration(sprintf('Stock count for selector "%s" must be an integer.', $selector));
             }
 
-            $updatedProductStocks[$selector] = $productStock->withQuantity($quantity);
+            $updatedProductStocks[$selector] = $productStock->withQuantity(StockQuantity::from($quantity));
         }
 
         foreach (array_keys($stockCounts) as $selector) {
@@ -184,7 +184,7 @@ final readonly class Machine
 
         return new self(
             array_values($updatedProductStocks),
-            AvailableChange::fromCounts($availableChangeCounts),
+            AvailableChange::from($availableChange),
             $this->insertedCoins,
         );
     }

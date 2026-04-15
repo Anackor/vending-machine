@@ -8,10 +8,10 @@ use InvalidArgumentException;
 use VendingMachine\Domain\Machine\AvailableChange;
 use VendingMachine\Domain\Machine\InsertedCoins;
 use VendingMachine\Domain\Machine\Machine;
+use VendingMachine\Domain\Machine\MachineId;
 use VendingMachine\Domain\Machine\Money;
 use VendingMachine\Domain\Machine\Product;
 use VendingMachine\Domain\Machine\ProductStock;
-use VendingMachine\Domain\Machine\Selector;
 use VendingMachine\Infrastructure\Persistence\MongoDB\Machine\Document\MachineDocument;
 use VendingMachine\Infrastructure\Persistence\MongoDB\Machine\Document\ProductStockDocument;
 
@@ -20,24 +20,24 @@ use VendingMachine\Infrastructure\Persistence\MongoDB\Machine\Document\ProductSt
  */
 final class MachineDocumentMapper
 {
-    public function fromDomain(string $machineId, Machine $machine): MachineDocument
+    public function fromDomain(MachineId $machineId, Machine $machine): MachineDocument
     {
-        // Keep persistence DTOs free of domain behavior while preserving the aggregate shape.
+        // Keep persistence conversion isolated in the mapper while preserving the aggregate shape.
         $productStocks = [];
 
         foreach ($machine->productStocks() as $productStock) {
             $product = $productStock->product();
 
             $productStocks[] = new ProductStockDocument(
-                $product->selector()->value(),
+                $product->selector(),
                 $product->price()->cents(),
-                $productStock->quantity(),
-                $product->name(),
+                $productStock->stockQuantity(),
+                $product->productName(),
             );
         }
 
         return new MachineDocument(
-            $machineId,
+            $machineId->value(),
             $productStocks,
             $machine->availableChange()->counts(),
             $machine->insertedCoins()->counts(),
@@ -52,11 +52,11 @@ final class MachineDocumentMapper
         foreach ($document->productStocks() as $productStock) {
             $productStocks[] = new ProductStock(
                 new Product(
-                    Selector::fromString($productStock->selector()),
+                    $productStock->selector(),
                     Money::fromCents($productStock->priceCents()),
-                    $productStock->name(),
+                    $productStock->productName(),
                 ),
-                $productStock->quantity(),
+                $productStock->stockQuantity(),
             );
         }
 
@@ -89,7 +89,7 @@ final class MachineDocumentMapper
 
         foreach ($document->productStocks() as $productStock) {
             $productStocks[] = [
-                'selector' => $productStock->selector(),
+                'selector' => $productStock->selector()->value(),
                 'name' => $productStock->name(),
                 'priceCents' => $productStock->priceCents(),
                 'quantity' => $productStock->quantity(),

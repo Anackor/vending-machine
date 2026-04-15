@@ -11,6 +11,10 @@ use VendingMachine\Application\Machine\Command\ReturnInsertedMoneyCommand;
 use VendingMachine\Application\Machine\Command\SelectProductCommand;
 use VendingMachine\Application\Machine\Command\ServiceMachineCommand;
 use VendingMachine\Application\Machine\Query\GetMachineStateQuery;
+use VendingMachine\Domain\Machine\AvailableChange;
+use VendingMachine\Domain\Machine\MachineId;
+use VendingMachine\Domain\Machine\Selector;
+use VendingMachine\Domain\Machine\StockQuantity;
 
 final class CommandAndQueryContractTest extends TestCase
 {
@@ -19,7 +23,7 @@ final class CommandAndQueryContractTest extends TestCase
         $command = new InsertCoinCommand(25);
 
         self::assertSame(25, $command->coinCents());
-        self::assertSame('default', $command->machineId());
+        self::assertTrue(MachineId::default()->equals($command->machineId()));
     }
 
     public function testItNormalizesMachineIdAndSelectorInputs(): void
@@ -28,10 +32,10 @@ final class CommandAndQueryContractTest extends TestCase
         $returnInsertedMoney = new ReturnInsertedMoneyCommand(' DEFAULT ');
         $getMachineState = new GetMachineStateQuery(' DEFAULT ');
 
-        self::assertSame('water', $selectProduct->selector());
-        self::assertSame('default', $selectProduct->machineId());
-        self::assertSame('default', $returnInsertedMoney->machineId());
-        self::assertSame('default', $getMachineState->machineId());
+        self::assertSame('water', $selectProduct->selector()->value());
+        self::assertSame('default', $selectProduct->machineId()->value());
+        self::assertSame('default', $returnInsertedMoney->machineId()->value());
+        self::assertSame('default', $getMachineState->machineId()->value());
     }
 
     public function testItBuildsAServiceMachineCommandWithNormalizedCounts(): void
@@ -48,8 +52,10 @@ final class CommandAndQueryContractTest extends TestCase
             ' DEFAULT ',
         );
 
-        self::assertSame('default', $command->machineId());
-        self::assertSame(['juice' => 3, 'water' => 2], $command->productQuantities());
+        self::assertSame('default', $command->machineId()->value());
+        self::assertSame(['juice', 'water'], array_keys($command->productQuantities()));
+        self::assertSame(3, $command->productQuantities()['juice']->value());
+        self::assertSame(2, $command->productQuantities()['water']->value());
         self::assertSame([5 => 1, 25 => 2], $command->availableChangeCounts());
     }
 
@@ -59,9 +65,51 @@ final class CommandAndQueryContractTest extends TestCase
         $returnInsertedMoney = new ReturnInsertedMoneyCommand(' DEFAULT ');
         $getMachineState = new GetMachineStateQuery(' DEFAULT ');
 
-        self::assertSame('default', $insertCoin->machineId());
-        self::assertSame('default', $returnInsertedMoney->machineId());
-        self::assertSame('default', $getMachineState->machineId());
+        self::assertSame('default', $insertCoin->machineId()->value());
+        self::assertSame('default', $returnInsertedMoney->machineId()->value());
+        self::assertSame('default', $getMachineState->machineId()->value());
+    }
+
+    public function testItAcceptsAMachineIdValueObject(): void
+    {
+        $machineId = MachineId::fromString(' Lobby-01 ');
+        $command = new InsertCoinCommand(25, $machineId);
+
+        self::assertSame($machineId, $command->machineId());
+        self::assertSame('lobby-01', $command->machineId()->value());
+    }
+
+    public function testItAcceptsASelectorValueObject(): void
+    {
+        $selector = Selector::fromString(' WATER ');
+        $command = new SelectProductCommand($selector);
+
+        self::assertSame($selector, $command->selector());
+        self::assertSame('water', $command->selector()->value());
+    }
+
+    public function testItAcceptsStockQuantityValueObjects(): void
+    {
+        $quantity = StockQuantity::fromInt(4);
+        $command = new ServiceMachineCommand(
+            ['water' => $quantity],
+            [25 => 1],
+        );
+
+        self::assertSame($quantity, $command->productQuantities()['water']);
+        self::assertSame(4, $command->productQuantities()['water']->value());
+    }
+
+    public function testItAcceptsAvailableChangeValueObjects(): void
+    {
+        $availableChange = AvailableChange::fromCounts(['25' => 2, 5 => 1]);
+        $command = new ServiceMachineCommand(
+            ['water' => 2],
+            $availableChange,
+        );
+
+        self::assertSame($availableChange, $command->availableChange());
+        self::assertSame([5 => 1, 25 => 2], $command->availableChangeCounts());
     }
 
     public function testItRejectsNonPositiveInsertCoinAmounts(): void
@@ -91,9 +139,17 @@ final class CommandAndQueryContractTest extends TestCase
     public function testItRejectsEmptyProductSelectors(): void
     {
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Product selector cannot be empty.');
+        $this->expectExceptionMessage('Selector cannot be empty.');
 
         new SelectProductCommand('   ');
+    }
+
+    public function testItRejectsInvalidProductSelectors(): void
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Selector "water!" is invalid.');
+
+        new SelectProductCommand('water!');
     }
 
     public function testItRejectsEmptyMachineIdsForSelectProductCommands(): void
@@ -134,7 +190,7 @@ final class CommandAndQueryContractTest extends TestCase
     public function testItRejectsNegativeServiceProductQuantities(): void
     {
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Service product quantities cannot be negative.');
+        $this->expectExceptionMessage('Stock quantity cannot be negative.');
 
         new ServiceMachineCommand(
             ['water' => -1],
@@ -145,10 +201,21 @@ final class CommandAndQueryContractTest extends TestCase
     public function testItRejectsEmptyServiceProductSelectors(): void
     {
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Service product selectors cannot be empty.');
+        $this->expectExceptionMessage('Selector cannot be empty.');
 
         new ServiceMachineCommand(
             ['   ' => 1],
+            [25 => 1],
+        );
+    }
+
+    public function testItRejectsInvalidServiceProductSelectors(): void
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Selector "water!" is invalid.');
+
+        new ServiceMachineCommand(
+            ['water!' => 1],
             [25 => 1],
         );
     }
@@ -167,7 +234,7 @@ final class CommandAndQueryContractTest extends TestCase
     public function testItRejectsInvalidServiceChangeShapes(): void
     {
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Available change denomination keys must be integer values.');
+        $this->expectExceptionMessage('Coin denomination keys must be integer values.');
 
         new ServiceMachineCommand(
             ['water' => 2],
@@ -175,10 +242,21 @@ final class CommandAndQueryContractTest extends TestCase
         );
     }
 
+    public function testItRejectsUnsupportedServiceChangeDenominations(): void
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Unsupported coin denomination "50".');
+
+        new ServiceMachineCommand(
+            ['water' => 2],
+            [50 => 1],
+        );
+    }
+
     public function testItRejectsNonIntegerServiceChangeCounts(): void
     {
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Available change counts must be integers.');
+        $this->expectExceptionMessage('Coin counts must be integers.');
 
         new ServiceMachineCommand(
             ['water' => 2],
@@ -189,7 +267,7 @@ final class CommandAndQueryContractTest extends TestCase
     public function testItRejectsNegativeServiceChangeCounts(): void
     {
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Available change counts cannot be negative.');
+        $this->expectExceptionMessage('Coin counts cannot be negative.');
 
         new ServiceMachineCommand(
             ['water' => 2],

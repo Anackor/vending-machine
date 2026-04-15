@@ -8,6 +8,7 @@ use MongoDB\Collection;
 use MongoDB\Database;
 use VendingMachine\Application\Machine\Repository\MachineRepository;
 use VendingMachine\Domain\Machine\Machine;
+use VendingMachine\Domain\Machine\MachineId;
 use VendingMachine\Infrastructure\Persistence\MongoDB\Machine\Mapper\MachineDocumentMapper;
 
 /**
@@ -37,10 +38,10 @@ final readonly class MongoDBMachineRepository implements MachineRepository
         $this->collection = $database->selectCollection(self::COLLECTION_NAME);
     }
 
-    public function find(string $machineId): ?Machine
+    public function find(MachineId $machineId): ?Machine
     {
         // MongoDB returns arrays here so the mapper can validate the persisted shape explicitly.
-        $document = $this->collection->findOne(['_id' => $machineId], self::TYPE_MAP);
+        $document = $this->collection->findOne(['_id' => $machineId->value()], self::TYPE_MAP);
 
         if ($document === null) {
             return null;
@@ -52,7 +53,7 @@ final readonly class MongoDBMachineRepository implements MachineRepository
         );
     }
 
-    public function save(string $machineId, Machine $machine): void
+    public function save(MachineId $machineId, Machine $machine): void
     {
         // The aggregate is persisted as one logical replacement to keep the write model simple.
         $document = $this->machineDocumentMapper->fromDomain($machineId, $machine);
