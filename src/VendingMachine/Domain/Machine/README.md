@@ -27,6 +27,10 @@ It owns:
 - available coin counts
 - the currently inserted customer coins
 
+`MachineId` identifies one logical machine outside the aggregate state. It owns
+normalization for machine keys so application and persistence code do not repeat
+the same string rules.
+
 ## Behavioral rules
 
 - refund returns the exact inserted coin multiset
