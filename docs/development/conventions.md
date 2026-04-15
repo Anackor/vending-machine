@@ -8,6 +8,7 @@ automated tools.
 Use it together with:
 
 - `src/VendingMachine/README.md`
+- `docs/architecture/http-api-boundary.md`
 - `docs/planning/phases/phase-0/block-d-architecture-and-namespace.md`
 - `docs/planning/phases/phase-0/block-e-ddd-naming.md`
 
@@ -46,6 +47,7 @@ These tools do not replace semantic naming decisions or class-placement rules.
 ## Where rules live
 
 - architecture and namespace decisions: `docs/planning/phases/phase-0/block-d-architecture-and-namespace.md`
+- HTTP adapter boundary decisions: `docs/architecture/http-api-boundary.md`
 - naming decisions: `docs/planning/phases/phase-0/block-e-ddd-naming.md`
 - core-facing summary: `src/VendingMachine/README.md`
 - enforceable dependency rules: `deptrac.yaml`
