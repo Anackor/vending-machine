@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace VendingMachine\Infrastructure\Persistence\MongoDB\Machine\Document;
 
 use InvalidArgumentException;
+use VendingMachine\Domain\Machine\AvailableChange;
+use VendingMachine\Domain\Machine\InsertedCoins;
 
 /**
  * Persistence DTO that stores one complete machine aggregate as a single MongoDB document.
@@ -18,26 +20,19 @@ final readonly class MachineDocument
      */
     private array $productStocks;
 
-    /**
-     * @var array<int, int>
-     */
-    private array $availableChangeCounts;
-
-    /**
-     * @var array<int, int>
-     */
-    private array $insertedCoinCounts;
+    private AvailableChange $availableChange;
+    private InsertedCoins $insertedCoins;
 
     /**
      * @param list<ProductStockDocument> $productStocks
-     * @param array<int|string, mixed> $availableChangeCounts
-     * @param array<int|string, mixed> $insertedCoinCounts
+     * @param AvailableChange|array<int|string, mixed> $availableChange
+     * @param InsertedCoins|array<int|string, mixed> $insertedCoins
      */
     public function __construct(
         string $machineId,
         array $productStocks,
-        array $availableChangeCounts,
-        array $insertedCoinCounts,
+        AvailableChange|array $availableChange,
+        InsertedCoins|array $insertedCoins,
     ) {
         $machineId = trim($machineId);
 
@@ -66,14 +61,8 @@ final readonly class MachineDocument
 
         $this->machineId = $machineId;
         $this->productStocks = $productStocks;
-        $this->availableChangeCounts = self::normalizeCoinCounts(
-            $availableChangeCounts,
-            'Persisted available change counts',
-        );
-        $this->insertedCoinCounts = self::normalizeCoinCounts(
-            $insertedCoinCounts,
-            'Persisted inserted coin counts',
-        );
+        $this->availableChange = AvailableChange::from($availableChange);
+        $this->insertedCoins = InsertedCoins::from($insertedCoins);
     }
 
     public function machineId(): string
@@ -94,7 +83,12 @@ final readonly class MachineDocument
      */
     public function availableChangeCounts(): array
     {
-        return $this->availableChangeCounts;
+        return $this->availableChange->counts();
+    }
+
+    public function availableChange(): AvailableChange
+    {
+        return $this->availableChange;
     }
 
     /**
@@ -102,43 +96,11 @@ final readonly class MachineDocument
      */
     public function insertedCoinCounts(): array
     {
-        return $this->insertedCoinCounts;
+        return $this->insertedCoins->counts();
     }
 
-    /**
-     * @param array<int|string, mixed> $counts
-     *
-     * @return array<int, int>
-     */
-    private static function normalizeCoinCounts(array $counts, string $label): array
+    public function insertedCoins(): InsertedCoins
     {
-        $normalized = [];
-
-        foreach ($counts as $denomination => $count) {
-            if (!is_int($count)) {
-                throw new InvalidArgumentException(sprintf('%s must be integers.', $label));
-            }
-
-            if ($count < 0) {
-                throw new InvalidArgumentException(sprintf('%s cannot be negative.', $label));
-            }
-
-            if (is_string($denomination) && !ctype_digit($denomination)) {
-                throw new InvalidArgumentException(sprintf(
-                    '%s must use integer denomination keys.',
-                    $label,
-                ));
-            }
-
-            if ($count === 0) {
-                continue;
-            }
-
-            $normalized[(int) $denomination] = $count;
-        }
-
-        ksort($normalized);
-
-        return $normalized;
+        return $this->insertedCoins;
     }
 }
