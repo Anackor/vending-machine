@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace VendingMachine\Application\Machine\Result;
 
 use InvalidArgumentException;
+use VendingMachine\Domain\Machine\ProductName;
 use VendingMachine\Domain\Machine\Selector;
 use VendingMachine\Domain\Machine\StockQuantity;
 
@@ -13,7 +14,7 @@ use VendingMachine\Domain\Machine\StockQuantity;
  */
 final readonly class ProductSnapshot
 {
-    private string $name;
+    private ProductName $name;
     private StockQuantity $quantity;
     private Selector $selector;
 
@@ -21,15 +22,11 @@ final readonly class ProductSnapshot
         Selector|string $selector,
         private int $priceCents,
         StockQuantity|int $quantity,
-        string $name,
+        ProductName|string $name,
     ) {
         $this->selector = Selector::from($selector);
         $this->quantity = StockQuantity::from($quantity);
-        $this->name = trim($name);
-
-        if ($this->name === '') {
-            throw new InvalidArgumentException('Product snapshot name cannot be empty.');
-        }
+        $this->name = ProductName::from($name);
 
         if ($this->priceCents <= 0) {
             throw new InvalidArgumentException('Product snapshot price must be greater than zero.');
@@ -42,6 +39,11 @@ final readonly class ProductSnapshot
     }
 
     public function name(): string
+    {
+        return $this->name->value();
+    }
+
+    public function productName(): ProductName
     {
         return $this->name;
     }

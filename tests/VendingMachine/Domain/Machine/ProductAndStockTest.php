@@ -8,6 +8,7 @@ use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
 use VendingMachine\Domain\Machine\Money;
 use VendingMachine\Domain\Machine\Product;
+use VendingMachine\Domain\Machine\ProductName;
 use VendingMachine\Domain\Machine\ProductStock;
 use VendingMachine\Domain\Machine\Selector;
 use VendingMachine\Domain\Machine\StockQuantity;
@@ -23,8 +24,22 @@ final class ProductAndStockTest extends TestCase
         );
 
         self::assertSame('Water', $product->name());
+        self::assertSame('Water', $product->productName()->value());
         self::assertSame('water', $product->selector()->value());
         self::assertSame(65, $product->price()->cents());
+    }
+
+    public function testItAcceptsProductNameValueObjects(): void
+    {
+        $name = ProductName::fromString(' Water ');
+        $product = new Product(
+            Selector::fromString('water'),
+            Money::fromCents(65),
+            $name,
+        );
+
+        self::assertSame($name, $product->productName());
+        self::assertSame('Water', $product->name());
     }
 
     public function testItRejectsProductsWithZeroPrice(): void

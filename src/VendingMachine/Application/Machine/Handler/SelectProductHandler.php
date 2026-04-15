@@ -50,7 +50,7 @@ final readonly class SelectProductHandler
 
         return new SelectProductResult(
             $purchase->product()->selector(),
-            $purchase->product()->name(),
+            $purchase->product()->productName(),
             $purchase->change()->counts(),
             $this->machineSnapshotFactory->create($command->machineId(), $updatedMachine),
         );

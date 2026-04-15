@@ -32,7 +32,7 @@ final class MachineDocumentMapper
                 $product->selector(),
                 $product->price()->cents(),
                 $productStock->stockQuantity(),
-                $product->name(),
+                $product->productName(),
             );
         }
 
@@ -54,7 +54,7 @@ final class MachineDocumentMapper
                 new Product(
                     $productStock->selector(),
                     Money::fromCents($productStock->priceCents()),
-                    $productStock->name(),
+                    $productStock->productName(),
                 ),
                 $productStock->stockQuantity(),
             );

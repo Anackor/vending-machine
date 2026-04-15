@@ -26,7 +26,7 @@ final class MachineSnapshotFactory
                 $product->selector(),
                 $product->price()->cents(),
                 $productStock->stockQuantity(),
-                $product->name(),
+                $product->productName(),
             );
         }
 

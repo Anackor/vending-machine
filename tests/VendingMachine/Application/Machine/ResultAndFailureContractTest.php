@@ -16,6 +16,7 @@ use VendingMachine\Application\Machine\Result\ProductSnapshot;
 use VendingMachine\Application\Machine\Result\ReturnInsertedMoneyResult;
 use VendingMachine\Application\Machine\Result\SelectProductResult;
 use VendingMachine\Application\Machine\Result\ServiceMachineResult;
+use VendingMachine\Domain\Machine\ProductName;
 use VendingMachine\Domain\Machine\StockQuantity;
 
 final class ResultAndFailureContractTest extends TestCase
@@ -55,17 +56,21 @@ final class ResultAndFailureContractTest extends TestCase
 
         self::assertSame('water', $product->selector()->value());
         self::assertSame('Water', $product->name());
+        self::assertSame('Water', $product->productName()->value());
         self::assertSame(65, $product->priceCents());
         self::assertSame(2, $product->quantity());
         self::assertTrue($product->isAvailable());
     }
 
-    public function testItAcceptsStockQuantityValueObjectsInProductSnapshots(): void
+    public function testItAcceptsValueObjectsInProductSnapshots(): void
     {
+        $name = ProductName::fromString(' Water ');
         $quantity = StockQuantity::fromInt(2);
-        $product = new ProductSnapshot('water', 65, $quantity, 'Water');
+        $product = new ProductSnapshot('water', 65, $quantity, $name);
 
+        self::assertSame($name, $product->productName());
         self::assertSame($quantity, $product->stockQuantity());
+        self::assertSame('Water', $product->name());
         self::assertSame(2, $product->quantity());
     }
 
@@ -88,6 +93,14 @@ final class ResultAndFailureContractTest extends TestCase
         self::assertSame($snapshot, $returnInsertedMoney->machineSnapshot());
         self::assertSame($snapshot, $serviceMachine->machineSnapshot());
         self::assertSame($snapshot, $getMachineState->machineSnapshot());
+    }
+
+    public function testItAcceptsProductNameValueObjectsInSelectProductResults(): void
+    {
+        $name = ProductName::fromString(' Water ');
+        $selectProduct = new SelectProductResult('water', $name, [10 => 1], $this->snapshot());
+
+        self::assertSame('Water', $selectProduct->dispensedProductName());
     }
 
     public function testItBuildsTheApplicationFailureModel(): void
@@ -237,7 +250,7 @@ final class ResultAndFailureContractTest extends TestCase
     public function testItRejectsEmptyProductSnapshotNames(): void
     {
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Product snapshot name cannot be empty.');
+        $this->expectExceptionMessage('Product name cannot be empty.');
 
         new ProductSnapshot('water', 65, 1, '   ');
     }
@@ -305,7 +318,7 @@ final class ResultAndFailureContractTest extends TestCase
             new SelectProductResult('water', '   ', [25 => 1], $snapshot);
             self::fail('The result should have rejected the empty product name.');
         } catch (InvalidArgumentException $exception) {
-            self::assertSame('Dispensed product name cannot be empty.', $exception->getMessage());
+            self::assertSame('Product name cannot be empty.', $exception->getMessage());
         }
 
         try {

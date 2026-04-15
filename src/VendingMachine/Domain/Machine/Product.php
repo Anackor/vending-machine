@@ -11,24 +11,18 @@ use InvalidArgumentException;
  */
 final readonly class Product
 {
-    private string $name;
+    private ProductName $name;
 
     public function __construct(
         private Selector $selector,
         private Money $price,
-        string $name,
+        ProductName|string $name,
     ) {
-        $name = trim($name);
-
-        if ($name === '') {
-            throw new InvalidArgumentException('Product name cannot be empty.');
-        }
+        $this->name = ProductName::from($name);
 
         if (!$this->price->isPositive()) {
             throw new InvalidArgumentException('Product price must be greater than zero.');
         }
-
-        $this->name = $name;
     }
 
     public function selector(): Selector
@@ -37,6 +31,11 @@ final readonly class Product
     }
 
     public function name(): string
+    {
+        return $this->name->value();
+    }
+
+    public function productName(): ProductName
     {
         return $this->name;
     }

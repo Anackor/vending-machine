@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace VendingMachine\Application\Machine\Result;
 
 use InvalidArgumentException;
+use VendingMachine\Domain\Machine\ProductName;
 use VendingMachine\Domain\Machine\Selector;
 
 /**
@@ -17,7 +18,7 @@ final readonly class SelectProductResult
      */
     private array $dispensedChangeCounts;
 
-    private string $dispensedProductName;
+    private ProductName $dispensedProductName;
     private Selector $dispensedProductSelector;
 
     /**
@@ -25,16 +26,12 @@ final readonly class SelectProductResult
      */
     public function __construct(
         Selector|string $dispensedProductSelector,
-        string $dispensedProductName,
+        ProductName|string $dispensedProductName,
         array $dispensedChangeCounts,
         private MachineSnapshot $machineSnapshot,
     ) {
         $this->dispensedProductSelector = Selector::from($dispensedProductSelector);
-        $this->dispensedProductName = trim($dispensedProductName);
-
-        if ($this->dispensedProductName === '') {
-            throw new InvalidArgumentException('Dispensed product name cannot be empty.');
-        }
+        $this->dispensedProductName = ProductName::from($dispensedProductName);
 
         $this->dispensedChangeCounts = self::normalizeCoinCounts($dispensedChangeCounts);
     }
@@ -49,7 +46,7 @@ final readonly class SelectProductResult
 
     public function dispensedProductName(): string
     {
-        return $this->dispensedProductName;
+        return $this->dispensedProductName->value();
     }
 
     public function dispensedProductSelector(): Selector

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace VendingMachine\Infrastructure\Persistence\MongoDB\Machine\Document;
 
 use InvalidArgumentException;
+use VendingMachine\Domain\Machine\ProductName;
 use VendingMachine\Domain\Machine\Selector;
 use VendingMachine\Domain\Machine\StockQuantity;
 
@@ -15,21 +16,17 @@ final readonly class ProductStockDocument
 {
     private Selector $selector;
     private StockQuantity $quantity;
-    private string $name;
+    private ProductName $name;
 
     public function __construct(
         Selector|string $selector,
         private int $priceCents,
         StockQuantity|int $quantity,
-        string $name,
+        ProductName|string $name,
     ) {
         $selector = Selector::from($selector);
         $quantity = StockQuantity::from($quantity);
-        $name = trim($name);
-
-        if ($name === '') {
-            throw new InvalidArgumentException('Persisted product name cannot be empty.');
-        }
+        $name = ProductName::from($name);
 
         if ($this->priceCents <= 0) {
             throw new InvalidArgumentException('Persisted product price must be greater than zero.');
@@ -46,6 +43,11 @@ final readonly class ProductStockDocument
     }
 
     public function name(): string
+    {
+        return $this->name->value();
+    }
+
+    public function productName(): ProductName
     {
         return $this->name;
     }
