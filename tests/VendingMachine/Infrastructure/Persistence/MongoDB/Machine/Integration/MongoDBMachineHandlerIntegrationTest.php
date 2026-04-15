@@ -8,8 +8,8 @@ use VendingMachine\Application\Machine\Command\InsertCoinCommand;
 use VendingMachine\Application\Machine\Handler\GetMachineStateHandler;
 use VendingMachine\Application\Machine\Handler\InsertCoinHandler;
 use VendingMachine\Application\Machine\Query\GetMachineStateQuery;
-use VendingMachine\Domain\Machine\ValueObject\MachineId;
-use VendingMachine\Domain\Machine\ValueObject\Selector;
+use VendingMachine\Domain\Machine\MachineId;
+use VendingMachine\Domain\Machine\Selector;
 
 final class MongoDBMachineHandlerIntegrationTest extends MongoDBIntegrationTestCase
 {

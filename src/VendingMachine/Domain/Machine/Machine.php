@@ -11,13 +11,6 @@ use VendingMachine\Domain\Machine\Exception\InvalidServiceConfiguration;
 use VendingMachine\Domain\Machine\Exception\PendingBalanceDuringService;
 use VendingMachine\Domain\Machine\Exception\ProductNotFound;
 use VendingMachine\Domain\Machine\Exception\ProductOutOfStock;
-use VendingMachine\Domain\Machine\ValueObject\AvailableChange;
-use VendingMachine\Domain\Machine\ValueObject\Coin;
-use VendingMachine\Domain\Machine\ValueObject\CoinInventory;
-use VendingMachine\Domain\Machine\ValueObject\InsertedCoins;
-use VendingMachine\Domain\Machine\ValueObject\Money;
-use VendingMachine\Domain\Machine\ValueObject\Selector;
-use VendingMachine\Domain\Machine\ValueObject\StockQuantity;
 
 /**
  * Aggregate root that keeps stock, inserted balance, and available change consistent.

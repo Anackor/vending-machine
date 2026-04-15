@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace VendingMachine\Domain\Machine\ValueObject;
+namespace VendingMachine\Domain\Machine;
 
 use InvalidArgumentException;
 

@@ -11,10 +11,10 @@ use VendingMachine\Application\Machine\Command\ReturnInsertedMoneyCommand;
 use VendingMachine\Application\Machine\Command\SelectProductCommand;
 use VendingMachine\Application\Machine\Command\ServiceMachineCommand;
 use VendingMachine\Application\Machine\Query\GetMachineStateQuery;
-use VendingMachine\Domain\Machine\ValueObject\AvailableChange;
-use VendingMachine\Domain\Machine\ValueObject\MachineId;
-use VendingMachine\Domain\Machine\ValueObject\Selector;
-use VendingMachine\Domain\Machine\ValueObject\StockQuantity;
+use VendingMachine\Domain\Machine\AvailableChange;
+use VendingMachine\Domain\Machine\MachineId;
+use VendingMachine\Domain\Machine\Selector;
+use VendingMachine\Domain\Machine\StockQuantity;
 
 final class CommandAndQueryContractTest extends TestCase
 {

@@ -16,7 +16,7 @@ use VendingMachine\Domain\Machine\Exception\InvalidServiceConfiguration;
 use VendingMachine\Domain\Machine\Exception\PendingBalanceDuringService;
 use VendingMachine\Domain\Machine\Exception\ProductNotFound;
 use VendingMachine\Domain\Machine\Exception\ProductOutOfStock;
-use VendingMachine\Domain\Machine\ValueObject\MachineId;
+use VendingMachine\Domain\Machine\MachineId;
 
 final class MachineFailureFactoryTest extends TestCase
 {

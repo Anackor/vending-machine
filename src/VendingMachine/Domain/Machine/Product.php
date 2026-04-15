@@ -5,9 +5,6 @@ declare(strict_types=1);
 namespace VendingMachine\Domain\Machine;
 
 use InvalidArgumentException;
-use VendingMachine\Domain\Machine\ValueObject\Money;
-use VendingMachine\Domain\Machine\ValueObject\ProductName;
-use VendingMachine\Domain\Machine\ValueObject\Selector;
 
 /**
  * Immutable definition of a vendable product in the catalog.

@@ -6,9 +6,9 @@ namespace Tests\VendingMachine\Domain\Machine;
 
 use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
-use VendingMachine\Domain\Machine\ValueObject\Coin;
-use VendingMachine\Domain\Machine\ValueObject\MachineId;
-use VendingMachine\Domain\Machine\ValueObject\Selector;
+use VendingMachine\Domain\Machine\Coin;
+use VendingMachine\Domain\Machine\MachineId;
+use VendingMachine\Domain\Machine\Selector;
 
 final class CoinAndSelectorTest extends TestCase
 {

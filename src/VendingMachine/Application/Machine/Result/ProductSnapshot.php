@@ -5,9 +5,9 @@ declare(strict_types=1);
 namespace VendingMachine\Application\Machine\Result;
 
 use InvalidArgumentException;
-use VendingMachine\Domain\Machine\ValueObject\ProductName;
-use VendingMachine\Domain\Machine\ValueObject\Selector;
-use VendingMachine\Domain\Machine\ValueObject\StockQuantity;
+use VendingMachine\Domain\Machine\ProductName;
+use VendingMachine\Domain\Machine\Selector;
+use VendingMachine\Domain\Machine\StockQuantity;
 
 /**
  * Flat application snapshot of one product entry in the machine.

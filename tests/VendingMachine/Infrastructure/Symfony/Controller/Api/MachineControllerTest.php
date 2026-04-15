@@ -15,8 +15,8 @@ use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Tests\VendingMachine\Infrastructure\Persistence\MongoDB\Machine\Fixture\DefaultMachineFixture;
 use VendingMachine\Application\Machine\Repository\MachineRepository;
 use VendingMachine\Domain\Machine\Machine;
-use VendingMachine\Domain\Machine\ValueObject\MachineId;
-use VendingMachine\Domain\Machine\ValueObject\Selector;
+use VendingMachine\Domain\Machine\MachineId;
+use VendingMachine\Domain\Machine\Selector;
 use VendingMachine\Infrastructure\Persistence\MongoDB\Machine\Mapper\MachineDocumentMapper;
 use VendingMachine\Infrastructure\Persistence\MongoDB\Machine\MongoDBMachineRepository;
 

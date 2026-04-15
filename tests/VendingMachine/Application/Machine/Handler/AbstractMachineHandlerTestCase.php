@@ -10,13 +10,13 @@ use VendingMachine\Application\Machine\Exception\MachineOperationFailed;
 use VendingMachine\Application\Machine\Factory\MachineFailureFactory;
 use VendingMachine\Application\Machine\Factory\MachineSnapshotFactory;
 use VendingMachine\Application\Machine\Failure\MachineFailureCode;
+use VendingMachine\Domain\Machine\AvailableChange;
+use VendingMachine\Domain\Machine\InsertedCoins;
 use VendingMachine\Domain\Machine\Machine;
+use VendingMachine\Domain\Machine\Money;
 use VendingMachine\Domain\Machine\Product;
 use VendingMachine\Domain\Machine\ProductStock;
-use VendingMachine\Domain\Machine\ValueObject\AvailableChange;
-use VendingMachine\Domain\Machine\ValueObject\InsertedCoins;
-use VendingMachine\Domain\Machine\ValueObject\Money;
-use VendingMachine\Domain\Machine\ValueObject\Selector;
+use VendingMachine\Domain\Machine\Selector;
 
 abstract class AbstractMachineHandlerTestCase extends TestCase
 {

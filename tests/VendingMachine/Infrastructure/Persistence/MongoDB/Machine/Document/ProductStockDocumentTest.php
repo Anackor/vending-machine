@@ -6,8 +6,8 @@ namespace Tests\VendingMachine\Infrastructure\Persistence\MongoDB\Machine\Docume
 
 use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
-use VendingMachine\Domain\Machine\ValueObject\ProductName;
-use VendingMachine\Domain\Machine\ValueObject\StockQuantity;
+use VendingMachine\Domain\Machine\ProductName;
+use VendingMachine\Domain\Machine\StockQuantity;
 use VendingMachine\Infrastructure\Persistence\MongoDB\Machine\Document\ProductStockDocument;
 
 final class ProductStockDocumentTest extends TestCase

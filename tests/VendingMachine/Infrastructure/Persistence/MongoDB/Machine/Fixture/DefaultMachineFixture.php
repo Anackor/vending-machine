@@ -4,13 +4,13 @@ declare(strict_types=1);
 
 namespace Tests\VendingMachine\Infrastructure\Persistence\MongoDB\Machine\Fixture;
 
+use VendingMachine\Domain\Machine\AvailableChange;
+use VendingMachine\Domain\Machine\InsertedCoins;
 use VendingMachine\Domain\Machine\Machine;
+use VendingMachine\Domain\Machine\Money;
 use VendingMachine\Domain\Machine\Product;
 use VendingMachine\Domain\Machine\ProductStock;
-use VendingMachine\Domain\Machine\ValueObject\AvailableChange;
-use VendingMachine\Domain\Machine\ValueObject\InsertedCoins;
-use VendingMachine\Domain\Machine\ValueObject\Money;
-use VendingMachine\Domain\Machine\ValueObject\Selector;
+use VendingMachine\Domain\Machine\Selector;
 
 final class DefaultMachineFixture
 {

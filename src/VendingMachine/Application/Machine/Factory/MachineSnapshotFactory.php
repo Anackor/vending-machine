@@ -7,7 +7,7 @@ namespace VendingMachine\Application\Machine\Factory;
 use VendingMachine\Application\Machine\Result\MachineSnapshot;
 use VendingMachine\Application\Machine\Result\ProductSnapshot;
 use VendingMachine\Domain\Machine\Machine;
-use VendingMachine\Domain\Machine\ValueObject\MachineId;
+use VendingMachine\Domain\Machine\MachineId;
 
 /**
  * Builds transport-friendly snapshots from the machine aggregate.

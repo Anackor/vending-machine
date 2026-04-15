@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace VendingMachine\Application\Machine\Result;
 
 use InvalidArgumentException;
-use VendingMachine\Domain\Machine\ValueObject\MachineId;
-use VendingMachine\Domain\Machine\ValueObject\Selector;
+use VendingMachine\Domain\Machine\MachineId;
+use VendingMachine\Domain\Machine\Selector;
 
 /**
  * Flat application snapshot of the machine state exposed to adapters.
